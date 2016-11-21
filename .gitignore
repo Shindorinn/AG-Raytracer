@@ -17,8 +17,7 @@
 [Rr]eleases/
 x64/
 x86/
-!AG-Raytracer/lib/SDL2-2.0.3/lib/x64/
-!AG-Raytracer/lib/SDL2-2.0.3/lib/x86/
+!lib/*
 bld/
 [Bb]in/
 [Oo]bj/
