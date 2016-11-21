@@ -17,6 +17,8 @@
 [Rr]eleases/
 x64/
 x86/
+!AG-Raytracer/lib/SDL2-2.0.3/lib/x64/
+!AG-Raytracer/lib/SDL2-2.0.3/lib/x86/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -267,7 +269,6 @@ paket-files/
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -277,7 +278,6 @@ paket-files/
 *.lai
 *.la
 *.a
-*.lib
 
 # Executables
 *.exe
