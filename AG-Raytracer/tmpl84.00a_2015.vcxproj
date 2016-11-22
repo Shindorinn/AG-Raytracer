@@ -224,7 +224,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Primitive.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="template.cpp">
@@ -236,7 +240,12 @@
     <ClCompile Include="threads.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="Primitive.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="template.h" />
     <ClInclude Include="threads.h" />
