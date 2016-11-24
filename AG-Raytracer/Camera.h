@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Ray.h"
 
 class Camera
 {
@@ -13,5 +14,9 @@ public:
 	vec3 center;
 	vec3 p0, p1, p2;
 
+	//TODO: Put this to renderer probably.
+	Ray* primaryRays[SCRWIDTH*SCRHEIGHT];
+
 	Camera();
+	void GenerateRays();
 };

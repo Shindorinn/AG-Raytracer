@@ -1,5 +1,6 @@
 #include "template.h"
 #include "Scene.h"
+#include "Renderer.h"
 
 // -----------------------------------------------------------
 // Initialize the game
@@ -7,6 +8,7 @@
 void Game::Init()
 {
 	Scene* myScene = new Scene();
+	Renderer* renderer = new Renderer(myScene);
 }
 
 // -----------------------------------------------------------
