@@ -1,11 +1,15 @@
 ﻿#pragma once
 #include "Primitive.h"
 
-class Sphere : Primitive
+class Sphere : public Primitive
 {
 public:
 	float radius;
-	vec3 center;
 
 	void CheckIntersection(Ray ray) override;
+
+	Sphere(vec3 position, float radius) : Primitive(position)
+	{		
+		this->radius = radius;
+	}
 };

@@ -226,9 +226,13 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="Ray.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="template.cpp">
@@ -242,9 +246,13 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Screen.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="template.h" />
