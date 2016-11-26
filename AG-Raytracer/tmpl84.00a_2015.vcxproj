@@ -224,6 +224,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="_3DObject.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="Light.cpp" />
@@ -244,6 +247,9 @@
     <ClCompile Include="threads.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="_3DObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Light.h" />

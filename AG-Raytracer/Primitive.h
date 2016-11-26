@@ -4,8 +4,9 @@
 class Primitive
 {
 public: 
-	virtual void CheckIntersection(Ray* ray) = 0;	
 	vec3 position;
-
+	
+	virtual void CheckIntersection(Ray* ray) = 0;	
+	
 	Primitive(vec3 position);
 };
