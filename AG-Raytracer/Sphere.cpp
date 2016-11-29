@@ -18,3 +18,8 @@ void Sphere::CheckIntersection(Ray* ray)
 	if ((t < ray->t) && (t > 0)) ray->t = t;
 	// or: ray.t = min( ray.t, max( 0, t ) );
 }
+
+vec3 Sphere::GetNormal(vec3 point)
+{
+	return normalize(position - point);
+}

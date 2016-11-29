@@ -4,7 +4,7 @@
 class Plane : public Primitive
 {
 public:
-	vec3 normal, p;
+	vec3 p;
 
 	void CheckIntersection(Ray* ray) override;
 

@@ -13,5 +13,7 @@ public:
 		this->v0 = position;
 		this->v1 = v1;
 		this->v2 = v2;
+
+		this->normal = cross(v1 - v0, v2 - v0);
 	}
 };
