@@ -7,6 +7,8 @@ class Renderer
 {
 public:
 	Scene* scene;
-	vec3 Trace(Ray* ray);
+	Pixel buffer[SCRWIDTH][SCRHEIGHT];
+
+	Pixel Trace(Ray* ray, int x, int y);
 	Renderer(Scene* scene);
 };

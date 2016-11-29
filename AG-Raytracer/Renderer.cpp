@@ -14,7 +14,7 @@ Renderer::Renderer(Scene* scene)
 	for (int y = 0; y < SCRHEIGHT; y++)
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
+			buffer[x][y] = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
 		}
 
 #if DEBUG == 1
@@ -23,13 +23,15 @@ Renderer::Renderer(Scene* scene)
 }
 
 
-vec3 Renderer::Trace(Ray* ray)
+Pixel Renderer::Trace(Ray* ray, int x, int y)
 {
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		this->scene->primitives[x]->CheckIntersection(ray);
-	
-	}
 
-	return vec3(1, 1, 1);
+	}
+	if (ray->t == INFINITY)
+		return 0xffffff;
+	else
+		return 0xff0000;
 }
