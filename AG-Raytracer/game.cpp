@@ -25,12 +25,12 @@ void Game::HandleInput(float dt)
 // -----------------------------------------------------------
 void Game::Tick(float dt)
 {
-	screen->Clear(0);
-	screen->Print("hello world", 2, 2, 0xffffff);
-	screen->Line(2, 10, 50, 10, 0xff0000);
+	renderSurface->Clear(0);
+	renderSurface->Print("hello world", 2, 2, 0xffffff);
+	renderSurface->Line(2, 10, 50, 10, 0xff0000);
 
 	for (int y = 0; y < SCRHEIGHT; y++)
 		for (int x = 0; x < SCRWIDTH; x++)
-			screen->Plot(x, y, renderer->buffer[x][y]);
+			renderSurface->Plot(x, y, renderer->buffer[x][y]);
 
 }

@@ -9,7 +9,7 @@ class Surface;
 class Game
 {
 public:
-	void SetTarget( Surface* _Surface ) { screen = _Surface; }
+	void SetTarget( Surface* _Surface ) { renderSurface = _Surface; }
 	void Init();
 	void Shutdown() { /* implement if you want code to be executed upon app exit */ };
 	void HandleInput( float dt );
@@ -20,7 +20,7 @@ public:
 	void KeyUp( int a_Key ) { /* implement if you want to handle keys */ }
 	void KeyDown( int a_Key ) { /* implement if you want to handle keys */ }
 private:
-	Surface* screen;
+	Surface* renderSurface;
 };
 
 }; // namespace Tmpl8
