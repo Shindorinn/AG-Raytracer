@@ -8,7 +8,8 @@ class Renderer
 public:
 	Scene* scene;
 	Pixel buffer[SCRWIDTH][SCRHEIGHT];
+	Renderer(Scene* scene);
 
 	Pixel Trace(Ray* ray, int x, int y);
-	Renderer(Scene* scene);
+	float DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal);
 };
