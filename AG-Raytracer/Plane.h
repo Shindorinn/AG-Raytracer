@@ -1,13 +1,16 @@
 ﻿#pragma once
 #include "Primitive.h"
 
-class Plane : Primitive
+class Plane : public Primitive
 {
 public:
-	//p*N +d = 0
+	vec3 normal, p;
 
-	Plane(vec3 position) : Primitive(position)
+	void CheckIntersection(Ray* ray) override;
+
+	Plane(vec3 position, vec3 normal) : Primitive(position)
 	{
-
+		this->position = position;
+		this->normal = normal;
 	}
 };
