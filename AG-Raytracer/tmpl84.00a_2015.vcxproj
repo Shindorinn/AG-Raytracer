@@ -226,6 +226,7 @@
   <ItemGroup>
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="_3DObject.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="game.cpp" />
@@ -249,6 +250,7 @@
   <ItemGroup>
     <ClInclude Include="Material.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Triangle.h" />
     <ClInclude Include="_3DObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="game.h" />
