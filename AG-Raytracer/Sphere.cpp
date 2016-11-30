@@ -2,7 +2,7 @@
 #include "Sphere.h"
 
 //This only works for rays that start outside the sphere.
-//TODO: use the other (slower) interesection for glass/water-like objects (because refraction causes rays to start inside the sphere).
+//TODO: use the other (slower) intersection for glass/water-like objects (because refraction causes rays to start inside the sphere).
 void Sphere::CheckIntersection(Ray* ray)
 {
 	vec3 c = this->GetPosition() - ray->origin;

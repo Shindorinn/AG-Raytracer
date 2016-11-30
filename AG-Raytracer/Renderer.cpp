@@ -7,9 +7,6 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
 	this->scene = scene;
 	this->renderSurface = renderSurface;
-
-	printf("\n Camera Direction : (%f, %f, %f, %f) \n", this->scene->camera->viewDirection.x, this->scene->camera->viewDirection.y, this->scene->camera->viewDirection.z, this->scene->camera->viewDirection.w);
-
 	this->scene->camera->GenerateRays();
 
 	/*for (int y = 0; y < SCRHEIGHT; y++) {
@@ -31,7 +28,7 @@ void Renderer::Render() {
 
 	for (int y = 0; y < SCRHEIGHT; y++)
 		for (int x = 0; x < SCRWIDTH; x++)
-			this->renderSurface->Plot(x, y, this->buffer[x][y]);
+			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
 
 
@@ -58,9 +55,11 @@ float Renderer::DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal) {
 		this->scene->primitives[x]->CheckIntersection(shadowRay);
 	}
 	if (shadowRay->t == INFINITY) {
+		delete shadowRay;
 		return 0.0f;
 	}
 	else {
+		delete shadowRay;
 		return 1.0f;
 	}
 }

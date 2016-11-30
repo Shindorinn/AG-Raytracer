@@ -11,13 +11,13 @@ public:
 	quat rotation;
 	vec3 position;
 	vec3 skew;
-	vec4 viewDirection;
-
+	vec4 perspective;
+	
 	//TODO: TWEAK D FOR FOV
 	float d;
-
-	vec4 screenCenter;
-	vec4 p0, p1, p2;
+	vec3 viewDirection;
+	vec3 screenCenter;
+	vec3 p0, p1, p2;
 
 	//TODO: Put this to renderer probably.
 	Ray* primaryRays[SCRWIDTH*SCRHEIGHT];

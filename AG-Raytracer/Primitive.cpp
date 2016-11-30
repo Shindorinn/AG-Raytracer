@@ -32,7 +32,7 @@ void Primitive::Init(mat4 transformMatrix)
 	this->rotation = quat();
 	this->position = vec3();
 	this->skew = vec3();
-	this->viewDirection = vec4();
+	this->perspective = vec4();
 };
 
 vec3 Primitive::GetPosition()

@@ -8,7 +8,7 @@ class Renderer
 public:
 	Surface* renderSurface;
 	Scene* scene;
-	Pixel buffer[SCRWIDTH][SCRHEIGHT];
+	Pixel buffer[SCRHEIGHT][SCRWIDTH];
 	Renderer(Scene* scene, Surface* renderSurface);
 
 	void Render();

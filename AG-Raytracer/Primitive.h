@@ -10,7 +10,7 @@ public:
 	quat rotation;
 	vec3 position;
 	vec3 skew;
-	vec4 viewDirection;
+	vec4 perspective;
 
 	virtual void CheckIntersection(Ray* ray) = 0;
 	virtual vec3 GetNormal(vec3 point) = 0;
