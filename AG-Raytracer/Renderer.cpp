@@ -3,23 +3,35 @@
 
 #define DEBUG 1
 
-Renderer::Renderer(Scene* scene)
+Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
-#if DEBUG == 1
-	printf("1doet dit Überhaupt dingen \n");
-#endif
 	this->scene = scene;
+	this->renderSurface = renderSurface;
+
+	printf("\n Camera Direction : (%f, %f, %f, %f) \n", this->scene->camera->viewDirection.x, this->scene->camera->viewDirection.y, this->scene->camera->viewDirection.z, this->scene->camera->viewDirection.w);
+
 	this->scene->camera->GenerateRays();
 
-	for (int y = 0; y < SCRHEIGHT; y++)
+	/*for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			buffer[x][y] = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
 		}
+	}*/
+}
 
-#if DEBUG == 1
-	printf("Tracing is done. \n");
-#endif
+void Renderer::Render() {
+
+	for (int y = 0; y < SCRHEIGHT; y++) {
+		for (int x = 0; x < SCRWIDTH; x++)
+		{
+			buffer[y][x] = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
+		}
+	}
+
+	for (int y = 0; y < SCRHEIGHT; y++)
+		for (int x = 0; x < SCRWIDTH; x++)
+			this->renderSurface->Plot(x, y, this->buffer[x][y]);
 }
 
 

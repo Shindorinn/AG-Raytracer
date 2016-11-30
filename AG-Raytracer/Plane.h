@@ -7,11 +7,13 @@ public:
 	float width, height;
 	vec3 normal;
 
+	void Init(vec3 position, vec3 normal);
 	void CheckIntersection(Ray* ray) override;
+	
+	vec3 GetNormal(vec3 point) override;
 
-	Plane(vec3 position, float width, float height) : Primitive(position)
+	Plane(vec3 position, vec3 normal) : Primitive(position)
 	{
-		this->Init(position);
-		this->normal = normalize(cross((vec3(width, 0, 0) + position), (vec3(0, height, 0) + position)));
+		this->Init(position, normal);
 	}
 };

@@ -14,7 +14,7 @@ public:
 	vec4 viewDirection;
 
 	//TODO: TWEAK D FOR FOV
-	float d = 1;
+	float d;
 
 	vec4 screenCenter;
 	vec4 p0, p1, p2;

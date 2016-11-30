@@ -6,10 +6,12 @@
 class Renderer
 {
 public:
+	Surface* renderSurface;
 	Scene* scene;
 	Pixel buffer[SCRWIDTH][SCRHEIGHT];
-	Renderer(Scene* scene);
+	Renderer(Scene* scene, Surface* renderSurface);
 
+	void Render();
 	Pixel Trace(Ray* ray, int x, int y);
 	float DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal);
 };

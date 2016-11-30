@@ -14,6 +14,8 @@ void Sphere::CheckIntersection(Ray* ray)
 
 	if (p2 > r2) return; // r2 = r * r
 
+	//printf("Sphere : Intersection found!");
+
 	t -= glm::sqrt(r2 - p2);
 	if ((t < ray->t) && (t > 0)) ray->t = t;
 	// or: ray.t = min( ray.t, max( 0, t ) );

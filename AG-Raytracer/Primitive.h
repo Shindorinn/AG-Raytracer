@@ -4,7 +4,13 @@
 class Primitive
 {
 public:
-	mat4 transformMatrix;
+	//check glm documentation for rotation of camera.
+	mat4 transformMatrix; // your transformation matrix.
+	vec3 scale;
+	quat rotation;
+	vec3 position;
+	vec3 skew;
+	vec4 viewDirection;
 
 	virtual void CheckIntersection(Ray* ray) = 0;
 	virtual vec3 GetNormal(vec3 point) = 0;
