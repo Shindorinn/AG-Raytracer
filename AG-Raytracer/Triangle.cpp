@@ -53,3 +53,8 @@ void Triangle::CheckIntersection(Ray* ray)
 	// No hit at all
 	return;
 }
+
+vec3 Triangle::GetNormal(vec3 point)
+{
+	return normalize(cross((v1 - v0), (v2 - v0)));
+} 

@@ -5,7 +5,7 @@
 //TODO: use the other (slower) interesection for glass/water-like objects (because refraction causes rays to start inside the sphere).
 void Sphere::CheckIntersection(Ray* ray)
 {
-	vec3 c = position - ray->origin;
+	vec3 c = this->GetPosition() - ray->origin;
 	float t = dot(c, ray->direction);
 	vec3 q = c - t * ray->direction;
 	float p2 = dot(q, q);
@@ -21,5 +21,5 @@ void Sphere::CheckIntersection(Ray* ray)
 
 vec3 Sphere::GetNormal(vec3 point)
 {
-	return normalize(position - point);
+	return normalize(this->GetPosition() - point);
 }

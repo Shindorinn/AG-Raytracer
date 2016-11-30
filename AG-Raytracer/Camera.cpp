@@ -5,10 +5,10 @@
 
 Camera::Camera()
 {
-	transformMatrix = mat4(0.0f, 0.0f, 0.0f, 0.0f,  // x0,y0,z0,w0
-		0.0f, 0.0f, 0.0f, 0.0f,  // x1,y1,z1,w1
-		0.0f, 0.0f, 0.0f, 0.0f,  // x2,y2,z2,w2 
-		0.0f, 0.0f, 0.0f, 1.0f); // x3,y3,z3,w3
+	transformMatrix = mat4(	1.0f, 0.0f, 0.0f, 0.0f,  // x0,y0,z0,w0
+							0.0f, 1.0f, 0.0f, 0.0f,  // x1,y1,z1,w1
+							0.0f, 0.0f, 1.0f, 0.0f,  // x2,y2,z2,w2 
+							0.0f, 0.0f, 0.0f, 1.0f); // x3,y3,z3,w3
 
 	position = vec4(transformMatrix[0][3], transformMatrix[1][3], transformMatrix[2][3], 1.0f);
 	//position = vec3(0, 0, 0);
