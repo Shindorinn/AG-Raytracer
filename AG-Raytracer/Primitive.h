@@ -22,4 +22,6 @@ public:
 	
 	vec3 GetPosition();
 	vec3 GetDirectionVector();
+
+	void UpdatePosition();
 };

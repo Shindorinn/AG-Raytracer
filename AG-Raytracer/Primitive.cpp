@@ -15,12 +15,7 @@ Primitive::Primitive(mat4 transformMatrix)
 void Primitive::Init(vec3 position)
 {
 	this->Init(
-		mat4(
-		1.0f, 0.0f, 0.0f, position.x,  // x0,y0,z0,w0
-		0.0f, 1.0f, 0.0f, position.y,  // x1,y1,z1,w1
-		0.0f, 0.0f, 1.0f, position.z,  // x2,y2,z2,w2 
-		0.0f, 0.0f, 0.0f, 1.0f
-		)
+		translate(mat4(1.0f), position)
 	); // x3,y3,z3,w3
 
 };
@@ -33,14 +28,21 @@ void Primitive::Init(mat4 transformMatrix)
 	this->position = vec3();
 	this->skew = vec3();
 	this->perspective = vec4();
+	this->UpdatePosition();
 };
 
 vec3 Primitive::GetPosition()
 {
-	return (vec4(1, 0, 0, 0) * this->transformMatrix).xyz;
+	return this->position;
 };
 
 vec3 Primitive::GetDirectionVector()
 {
-	return this->GetPosition() + (vec4(0, 0, 1, 0) * this->transformMatrix).xyz;
+	return rotation * vec3(1, 0, 0);
 };
+
+void Primitive::UpdatePosition()
+{
+	decompose(transformMatrix, scale, rotation, position, skew, perspective);
+	rotation = conjugate(rotation);
+}
