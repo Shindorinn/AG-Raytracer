@@ -5,9 +5,12 @@
 class Camera
 {
 public:
-	//mat4 check glm documentation for rotation of camera.
-	mat4 transformMatrix;
-	vec4 position;
+	//check glm documentation for rotation of camera.
+	mat4 transformMatrix; // your transformation matrix.
+	vec3 scale;
+	quat rotation;
+	vec3 position;
+	vec3 skew;
 	vec4 viewDirection;
 
 	//TODO: TWEAK D FOR FOV
@@ -20,7 +23,8 @@ public:
 	Ray* primaryRays[SCRWIDTH*SCRHEIGHT];
 
 	Camera();
+	void Init();
 	void GenerateRays();
-
 	void TransformCamera(mat4 transformMatrix);
+	void UpdatePosition();
 };

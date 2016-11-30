@@ -13,6 +13,8 @@
 #include "windows.h"
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include "glm\gtx\matrix_decompose.hpp"
+#include "glm\gtx\quaternion.hpp"
 #include "surface.h"
 #include "game.h"
 #include <vector>
