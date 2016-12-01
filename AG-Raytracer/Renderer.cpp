@@ -51,7 +51,7 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 
 		for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
 		{
-			vec3 direction = glm::normalize(ray->origin - scene->lights[i]->position);
+			vec3 direction = glm::normalize(intersectionPoint - scene->lights[i]->position);
 			vec3 normal = hit->GetNormal(intersectionPoint);
 			if (dot(direction, normal) < 0)
 				continue;

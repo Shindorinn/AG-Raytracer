@@ -35,7 +35,7 @@ Scene::Scene()
 	//primitives[1] = new Sphere(vec3(5, 0, 3), 1.0f);
 	//primitives[0] = new Sphere(vec3(2, 0, 10), 1.0f);
 	//primitives[1] = new Sphere(vec3(-2, 8, 10), 1.5f);
-	primitives[1] = new Triangle(vec3(0, 0, 5), vec3(0, 1, 5), vec3(1, 1, 5));
+	//primitives[1] = new Triangle(vec3(0, 0, 5), vec3(0, 1, 5), vec3(1, 1, 5));
 	//primitives[3] = new Triangle(vec3(-3, 1, 4), vec3(-3, 0, 4), vec3(0, 1, 4));
 	//primitives[4] = new Triangle(vec3(0, 0, 5), vec3(2, 0, 2), vec3(0, 2, 2));
 	//primitives[0] = new Plane(vec3(0, 0, -5), vec3(0, 0, 1));
