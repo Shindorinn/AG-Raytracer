@@ -41,14 +41,14 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 
 	}
 	if (ray->t == INFINITY) {
-		return 0xffffff;
+		return 0x000000;
 	}
 	else {
 		vec3 intersectionPoint = ray->origin + ray->t*ray->direction;
 		vec3 colorResult = vec3(0, 0, 0);
 
 		for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
-			DirectIllumination(
+			colorResult += DirectIllumination(
 				intersectionPoint,
 				glm::normalize(ray->origin - scene->lights[i]->position),
 				hit->GetNormal(intersectionPoint),
@@ -66,7 +66,7 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 	}
 }
 
-vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material) 
+vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material)
 {
 	vec3 intersectionWithEpsilon = intersectionPoint + EPSILON * direction;
 	Ray* shadowRay = new Ray(intersectionWithEpsilon, direction);
@@ -79,7 +79,7 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 
 	if (shadowRay->t != INFINITY) {
 		delete shadowRay;
-		return vec3(0.0f, 0.0f, 0.0f);
+		return vec3(0.0f, 1.0f, 0.0f);
 	}
 	else {
 		//float euclidianDistance = distance(intersectionPoint, lightSource->position);
