@@ -20,7 +20,6 @@ public:
 	void KeyUp(int a_Key);
 	void KeyDown(int a_Key);
 private:
-	void KeySwitch(int key, int changedBy);
 	Surface* renderSurface;
 
 	int moveForward;

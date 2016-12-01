@@ -16,6 +16,14 @@ void Game::Init()
 // -----------------------------------------------------------
 void Game::HandleInput(float dt)
 {
+	Camera* camera = renderer->scene->camera;
+
+	// Adjust lookdirection
+
+	// Adjust translation based on lookdirection
+
+	// Replace transformMatrix for camera
+
 	//moveForward;
 	//moveBackward;
 	//strafeRight;
@@ -32,66 +40,8 @@ void Game::HandleInput(float dt)
 void Game::MouseUp(int _Button) { /* implement if you want to detect mouse button presses */ }
 void Game::MouseDown(int _Button) { /* implement if you want to detect mouse button presses */ }
 void Game::MouseMove(int _X, int _Y) { /* implement if you want to detect mouse movement */ }
-void Game::KeyUp(int a_Key) {
-	/* implement if you want to handle keys */ 
-	this->KeySwitch(a_Key, 0);
-}
-void Game::KeyDown(int a_Key) { 
-	this->KeySwitch(a_Key, 1);
-}
-
-void Game::KeySwitch(int key, int changedBy) {
-	/* implement if you want to handle keys */
-	// find other keys here: http://sdl.beuc.net/sdl.wiki/SDLKey
-
-	switch (key)
-	{
-	case SDLK_w: // Move forward according to current viewing direction
-		moveForward = changedBy;
-		break;
-	case SDLK_s: // Move backward according to current viewing direction
-		moveBackward = changedBy;
-		break;
-	case SDLK_a: // Strafe left according to current viewing direction
-		strafeLeft = changedBy;
-		break;
-
-	case SDLK_d: // Strafe right according to current viewing direction
-		strafeRight = changedBy;
-		break;
-
-	case SDLK_q: // Rotate left according to current viewing direction
-		turnLeft = changedBy;
-		break;
-
-	case SDLK_e: // Rotate right according to current viewing direction
-		turnRight = changedBy;
-		break;
-
-	case SDLK_r: // Reset to starting position
-		resetPosition = changedBy;
-		break;
-
-	case SDLK_c: // Move down according to current viewing direction
-		moveDown = changedBy; // TODO : Maybe make this world aligned only?
-		break;
-
-	case SDLK_SPACE: // Move up according to current viewing direction
-		moveUp = changedBy;	 // TODO : Maybe make this world aligned only?
-		break;
-
-	case SDLK_PLUS: // Increase FoV by increasing d in Camera
-		increaseFOV = changedBy;
-		break;
-
-	case SDLK_MINUS: // Decrease FoV by decreasing d in Camera
-		decreaseFOV = changedBy;
-		break;
-
-	default:
-		break;
-	}
-}
+void Game::KeyUp(int a_Key) {/* implement if you want to handle keys */}
+void Game::KeyDown(int a_Key) {/* implement if you want to handle keys */}
 
 // -----------------------------------------------------------
 // Main game tick function
