@@ -13,7 +13,7 @@ public:
 	vec3 skew;
 	vec4 perspective;
 
-	Material material = Material(0xffffff, Material::MaterialKind::DIFFUSE);
+	Material material = Material(vec3(0,0,0), Material::MaterialKind::DIFFUSE);
 
 	virtual bool CheckIntersection(Ray* ray) = 0;
 	virtual vec3 GetNormal(vec3 point) = 0;
