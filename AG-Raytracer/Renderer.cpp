@@ -35,14 +35,14 @@ void Renderer::Render() {
 Pixel Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
-	//Material mat;
+	Primitive* hit;
 
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
 		{
 			smallestT = ray->t;
-			//mat = this->scene->primitives[x]->material;
+			hit = this->scene->primitives[x];
 		}
 
 	}
@@ -53,22 +53,28 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 		vec3 intersectionPoint = ray->origin + ray->t*ray->direction;
 
 		//TODO: Take multiple lights into account (sum them).
-		return 0xff0000 * DirectIllumination(intersectionPoint, glm::normalize(ray->origin - scene->lights[0]->position));
+		return hit->material.color * 
+					DirectIllumination(	intersectionPoint,
+										glm::normalize(ray->origin - scene->lights[0]->position),
+										scene->lights[0]);
 	}
 }
 
-float Renderer::DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal) {
-	Ray* shadowRay = new Ray(intersectionPoint, surfaceNormal);
+float Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, Light* lightSource) {
+	Ray* shadowRay = new Ray(intersectionPoint, direction);
+	float lightIntensity = 0.0f;
+	float t = 0.0f;
 	for (int x = 0; (x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0])) && (shadowRay->t == INFINITY); x++)
 	{
 		this->scene->primitives[x]->CheckIntersection(shadowRay);
 	}
+	t = shadowRay->t;
 	if (shadowRay->t == INFINITY) {
 		delete shadowRay;
 		return 0.0f;
 	}
 	else {
 		delete shadowRay;
-		return 1.0f;
+		return lightSource->intensity * distance(intersectionPoint, lightSource->position) * t;
 	}
 }

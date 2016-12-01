@@ -13,5 +13,5 @@ public:
 
 	void Render();
 	Pixel Trace(Ray* ray, int x, int y);
-	float DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal);
+	float DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal, Light* lightSource);
 };
