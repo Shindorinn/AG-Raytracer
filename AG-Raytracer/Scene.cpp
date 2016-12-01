@@ -11,9 +11,9 @@ Scene::Scene()
 	lights[0] = new Light(vec3(0, 2, 0), vec3(20, 20, 20));
 
 
-	//primitives[0] = new Triangle(vec3(0, 0, 5), vec3(0, 2, 5), vec3(2, 0, 5));
+	primitives[1] = new Triangle(vec3(0, 0, 5), vec3(0, 2, 5), vec3(2, 0, 5));
 	//primitives[1] = new Triangle(vec3(1, 2, 2), vec3(1, 2, 2), vec3(1, 2, 2));
-	primitives[0] = new Sphere(vec3(0, 0, 5), 1.0f);
+	primitives[0] = new Sphere(vec3(0, 0, 2), 1.0f);
 	//primitives[1] = new Sphere(vec3(0, 5, 0), 1.0f);
 	//primitives[2] = new Sphere(vec3(0, 0, 5), 1.0f);
 	//primitives[3] = new Sphere(vec3(0, 0, -5), 1.0f);

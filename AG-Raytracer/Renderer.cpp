@@ -31,6 +31,9 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 	float smallestT = INFINITY;
 	Primitive* hit;
 
+	if (ray->direction.z == 1.0f)
+		printf("breakpoint");
+
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
@@ -44,10 +47,8 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 		return 0x000000;
 	}
 	else {
-		vec3 intersectionPoint = ray->origin + ray->t*ray->direction;
+		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
 		vec3 colorResult = vec3(0, 0, 0);
-
-
 
 		for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
 		{
