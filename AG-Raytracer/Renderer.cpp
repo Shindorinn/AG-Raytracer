@@ -79,18 +79,20 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 
 	if (shadowRay->t != INFINITY) {
 		delete shadowRay;
-		return vec3(0.0f, 1.0f, 0.0f);
+		return vec3(0.0f, 0.0f, 0.0f);
 	}
 	else {
-		//float euclidianDistance = distance(intersectionPoint, lightSource->position);
-		float euclidianDistance = shadowRay->t;
+		float euclidianDistance = distance(intersectionPoint, lightSource->position);
+		//float euclidianDistance = shadowRay->t;
 		delete shadowRay;
 
 		// I = LightColor * N. L * 1/d^2 * BRDF/PI
 		return	lightSource->intensity *
 			lightSource->color *
-			normal * direction *
+			dot(normal, direction) *
 			(1 / (euclidianDistance*euclidianDistance)) *
 			(material.color / PI);
 	}
 }
+
+//TODO: delete weghalen, lightsource intensity&color in 1 ding proppen.

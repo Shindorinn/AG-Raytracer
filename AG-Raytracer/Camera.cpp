@@ -15,7 +15,7 @@ Camera::Camera()
 		viewDirection[0],
 		viewDirection[1],
 		viewDirection[2]
-	);
+		);
 
 	screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
 	p0 = screenCenter + vec3(-1.0f, -1.0f, 0.0f);
@@ -26,29 +26,29 @@ Camera::Camera()
 		screenCenter[0],
 		screenCenter[1],
 		screenCenter[2]
-	);	
+		);
 	printf("\n p0: %f, %f, %f \n",
 		p0[0],
 		p0[1],
 		p0[2]
-	);
+		);
 	printf("\n p1: %f, %f, %f \n",
 		p1[0],
 		p1[1],
 		p1[2]
-	);
+		);
 	printf("\n p2: %f, %f, %f \n",
 		p2[0],
 		p2[1],
 		p2[2]
-	);
+		);
 }
 
 void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
 
-	float ratio = SCRWIDTH / SCRHEIGHT;
+	float ratio = SCRHEIGHT / SCRWIDTH;
 	float width = 1.0f;
 	float height = ratio;
 
@@ -62,7 +62,7 @@ void Camera::GenerateRays()
 
 			vec3 position3d = position.xyz;
 			vec3 pointOnScreen3d = pointOnScreen.xyz;
-			
+
 			vec3 direction = normalize(pointOnScreen3d - position3d);
 
 			Ray* ray = new Ray(position.xyz, direction);
@@ -76,19 +76,19 @@ void Camera::GenerateRays()
 }
 
 //TODO : Check if the order of the matrix multiplication is correct
-void Camera::TransformCamera(mat4 transformMatrix) 
+void Camera::TransformCamera(mat4 transformMatrix)
 {
 	this->transformMatrix *= transformMatrix;
 }
 
-void Camera::Init() 
+void Camera::Init()
 {
 	this->transformMatrix = mat4(1.0f);
-	this->scale			= vec3();
-	this->rotation		= quat();
-	this->position		= vec3();
-	this->skew			= vec3();
-	this->perspective	= vec4();
+	this->scale = vec3();
+	this->rotation = quat();
+	this->position = vec3();
+	this->skew = vec3();
+	this->perspective = vec4();
 }
 
 void Camera::UpdatePosition()
