@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Ray.h"
+#include "Material.h"
 
 class Primitive
 {
@@ -12,14 +13,16 @@ public:
 	vec3 skew;
 	vec4 perspective;
 
-	virtual void CheckIntersection(Ray* ray) = 0;
+	Material material = Material(0xffffff, Material::MaterialKind::DIFFUSE);
+
+	virtual bool CheckIntersection(Ray* ray) = 0;
 	virtual vec3 GetNormal(vec3 point) = 0;
-	
+
 	Primitive(vec3 position);
 	Primitive(mat4 transformMatrix);
 	void Init(vec3 position);
 	void Init(mat4 transformMatrix);
-	
+
 	vec3 GetPosition();
 	vec3 GetDirectionVector();
 
