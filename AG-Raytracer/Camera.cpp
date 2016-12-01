@@ -83,11 +83,7 @@ void Camera::TransformCamera(mat4 transformMatrix)
 
 void Camera::Init() 
 {
-	this->transformMatrix = mat4(
-		0.0f, 0.0f, 0.0f, 0.0f,  // x0,y0,z0,w0
-		0.0f, 0.0f, 0.0f, 0.0f,  // x1,y1,z1,w1
-		0.0f, 0.0f, 0.0f, 0.0f,  // x2,y2,z2,w2 
-		0.0f, 0.0f, 0.0f, 1.0f); // x3,y3,z3,w3
+	this->transformMatrix = mat4(1.0f);
 	this->scale			= vec3();
 	this->rotation		= quat();
 	this->position		= vec3();
