@@ -1,7 +1,7 @@
 ﻿#include "template.h"
 #include "Triangle.h"
 
-void Triangle::CheckIntersection(Ray* ray)
+bool Triangle::CheckIntersection(Ray* ray)
 {
 #define Epsilon 0.000001
 	// Vectors from v0 to v1/v2 (edges)
@@ -21,7 +21,7 @@ void Triangle::CheckIntersection(Ray* ray)
 	det = dot(e1, p);
 
 	//if determinant is near zero, ray lies in plane of triangle otherwise not
-	if (det > -Epsilon && det < Epsilon) { return; }
+	if (det > -Epsilon && det < Epsilon) { return false; }
 	invDet = 1.0f / det;
 
 	//calculate distance from v0 to ray origin
@@ -31,7 +31,7 @@ void Triangle::CheckIntersection(Ray* ray)
 	u = dot(t, p) * invDet;
 
 	//Check for ray hit
-	if (u < 0 || u > 1) { return; }
+	if (u < 0 || u > 1) { return false; }
 
 	//Prepare to test v parameter
 	q = cross(t, e1);
@@ -40,18 +40,18 @@ void Triangle::CheckIntersection(Ray* ray)
 	v = dot(ray->direction, q) * invDet;
 
 	//Check for ray hit
-	if (v < 0 || u + v > 1) { return; }
+	if (v < 0 || u + v > 1) { return false; }
 
 	float tValue = dot(e2, q) * invDet;
 	if (tValue > Epsilon)
 	{
 		//ray does intersect
 		ray->t = tValue;
-		return;
+		return true;
 	}
 
 	// No hit at all
-	return;
+	return false;
 }
 
 vec3 Triangle::GetNormal(vec3 point)

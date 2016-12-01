@@ -6,15 +6,16 @@ void Plane::Init(vec3 position, vec3 normal)
 	this->normal = normalize(normal);
 }
 
-void Plane::CheckIntersection(Ray* ray)
+bool Plane::CheckIntersection(Ray* ray)
 {
 	float denominator = dot(normal, ray->direction);
 	if (denominator != 0)
 	{
 		vec3 displacement = this->GetPosition() - ray->origin;
 		ray->t = dot(displacement, normal) / denominator;
+		return true;
 	}
-	return;
+	return false;
 }
 
 vec3 Plane::GetNormal(vec3 point) {

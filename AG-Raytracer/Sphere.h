@@ -6,7 +6,7 @@ class Sphere : public Primitive
 public:
 	float radius;
 
-	void CheckIntersection(Ray* ray) override;
+	bool CheckIntersection(Ray* ray) override;
 	vec3 GetNormal(vec3 point);
 
 	Sphere(vec3 position, float radius) : Primitive(position)

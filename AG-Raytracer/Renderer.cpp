@@ -34,9 +34,16 @@ void Renderer::Render() {
 
 Pixel Renderer::Trace(Ray* ray, int x, int y)
 {
+	float smallestT = INFINITY;
+	//Material mat;
+
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
-		this->scene->primitives[x]->CheckIntersection(ray);
+		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
+		{
+			smallestT = ray->t;
+			//mat = this->scene->primitives[x]->material;
+		}
 
 	}
 	if (ray->t == INFINITY) {
@@ -44,13 +51,15 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 	}
 	else {
 		vec3 intersectionPoint = ray->origin + ray->t*ray->direction;
+
+		//TODO: Take multiple lights into account (sum them).
 		return 0xff0000 * DirectIllumination(intersectionPoint, glm::normalize(ray->origin - scene->lights[0]->position));
 	}
 }
 
 float Renderer::DirectIllumination(vec3 intersectionPoint, vec3 surfaceNormal) {
 	Ray* shadowRay = new Ray(intersectionPoint, surfaceNormal);
-	for (int x = 0; (x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0] )) && (shadowRay->t == INFINITY); x++)
+	for (int x = 0; (x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0])) && (shadowRay->t == INFINITY); x++)
 	{
 		this->scene->primitives[x]->CheckIntersection(shadowRay);
 	}

@@ -8,7 +8,7 @@ public:
 	vec3 normal;
 
 	void Init(vec3 position, vec3 normal);
-	void CheckIntersection(Ray* ray) override;
+	bool CheckIntersection(Ray* ray) override;
 	
 	vec3 GetNormal(vec3 point) override;
 
