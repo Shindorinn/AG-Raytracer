@@ -77,7 +77,7 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		this->scene->primitives[x]->CheckIntersection(shadowRay);
 	}
 
-	if (shadowRay->t == INFINITY) {
+	if (shadowRay->t != INFINITY) {
 		delete shadowRay;
 		return vec3(0.0f, 0.0f, 0.0f);
 	}
