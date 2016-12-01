@@ -20,7 +20,20 @@ public:
 	void KeyUp(int a_Key);
 	void KeyDown(int a_Key);
 private:
+	void KeySwitch(int key, int changedBy);
 	Surface* renderSurface;
+
+	int moveForward;
+	int moveBackward;
+	int strafeRight;
+	int strafeLeft;
+	int moveUp;
+	int moveDown;
+	int turnRight;
+	int turnLeft;
+	int increaseFOV;
+	int decreaseFOV;
+	int resetPosition;
 };
 
 }; // namespace Tmpl8
