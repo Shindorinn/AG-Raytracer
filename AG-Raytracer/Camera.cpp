@@ -48,15 +48,15 @@ void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
 
-	float ratio = SCRHEIGHT / SCRWIDTH;
+	float ratio = (float)SCRHEIGHT / (float)SCRWIDTH;
 	float width = 1.0f;
 	float height = ratio;
 
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			u = (width / SCRWIDTH) * x;
-			v = (height / SCRHEIGHT) * y;
+			u = (float) x / SCRWIDTH;
+			v = (float) y / SCRHEIGHT;
 
 			vec3 pointOnScreen = p0 + u*(p1 - p0) + v*(p2 - p0);
 
