@@ -1,9 +1,8 @@
 ﻿#include "template.h"
 #include "Light.h"
 
-Light::Light(vec3 position, float intensity)
+Light::Light(vec3 position, vec3 color)
 {
 	this->position = position;
-	this->intensity = intensity;
-	this->color = vec3(1, 1, 1);
+	this->color = color;
 }

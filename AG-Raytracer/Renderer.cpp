@@ -47,13 +47,23 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 		vec3 intersectionPoint = ray->origin + ray->t*ray->direction;
 		vec3 colorResult = vec3(0, 0, 0);
 
+
+
 		for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
+		{
+			vec3 direction = glm::normalize(ray->origin - scene->lights[i]->position);
+			vec3 normal = hit->GetNormal(intersectionPoint);
+			if (dot(direction, normal) < 0)
+				continue;
+
 			colorResult += DirectIllumination(
 				intersectionPoint,
-				glm::normalize(ray->origin - scene->lights[i]->position),
-				hit->GetNormal(intersectionPoint),
+				direction,
+				normal,
 				scene->lights[i],
 				hit->material);
+		}
+
 		//TODO: vec3 to Pixel conversion
 		// First convert range
 		colorResult *= 256.0f;
@@ -87,8 +97,7 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		delete shadowRay;
 
 		// I = LightColor * N. L * 1/d^2 * BRDF/PI
-		return	lightSource->intensity *
-			lightSource->color *
+		return lightSource->color *
 			dot(normal, direction) *
 			(1 / (euclidianDistance*euclidianDistance)) *
 			(material.color / PI);
