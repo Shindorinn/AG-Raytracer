@@ -7,6 +7,9 @@ Camera::Camera()
 {
 	this->Init();
 	this->d = 1;
+	this->ratio = (float)SCRHEIGHT / (float)SCRWIDTH;
+	this->width = 1.0f;
+	this->height = ratio;
 
 	//position = vec3(transformMatrix[0][3], transformMatrix[1][3], transformMatrix[2][3]);
 	viewDirection = vec3(0.0f, 0.0f, 1.0f);
@@ -18,9 +21,9 @@ Camera::Camera()
 		);
 
 	screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
-	p0 = screenCenter + vec3(-1.0f, -1.0f, 0.0f);
-	p1 = screenCenter + vec3(1.0f, -1.0f, 0.0f);
-	p2 = screenCenter + vec3(-1.0f, 1.0f, 0.0f);
+	p0 = screenCenter + vec3(-1.0f, -1.0f*this->ratio, 0.0f);
+	p1 = screenCenter + vec3(1.0f, -1.0f *this->ratio, 0.0f);
+	p2 = screenCenter + vec3(-1.0f, 1.0f *this->ratio, 0.0f);
 
 	printf("\n screenCenter : %f, %f, %f \n",
 		screenCenter[0],
@@ -48,9 +51,7 @@ void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
 
-	float ratio = (float)SCRHEIGHT / (float)SCRWIDTH;
-	float width = 1.0f;
-	float height = ratio;
+
 
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)

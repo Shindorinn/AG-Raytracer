@@ -18,6 +18,9 @@ public:
 	vec3 viewDirection;
 	vec3 screenCenter;
 	vec3 p0, p1, p2;
+	float width;
+	float height;
+	float ratio;
 
 	//TODO: Put this to renderer probably.
 	Ray* primaryRays[SCRWIDTH*SCRHEIGHT];
