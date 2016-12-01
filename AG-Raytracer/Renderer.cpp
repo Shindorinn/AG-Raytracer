@@ -12,7 +12,7 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-
+		//this->scene->camera->GenerateRays();
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
@@ -30,7 +30,7 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
 	Primitive* hit;
-
+	
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
@@ -40,18 +40,17 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 		}
 
 	}
-	if (ray->t == INFINITY) {
+
+	if (smallestT == INFINITY) {
 		return 0x000000;
 	}
 	else {
-		vec3 intersectionPoint = ray->origin + ray->t*ray->direction;
+		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
 		vec3 colorResult = vec3(0, 0, 0);
-
-
 
 		for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
 		{
-			vec3 direction = glm::normalize(intersectionPoint - scene->lights[i]->position);
+			vec3 direction = glm::normalize(scene->lights[i]->position - intersectionPoint);
 			vec3 normal = hit->GetNormal(intersectionPoint);
 			if (dot(direction, normal) < 0)
 				continue;
@@ -104,4 +103,4 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 	}
 }
 
-//TODO: delete weghalen, lightsource intensity&color in 1 ding proppen.
+//TODO: delete weghalen

@@ -25,5 +25,5 @@ bool Sphere::CheckIntersection(Ray* ray)
 
 vec3 Sphere::GetNormal(vec3 point)
 {
-	return normalize(this->GetPosition() - point);
+	return normalize(point - this->GetPosition());
 }
