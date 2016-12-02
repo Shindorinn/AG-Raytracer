@@ -8,8 +8,8 @@ Scene::Scene()
 {
 	camera = new Camera();
 	//lights[0] = new Light(vec3(2, 5, 2), 10.0f);
-	lights[0] = new Light(vec3(1, 2, 0), vec3(50, 50, 50));
-	lights[1] = new Light(vec3(1, 2, 0), vec3(50, 50, 50));
+	lights[0] = new Light(vec3(3, 0, 3), vec3(100, 100, 100));
+	//lights[1] = new Light(vec3(1, 5, 0), vec3(50, 50, 50));
 
 
 	//primitives[1] = new Triangle(vec3(0, 0, 5), vec3(0, 2, 5), vec3(2, 0, 5));
@@ -18,17 +18,19 @@ Scene::Scene()
 	//primitives[0] = new Sphere(vec3(0, 0, 2), 1.0f);
 	//primitives[1] = new Sphere(vec3(0, 5, 0), 1.0f);
 
-	primitives[0] = new Sphere(vec3(3, 0, 5), 1.0f);
+	primitives[0] = new Sphere(vec3(1, 0, 5), 1.0f);
 	primitives[0]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
 
-	primitives[1] = new Sphere(vec3(-2, 0, 4), 1.2f);
-	primitives[1]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+	//primitives[1] = new Sphere(vec3(-2, 0, 4), 1.2f);
+	//primitives[1]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+
 	//primitives[2] = new Sphere(vec3(0, 0, 5), 1.0f);
 	//primitives[3] = new Sphere(vec3(0, 0, -5), 1.0f);
 	//primitives[4] = new Sphere(vec3(5, 0, 0), 1.0f);
 	//primitives[5] = new Sphere(vec3(-5, 0, 0), 1.0f);
 
-	//primitives[1] = new Plane(vec3(0, 0, -5), vec3(0, 0, 1));
+	primitives[1] = new Plane(vec3(-1, 0, 5), vec3(1, 0, 0));
 
 	//primitives[1] = new Sphere(vec3(500, 0, 10), 1.0f);
 	//primitives[1] = new Sphere(vec3(5, 0, 3), 1.0f);

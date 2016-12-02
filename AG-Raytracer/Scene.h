@@ -7,7 +7,7 @@ class Scene
 {
 public:
 	Primitive* primitives[2];
-	Light* lights[2];
+	Light* lights[1];
 	Camera* camera;
 	Scene();
 };

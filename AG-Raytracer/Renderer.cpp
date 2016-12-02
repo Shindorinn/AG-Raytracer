@@ -107,13 +107,14 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		this->scene->primitives[x]->CheckIntersection(&shadowRay);
 	}
 
-	if (shadowRay.t != INFINITY) {
+	float euclidianDistance = distance(intersectionPoint, lightSource->position);
+
+	//If a shadowRay hits something AND this something is between the intersectionPoint and the light.
+	if (shadowRay.t != INFINITY && euclidianDistance < length(lightSource->position - intersectionPoint))
+	{
 		return vec3(0.0f, 0.0f, 0.0f);
 	}
 	else {
-		float euclidianDistance = distance(intersectionPoint, lightSource->position);
-		//float euclidianDistance = shadowRay->t;
-
 		// I = LightColor * N. L * 1/d^2 * BRDF/PI
 		return lightSource->color *
 			dot(normal, direction) *
