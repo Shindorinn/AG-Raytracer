@@ -30,14 +30,10 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
 	Primitive* hit;
-<<<<<<< HEAD
 
 	//if (ray->direction.z == 1.0f)
 	//	printf("breakpoint");
 
-=======
-	
->>>>>>> 5561a3c717aa8e54931459131b4477bb7ae98aa8
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
