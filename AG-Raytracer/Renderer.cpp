@@ -48,7 +48,6 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 			smallestT = ray->t;
 			hit = this->scene->primitives[x];
 		}
-
 	}
 
 	if (smallestT == INFINITY) {
@@ -83,11 +82,8 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 		}
 		if (hit->material.materialKind == Material::MaterialKind::MIRROR)
 		{
-			//TODO: IMPLEMENT REFLECTION, ff zonder new, gewoon direct r.dir meegeven wellicth? 
-
 			ray->t = INFINITY;
-			return hit->material.color * Trace(new Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
-
+			return hit->material.color * Trace(&Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
 		}
 
 		if (hit->material.materialKind == Material::MaterialKind::GLASS)
@@ -103,22 +99,20 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material)
 {
 	vec3 intersectionWithEpsilon = intersectionPoint + EPSILON * direction;
-	Ray* shadowRay = new Ray(intersectionWithEpsilon, direction);
+	Ray shadowRay = Ray(intersectionWithEpsilon, direction);
 	float lightIntensity = 0.0f;
 
-	for (int x = 0; (x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0])) && (shadowRay->t == INFINITY); x++)
+	for (int x = 0; (x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0])) && (shadowRay.t == INFINITY); x++)
 	{
-		this->scene->primitives[x]->CheckIntersection(shadowRay);
+		this->scene->primitives[x]->CheckIntersection(&shadowRay);
 	}
 
-	if (shadowRay->t != INFINITY) {
-		delete shadowRay;
+	if (shadowRay.t != INFINITY) {
 		return vec3(0.0f, 0.0f, 0.0f);
 	}
 	else {
 		float euclidianDistance = distance(intersectionPoint, lightSource->position);
 		//float euclidianDistance = shadowRay->t;
-		delete shadowRay;
 
 		// I = LightColor * N. L * 1/d^2 * BRDF/PI
 		return lightSource->color *
@@ -127,5 +121,3 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 			(material.color / PI);
 	}
 }
-
-//TODO: delete weghalen

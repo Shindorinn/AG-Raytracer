@@ -8,8 +8,8 @@ Scene::Scene()
 {
 	camera = new Camera();
 	//lights[0] = new Light(vec3(2, 5, 2), 10.0f);
-	lights[0] = new Light(vec3(1, 2, 0), vec3(100, 100, 100));
-	lights[1] = new Light(vec3(-5, 0, 2), vec3(100, 100, 100));
+	lights[0] = new Light(vec3(1, 2, 0), vec3(50, 50, 50));
+	lights[1] = new Light(vec3(1, 2, 0), vec3(50, 50, 50));
 
 
 	//primitives[1] = new Triangle(vec3(0, 0, 5), vec3(0, 2, 5), vec3(2, 0, 5));
