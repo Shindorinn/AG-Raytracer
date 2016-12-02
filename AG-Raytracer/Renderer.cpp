@@ -16,7 +16,17 @@ void Renderer::Render() {
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			buffer[y][x] = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
+			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
+
+			// First convert range
+			colorResult *= 256.0f;
+			// Then clamp
+			int r = min((int)colorResult.x, 255);
+			int g = min((int)colorResult.y, 255);
+			int b = min((int)colorResult.z, 255);
+			// Then merge
+
+			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
 
@@ -26,13 +36,10 @@ void Renderer::Render() {
 }
 
 
-Pixel Renderer::Trace(Ray* ray, int x, int y)
+vec3 Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
 	Primitive* hit;
-
-	//if (ray->direction.z == 1.0f)
-	//	printf("breakpoint");
 
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
@@ -45,37 +52,51 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 	}
 
 	if (smallestT == INFINITY) {
-		return 0x000000;
+		return vec3(0, 0, 0);
 	}
 	else {
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
-		vec3 colorResult = vec3(0, 0, 0);
+		vec3 normal = hit->GetNormal(intersectionPoint);
 
-		for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
+		if (hit->material.materialKind == Material::MaterialKind::DIFFUSE)
 		{
-			vec3 direction = glm::normalize(scene->lights[i]->position - intersectionPoint);
-			vec3 normal = hit->GetNormal(intersectionPoint);
-			if (dot(direction, normal) < 0)
-				continue;
+			vec3 colorResult = vec3(0, 0, 0);
 
-			colorResult += DirectIllumination(
-				intersectionPoint,
-				direction,
-				normal,
-				scene->lights[i],
-				hit->material);
+			for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
+			{
+				vec3 direction = glm::normalize(scene->lights[i]->position - intersectionPoint);
+
+				if (dot(direction, normal) < 0)
+					continue;
+
+				colorResult += DirectIllumination(
+					intersectionPoint,
+					direction,
+					normal,
+					scene->lights[i],
+					hit->material);
+			}
+
+
+			ray->t = INFINITY;
+			return colorResult;
+		}
+		if (hit->material.materialKind == Material::MaterialKind::MIRROR)
+		{
+			//TODO: IMPLEMENT REFLECTION, ff zonder new, gewoon direct r.dir meegeven wellicth? 
+
+			ray->t = INFINITY;
+			return hit->material.color * Trace(new Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
+
 		}
 
-		//TODO: vec3 to Pixel conversion
-		// First convert range
-		colorResult *= 256.0f;
-		// Then clamp
-		int r = min((int)colorResult.x, 255);
-		int g = min((int)colorResult.y, 255);
-		int b = min((int)colorResult.z, 255);
-		// Then merge
-		ray->t = INFINITY;
-		return ((r << 16) + (g << 8) + (b));
+		if (hit->material.materialKind == Material::MaterialKind::GLASS)
+		{
+			printf("glass hit");
+			//TODO: IMPLEMENT REFRACTION
+		}
+
+
 	}
 }
 

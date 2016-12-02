@@ -12,6 +12,6 @@ public:
 	Renderer(Scene* scene, Surface* renderSurface);
 
 	void Render();
-	Pixel Trace(Ray* ray, int x, int y);
+	vec3 Trace(Ray* ray, int x, int y);
 	vec3 DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material);
 };
