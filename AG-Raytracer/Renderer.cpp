@@ -12,7 +12,7 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-		//this->scene->camera->GenerateRays();
+	//this->scene->camera->GenerateRays();
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
@@ -30,7 +30,7 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
 	Primitive* hit;
-	
+
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
@@ -71,6 +71,7 @@ Pixel Renderer::Trace(Ray* ray, int x, int y)
 		int g = min((int)colorResult.y, 255);
 		int b = min((int)colorResult.z, 255);
 		// Then merge
+		ray->t = INFINITY;
 		return ((r << 16) + (g << 8) + (b));
 	}
 }

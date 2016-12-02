@@ -40,8 +40,8 @@ void Game::HandleInput(float dt)
 void Game::MouseUp(int _Button) { /* implement if you want to detect mouse button presses */ }
 void Game::MouseDown(int _Button) { /* implement if you want to detect mouse button presses */ }
 void Game::MouseMove(int _X, int _Y) { /* implement if you want to detect mouse movement */ }
-void Game::KeyUp(int a_Key) {/* implement if you want to handle keys */}
-void Game::KeyDown(int a_Key) {/* implement if you want to handle keys */}
+void Game::KeyUp(int a_Key) {/* implement if you want to handle keys */ }
+void Game::KeyDown(int a_Key) {/* implement if you want to handle keys */ }
 
 // -----------------------------------------------------------
 // Main game tick function
@@ -49,8 +49,10 @@ void Game::KeyDown(int a_Key) {/* implement if you want to handle keys */}
 void Game::Tick(float dt)
 {
 	//renderSurface->Clear(0);
-	//renderSurface->Print("hello world", 2, 2, 0xffffff);
-	//renderSurface->Line(2, 10, 50, 10, 0xff0000);
-	//printf("New tick! Delay : %f", dt);
+
 	renderer->Render();
+
+	char buffer[100];
+	sprintf(buffer, "FPS: %f", 1 / dt);
+	renderSurface->Print(buffer, 2, 2, 0xffffff);
 }

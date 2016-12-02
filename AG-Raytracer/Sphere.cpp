@@ -10,13 +10,11 @@ bool Sphere::CheckIntersection(Ray* ray)
 	vec3 q = c - t * ray->direction;
 	float p2 = dot(q, q);
 
-	float r2 = radius * radius;
-
-	if (p2 > r2) return false; // r2 = r * r
+	if (p2 > radius2) return false; // r2 = r * r
 
 	//printf("Sphere : Intersection found!");
 
-	t -= glm::sqrt(r2 - p2);
+	t -= glm::sqrt(radius2 - p2);
 	if ((t < ray->t) && (t > 0)) ray->t = t;
 	// or: ray.t = min( ray.t, max( 0, t ) );
 
