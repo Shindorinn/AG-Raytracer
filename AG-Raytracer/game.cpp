@@ -17,10 +17,13 @@ void Game::Init()
 void Game::HandleInput(float dt)
 {
 	Camera* camera = renderer->scene->camera;
-
-	// Adjust lookdirection
-
-	// Adjust translation based on lookdirection
+	vec3 currentViewDirection = camera->viewDirection;
+	
+	// Adjust viewdirection
+	vec3 newViewDirection = vec3(0, 0, 1); // TODO: ADJUST
+	vec3 right = cross(newViewDirection, vec3(0, 1, 0));
+	vec3 up = cross(right, newViewDirection);
+	// Adjust translation based on new viewdirection
 
 	// Replace transformMatrix for camera
 
