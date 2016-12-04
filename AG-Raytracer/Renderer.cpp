@@ -13,7 +13,11 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 
 void Renderer::Render() {
 	//this->scene->camera->GenerateRays();
+
+
 	for (int y = 0; y < SCRHEIGHT; y++) {
+#pragma omp parallel
+#pragma omp for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
