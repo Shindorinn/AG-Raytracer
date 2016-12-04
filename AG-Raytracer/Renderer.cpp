@@ -16,8 +16,8 @@ void Renderer::Render() {
 
 
 	for (int y = 0; y < SCRHEIGHT; y++) {
-#pragma omp parallel
-#pragma omp for
+		#pragma omp parallel
+		#pragma omp for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
@@ -81,14 +81,12 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 					hit->material);
 			}
 
-
 			ray->t = INFINITY;
 		}
 		if (hit->material.materialKind == Material::MaterialKind::MIRROR)
 		{
 			ray->t = INFINITY;
-			//return hit->material.color * Trace(&Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
-			colorResult += Trace(&Ray(intersectionPoint, Reflect(ray->direction, normal)), x, y);
+			return hit->material.color * Trace(&Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
 		}
 
 		if (hit->material.materialKind == Material::MaterialKind::GLASS)
@@ -105,30 +103,26 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 {
 	vec3 intersectionWithEpsilon = intersectionPoint + EPSILON * direction;
 	Ray shadowRay = Ray(intersectionWithEpsilon, direction);
+	shadowRay.t = INFINITY;
 	float lightIntensity = 0.0f;
 
-	for (int x = 0; (x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0])) && (shadowRay.t == INFINITY); x++)
+	float tToLight = (lightSource->position.x - intersectionWithEpsilon.x) / direction.x;
+
+	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		this->scene->primitives[x]->CheckIntersection(&shadowRay);
+
+		//Check if the intersection is between the original intersection and the light. If it is, return black.
+		if (shadowRay.t < tToLight)
+			return vec3(0.0f, 0.0f, 0.0f);
 	}
 
-	float euclidianDistance = distance(intersectionPoint, lightSource->position);
+	float euclidianDistanceToLight = distance(intersectionPoint, lightSource->position);
 
-	//If a shadowRay hits something AND this something is between the intersectionPoint and the light.
-	if (shadowRay.t != INFINITY && euclidianDistance < length(lightSource->position - intersectionPoint))
-	{
-		return vec3(0.0f, 0.0f, 0.0f);
-	}
-	else {
-		// I = LightColor * N. L * 1/d^2 * BRDF/PI
-		return lightSource->color *
-			dot(normal, direction) *
-			(1 / (euclidianDistance*euclidianDistance)) *
-			(material.color / PI);
-	}
-}
+	// I = LightColor * N. L * 1/d^2 * BRDF/PI
+	return lightSource->color *
+		dot(normal, direction) *
+		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
+		(material.color / PI);
 
-vec3 Renderer::Reflect(vec3 direction, vec3 normal) {
-	//  𝑅 = 𝐷 − 2(𝐷 ∙ 𝑁)𝑁.
-	return direction - 2 * dot(direction, normal)* normal;
 }
