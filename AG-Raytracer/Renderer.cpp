@@ -60,10 +60,11 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 	else {
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
 		vec3 normal = hit->GetNormal(intersectionPoint);
-
+		vec3 colorResult = vec3(0, 0, 0);
+		
 		if (hit->material.materialKind == Material::MaterialKind::DIFFUSE)
 		{
-			vec3 colorResult = vec3(0, 0, 0);
+			
 
 			for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
 			{
@@ -82,12 +83,12 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 
 
 			ray->t = INFINITY;
-			return colorResult;
 		}
 		if (hit->material.materialKind == Material::MaterialKind::MIRROR)
 		{
 			ray->t = INFINITY;
-			return hit->material.color * Trace(&Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
+			//return hit->material.color * Trace(&Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
+			colorResult += Trace(&Ray(intersectionPoint, Reflect(ray->direction, normal)), x, y);
 		}
 
 		if (hit->material.materialKind == Material::MaterialKind::GLASS)
@@ -95,7 +96,7 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 			printf("glass hit");
 			//TODO: IMPLEMENT REFRACTION
 		}
-
+		return colorResult;
 
 	}
 }
@@ -125,4 +126,9 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 			(1 / (euclidianDistance*euclidianDistance)) *
 			(material.color / PI);
 	}
+}
+
+vec3 Renderer::Reflect(vec3 direction, vec3 normal) {
+	//  𝑅 = 𝐷 − 2(𝐷 ∙ 𝑁)𝑁.
+	return direction - 2 * dot(direction, normal)* normal;
 }
