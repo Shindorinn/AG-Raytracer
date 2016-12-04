@@ -120,10 +120,10 @@ void Camera::Init()
 void Camera::UpdatePosition()
 {
 	decompose(transformMatrix, scale, rotation, position, skew, perspective);
-	rotation = conjugate(rotation);
+	//rotation = conjugate(rotation);
 
 	screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
-	p0 = (transformMatrix * vec4(p0,1)).xyz;
+	p0 = (transformMatrix * vec4(p0, 1)).xyz;
 	p1 = (transformMatrix * vec4(p1, 1)).xyz;
 	p2 = (transformMatrix * vec4(p2, 1)).xyz;
 }

@@ -79,11 +79,11 @@ void Game::HandleInput(float dt)
 	
 	float rotationAmount = rotationSpeed * dt;
 
-	float rotateX = rotationAmount * up + rotationAmount * -down;
+	float rotateX = rotationAmount * ( up + -down );
 	// Adjust viewdirection
-	transform = rotate(transform, rotationAmount * up + rotationAmount * -down, vec3(1, 0, 0));
-	transform = rotate(transform, rotationAmount * left + rotationAmount * -right, vec3(0, 1, 0));
-	transform = rotate(transform, rotationAmount * rctrl + rotationAmount * -lctrl, vec3(0, 0, 1));
+	transform = rotate(transform, rotationAmount * (up + -down), vec3(1, 0, 0));
+	transform = rotate(transform, rotationAmount * (-left + right), vec3(0, 1, 0));
+	transform = rotate(transform, rotationAmount * (rctrl + -lctrl), vec3(0, 0, 1));
 
 	camera->TransformCamera(transform);
 
