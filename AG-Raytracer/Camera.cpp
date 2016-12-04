@@ -51,8 +51,6 @@ void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
 
-
-
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
@@ -80,6 +78,7 @@ void Camera::GenerateRays()
 void Camera::TransformCamera(mat4 transformMatrix)
 {
 	this->transformMatrix *= transformMatrix;
+	this->UpdatePosition();
 }
 
 void Camera::Init()
