@@ -64,7 +64,7 @@ void Camera::GenerateRays()
 
 			vec3 direction = normalize(pointOnScreen3d - position3d);
 
-			Ray* ray = new Ray(position.xyz, direction);
+			Ray* ray = new Ray(position3d, direction);
 
 			if (y == SCRHEIGHT / 2 && x == SCRWIDTH / 2)
 				printf("\n middle of the screen : %f, %f, %f \n", ray->direction[0], ray->direction[1], ray->direction[2]);
@@ -74,10 +74,36 @@ void Camera::GenerateRays()
 	}
 }
 
+void Camera::UpdateRays()
+{
+	float u, v = 0.0f;
+
+	for (int y = 0; y < SCRHEIGHT; y++) {
+		for (int x = 0; x < SCRWIDTH; x++)
+		{
+			u = (float)x / SCRWIDTH;
+			v = (float)y / SCRHEIGHT;
+
+			vec3 pointOnScreen = p0 + u*(p1 - p0) + v*(p2 - p0);
+
+			vec3 position3d = position.xyz;
+			vec3 pointOnScreen3d = pointOnScreen.xyz;
+
+			vec3 direction = normalize(pointOnScreen3d - position3d);
+
+			Ray* ray = primaryRays[y * SCRWIDTH + x];
+			ray->direction = direction;
+			ray->origin = position3d;
+			ray->t = INFINITY;
+		}
+	}
+
+}
+
 //TODO : Check if the order of the matrix multiplication is correct
 void Camera::TransformCamera(mat4 transformMatrix)
 {
-	this->transformMatrix *= transformMatrix;
+	this->transformMatrix = transformMatrix;
 	this->UpdatePosition();
 }
 
@@ -95,4 +121,9 @@ void Camera::UpdatePosition()
 {
 	decompose(transformMatrix, scale, rotation, position, skew, perspective);
 	rotation = conjugate(rotation);
+
+	screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
+	p0 = (transformMatrix * vec4(p0,1)).xyz;
+	p1 = (transformMatrix * vec4(p1, 1)).xyz;
+	p2 = (transformMatrix * vec4(p2, 1)).xyz;
 }

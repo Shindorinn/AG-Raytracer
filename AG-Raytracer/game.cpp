@@ -21,6 +21,7 @@ void Game::Init()
 #define VK_C 0x43
 
 #define VK_MASK_PRESSED_DOWN 1 << 16
+#define DEBUG 1
 
 void Game::HandleInput(float dt)
 {
@@ -73,15 +74,16 @@ void Game::HandleInput(float dt)
 	Camera* camera = renderer->scene->camera;
 	mat4 transform = camera->transformMatrix;
 
-	float rotationSpeed = 1.0f;
-	float movementSpeed = 10.0f;
+	float rotationSpeed = 0.1f;
+	float movementSpeed = 0.1f;
 	
 	float rotationAmount = rotationSpeed * dt;
 
+	float rotateX = rotationAmount * up + rotationAmount * -down;
 	// Adjust viewdirection
 	transform = rotate(transform, rotationAmount * up + rotationAmount * -down, vec3(1, 0, 0));
-	transform = rotate(transform, rotationAmount * left + rotationAmount -right, vec3(0, 1, 0));
-	transform = rotate(transform, rotationAmount * rctrl + rotationAmount -lctrl, vec3(0, 0, 1));
+	transform = rotate(transform, rotationAmount * left + rotationAmount * -right, vec3(0, 1, 0));
+	transform = rotate(transform, rotationAmount * rctrl + rotationAmount * -lctrl, vec3(0, 0, 1));
 
 	camera->TransformCamera(transform);
 
@@ -119,6 +121,7 @@ void Game::Tick(float dt)
 {
 	//renderSurface->Clear(0);
 	HandleInput(dt);
+	renderer->scene->camera->UpdateRays();
 	renderer->Render();
 
 	char buffer[100];

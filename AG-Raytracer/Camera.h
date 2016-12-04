@@ -28,6 +28,7 @@ public:
 	Camera();
 	void Init();
 	void GenerateRays();
+	void UpdateRays();
 	void TransformCamera(mat4 transformMatrix);
 	void UpdatePosition();
 };
