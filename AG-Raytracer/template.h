@@ -5,6 +5,7 @@
 
 #define GLM_FORCE_RADIANS
 #define GLM_SWIZZLE
+#define GLM_FORCE_LEFT_HANDED
 
 #include "math.h"
 #include "stdlib.h"

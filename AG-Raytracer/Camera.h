@@ -7,17 +7,17 @@ class Camera
 public:
 	//check glm documentation for rotation of camera.
 	mat4 transformMatrix; // your transformation matrix.
-	vec3 scale;
-	quat rotation;
 	vec3 position;
-	vec3 skew;
-	vec4 perspective;
-	
-	//TODO: TWEAK D FOR FOV
-	float d;
+	vec3 wUp = vec3(0, 1, 0);
+	vec3 rUp;
+	vec3 rRight;
+
 	vec3 viewDirection;
 	vec3 screenCenter;
 	vec3 p0, p1, p2;
+
+	//TODO: TWEAK D FOR FOV
+	float d;
 	float width;
 	float height;
 	float ratio;

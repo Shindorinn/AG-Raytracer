@@ -21,7 +21,7 @@ void Game::Init()
 #define VK_C 0x43
 
 #define VK_MASK_PRESSED_DOWN 1 << 16
-#define DEBUG 1
+#define DEBUG 0
 
 void Game::HandleInput(float dt)
 {
@@ -74,23 +74,37 @@ void Game::HandleInput(float dt)
 	Camera* camera = renderer->scene->camera;
 	mat4 transform = camera->transformMatrix;
 
-	float rotationSpeed = 0.1f;
-	float movementSpeed = 0.1f;
+	float rotationSpeed = 0.05f;
+	float movementSpeed = 0.05f;
 	
-	float rotationAmount = rotationSpeed * dt;
-
-	float rotateX = rotationAmount * ( up + -down );
+	float rotationAmount = rotationSpeed;// *dt;
+	vec3 rotationMask = vec3(
+		(up + -down),
+		(-left + right),
+		(rctrl + -lctrl)
+	);
 	// Adjust viewdirection
+	/*
 	transform = rotate(transform, rotationAmount * (up + -down), vec3(1, 0, 0));
 	transform = rotate(transform, rotationAmount * (-left + right), vec3(0, 1, 0));
 	transform = rotate(transform, rotationAmount * (rctrl + -lctrl), vec3(0, 0, 1));
-
+	*/
+	vec3 screenCenterRotateUp = normalize(camera->screenCenter + camera->rUp * rotationAmount * rotationMask.x);
+	mat4 inverseTransform = lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp);
+	transform = inverse(lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp));
+	printf("", inverseTransform);
 	camera->TransformCamera(transform);
 
+	vec3 screenCenterRotateRight = camera->screenCenter + camera->rRight * rotationAmount * rotationMask.y;
+	transform = inverse(lookAt(camera->position, screenCenterRotateRight - camera->position, camera->wUp));
+
+	camera->TransformCamera(transform);
+	//TODO : add rotate around z?
+	
 	// Adjust translation based on new viewdirection
 	vec3 viewDirection = camera->viewDirection;
-	vec3 rightDirection = cross(viewDirection, vec3(0, 1, 0));
-	vec3 position = camera->position;
+	vec3 rightDirection = camera->rRight;
+	vec3 currentPosition = camera->position;
 	
 	vec3 movementMask = vec3(
 		(a + -d),
@@ -98,13 +112,27 @@ void Game::HandleInput(float dt)
 		(w + -s)
 	);
 	
-	float movementAmount = movementSpeed * dt;
+	printf("Movementmask :  %f, %f, %f \n", movementMask.x, movementMask.y, movementMask.z);
 
+	float movementAmount = movementSpeed * dt;
+	movementMask = movementAmount * movementMask;
+
+	vec4 col0 = transform[0];
+	vec4 col1 = transform[1];
+	vec4 col2 = transform[2];
+	vec4 col3 = transform[3];
+	float xW = currentPosition.x + dot(vec4(movementMask.x, movementMask.y, movementMask.z, 1), vec4(col0.x, col1.x, col2.x, 1));	//vec4(transform[0], transform[4], transform[8], 1));
+	float yW = currentPosition.y + dot(vec4(movementMask.x, movementMask.y, movementMask.z, 1), vec4(col0.y, col1.y, col2.y, 1));	//vec4(transform[1], transform[5], transform[9], 1));
+	float zW = currentPosition.z + dot(vec4(movementMask.x, movementMask.y, movementMask.z, 1), vec4(col0.z, col1.z, col2.z, 1));	//vec4(transform[2], transform[6], transform[10], 1));
+
+	//transform = lookAt(vec3(xW, yW, zW), screenCenter + vec3(xW, yW, zW), camera->wUp);
+
+	/*
 	position += rightDirection	*	movementMask.x  * movementAmount;
 	position.y	+=					movementMask.y	* movementAmount;
 	position += viewDirection	*	movementMask.z	* movementAmount;
 
-	transform = translate(transform, position);
+	transform = translate(transform, position);*/
 	camera->TransformCamera(transform);
 }
 
