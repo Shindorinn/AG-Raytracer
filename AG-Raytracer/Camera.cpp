@@ -69,6 +69,7 @@ void Camera::TransformCamera(mat4 transformMatrix)
 
 void Camera::Init()
 {
+	this->wUp = vec3(0, -1, 0);
 	this->viewDirection = vec3(0.0f, 0.0f, 1.0f);
 	this->position = vec3(0);
 
@@ -82,10 +83,10 @@ void Camera::Init()
 	this->p1 = screenCenter + vec3(1.0f, -1.0f *this->ratio, 0.0f);
 	this->p2 = screenCenter + vec3(-1.0f, 1.0f *this->ratio, 0.0f);
 	
-	this->transformMatrix = lookAt(position, screenCenter, wUp);	
-	this->rUp = vec3(this->transformMatrix[1]);
+	this->transformMatrix = inverse(lookAt(position, screenCenter, wUp));	
 	this->rRight = vec3(this->transformMatrix[0]);
-	int w = 0;
+	this->rUp = vec3(this->transformMatrix[1]);
+	this->viewDirection = vec3(this->transformMatrix[2]);
 }
 
 void Camera::UpdatePosition()

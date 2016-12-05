@@ -8,7 +8,7 @@ public:
 	//check glm documentation for rotation of camera.
 	mat4 transformMatrix; // your transformation matrix.
 	vec3 position;
-	vec3 wUp = vec3(0, 1, 0);
+	vec3 wUp;
 	vec3 rUp;
 	vec3 rRight;
 

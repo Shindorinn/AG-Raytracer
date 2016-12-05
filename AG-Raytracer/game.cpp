@@ -75,31 +75,35 @@ void Game::HandleInput(float dt)
 	mat4 transform = camera->transformMatrix;
 
 	float rotationSpeed = 0.05f;
-	float movementSpeed = 0.05f;
+	float movementSpeed = 0.001f;
 	
-	float rotationAmount = rotationSpeed;// *dt;
-	vec3 rotationMask = vec3(
+	float rotationAmount = rotationSpeed * dt;
+	/*vec3 rotationMask = vec3(
 		(up + -down),
 		(-left + right),
 		(rctrl + -lctrl)
+	);*/
+	vec3 rotationMask = vec3(
+		(-left + right),
+		(up + -down),
+		(rctrl + -lctrl)
 	);
 	// Adjust viewdirection
-	/*
-	transform = rotate(transform, rotationAmount * (up + -down), vec3(1, 0, 0));
-	transform = rotate(transform, rotationAmount * (-left + right), vec3(0, 1, 0));
-	transform = rotate(transform, rotationAmount * (rctrl + -lctrl), vec3(0, 0, 1));
-	*/
-	vec3 screenCenterRotateUp = normalize(camera->screenCenter + camera->rUp * rotationAmount * rotationMask.x);
-	mat4 inverseTransform = lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp);
-	transform = inverse(lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp));
-	printf("", inverseTransform);
-	camera->TransformCamera(transform);
-
-	vec3 screenCenterRotateRight = camera->screenCenter + camera->rRight * rotationAmount * rotationMask.y;
+	vec3 screenCenterRotateRight = normalize(camera->screenCenter + camera->rUp * rotationAmount * rotationMask.x);
 	transform = inverse(lookAt(camera->position, screenCenterRotateRight - camera->position, camera->wUp));
 
 	camera->TransformCamera(transform);
+
+	vec3 screenCenterRotateUp = normalize(camera->screenCenter + camera->rRight * rotationAmount * rotationMask.y);
+	transform = inverse(lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp));
+
+	camera->TransformCamera(transform);
+
 	//TODO : add rotate around z?
+	//vec3 screenCenterRotateForward = normalize(camera->screenCenter + camera->viewDirection * rotationAmount * rotationMask.z);
+	//transform = inverse(lookAt(camera->position, screenCenterRotateForward - camera->position, camera->wUp));
+	//camera->TransformCamera(transform);
+
 	
 	// Adjust translation based on new viewdirection
 	vec3 viewDirection = camera->viewDirection;
@@ -125,15 +129,8 @@ void Game::HandleInput(float dt)
 	float yW = currentPosition.y + dot(vec4(movementMask.x, movementMask.y, movementMask.z, 1), vec4(col0.y, col1.y, col2.y, 1));	//vec4(transform[1], transform[5], transform[9], 1));
 	float zW = currentPosition.z + dot(vec4(movementMask.x, movementMask.y, movementMask.z, 1), vec4(col0.z, col1.z, col2.z, 1));	//vec4(transform[2], transform[6], transform[10], 1));
 
-	//transform = lookAt(vec3(xW, yW, zW), screenCenter + vec3(xW, yW, zW), camera->wUp);
-
-	/*
-	position += rightDirection	*	movementMask.x  * movementAmount;
-	position.y	+=					movementMask.y	* movementAmount;
-	position += viewDirection	*	movementMask.z	* movementAmount;
-
-	transform = translate(transform, position);*/
-	camera->TransformCamera(transform);
+	transform = lookAt(vec3(xW, yW, zW), camera->screenCenter + vec3(xW, yW, zW), camera->wUp);
+	//camera->TransformCamera(transform);
 }
 
 void Game::MouseUp(int _Button) { /* implement if you want to detect mouse button presses */ }
