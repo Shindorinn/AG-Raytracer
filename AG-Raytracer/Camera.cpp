@@ -70,7 +70,7 @@ void Camera::TransformCamera(mat4 transformMatrix)
 
 void Camera::Init()
 {
-	this->wUp = vec3(0, -1, 0);
+	this->wUp = vec3(0, 1, 0);
 	this->viewDirection = vec3(0.0f, 0.0f, 1.0f);
 	this->position = vec3(0);
 
