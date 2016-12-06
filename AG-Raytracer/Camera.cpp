@@ -102,8 +102,8 @@ void Camera::UpdatePosition()
 	p2 = (transformMatrix * vec4(p2, 1)).xyz;*/
 	this->viewDirection = vec3(this->transformMatrix[2]);
 	this->position = vec3(this->transformMatrix[3]);
-	this->rUp = vec3(this->transformMatrix[2]);
-	this->rRight = vec3(this->transformMatrix[1]);
+	this->rUp = vec3(this->transformMatrix[1]);
+	this->rRight = vec3(this->transformMatrix[0]);
 
 	this->screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
 	this->p0 = (transformMatrix * vec4(p0, 1)).xyz;
