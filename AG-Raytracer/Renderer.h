@@ -14,5 +14,6 @@ public:
 	void Render();
 	vec3 Trace(Ray* ray, int x, int y);
 	vec3 DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material);
-	vec3 Reflect(vec3 direction, vec3 normal);
+	vec3 Refract(vec3 intersectionPoint, Primitive* hit);
+	vec3 RefractInToOut(Ray* innerRay);
 };

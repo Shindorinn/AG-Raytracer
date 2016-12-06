@@ -14,10 +14,9 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 void Renderer::Render() {
 	//this->scene->camera->GenerateRays();
 
-
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		#pragma omp parallel
-		#pragma omp for
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
@@ -33,8 +32,9 @@ void Renderer::Render() {
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
@@ -125,4 +125,24 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
 		(material.color / PI);
 
+}
+
+vec3 Renderer::Refract(vec3 direction, Primitive* hit) {
+	// TODO: IMPLEMENT REFRACTION
+	// TODO: SPLIT INTO OUTTOINREFRACT AND VICE VERSA
+	// TODO: FIND A GOOD WAY TO DETERMINE REFLECTION
+	// First find reflection element and if TIR happens
+	vec3 normal = hit->GetNormal(direction);
+	float incidentCos = dot(normal, direction);
+	// Then do refraction ( out to in )
+	float sinT2 = hit->material.outToInN * (1 - incidentCos * incidentCos);
+	if (sinT2 > 1.0) // TIR
+		return vec3(0, 0, 0);
+	float outToIn = hit->material.outToInN;
+	return outToIn * direction - (outToIn + sqrtf(1.0 - sinT2)) * normal;
+	// Return both parts.
+
+	// two refraction indices, n1 and n2
+	// 𝐹𝑟 = 𝑅0 + (1 − 𝑅0)(1 − 𝑐𝑜𝑠𝜃)^5
+	// where 𝑅0 = ( (𝑛1−𝑛2) / (𝑛1 + 𝑛2) )^2
 }

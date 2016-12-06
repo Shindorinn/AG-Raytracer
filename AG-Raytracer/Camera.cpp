@@ -11,8 +11,9 @@ Camera::Camera()
 void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
-
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			u = (float) x / SCRWIDTH;
@@ -38,8 +39,9 @@ void Camera::GenerateRays()
 void Camera::UpdateRays()
 {
 	float u, v = 0.0f;
-
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			u = (float)x / SCRWIDTH;
