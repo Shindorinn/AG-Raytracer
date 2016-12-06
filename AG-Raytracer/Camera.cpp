@@ -65,6 +65,7 @@ void Camera::TransformCamera(mat4 transformMatrix)
 {
 	this->transformMatrix = transformMatrix;
 	this->UpdatePosition();
+	this->UpdateRays();
 }
 
 void Camera::Init()
@@ -87,6 +88,10 @@ void Camera::Init()
 	this->rRight = vec3(this->transformMatrix[0]);
 	this->rUp = vec3(this->transformMatrix[1]);
 	this->viewDirection = vec3(this->transformMatrix[2]);
+
+	//this->rRight =			vec3(this->transformMatrix[0].x, this->transformMatrix[1].x, this->transformMatrix[2].x);
+	//this->rUp =				vec3(this->transformMatrix[0].y, this->transformMatrix[1].y, this->transformMatrix[2].y);
+	//this->viewDirection =	vec3(this->transformMatrix[0].z, this->transformMatrix[1].z, this->transformMatrix[2].z);
 }
 
 void Camera::UpdatePosition()
@@ -104,12 +109,16 @@ void Camera::UpdatePosition()
 	this->position = vec3(this->transformMatrix[3]);
 	this->rUp = vec3(this->transformMatrix[1]);
 	this->rRight = vec3(this->transformMatrix[0]);
+	//this->rRight = vec3(this->transformMatrix[0].x, this->transformMatrix[1].x, this->transformMatrix[2].x);
+	//this->rUp = vec3(this->transformMatrix[0].y, this->transformMatrix[1].y, this->transformMatrix[2].y);
+	//this->viewDirection = vec3(this->transformMatrix[0].z, this->transformMatrix[1].z, this->transformMatrix[2].z);
+	//this->position = vec3(this->transformMatrix[0].w, this->transformMatrix[1].w, this->transformMatrix[2].w);
 
 	this->screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
 	this->p0 = (transformMatrix * vec4(p0, 1)).xyz;
 	this->p1 = (transformMatrix * vec4(p1, 1)).xyz;
 	this->p2 = (transformMatrix * vec4(p2, 1)).xyz;
-
+#if DEBUG
 	printf("\n position : %f, %f, %f \n",
 		position[0],
 		position[1],
@@ -140,4 +149,5 @@ void Camera::UpdatePosition()
 		p2[1],
 		p2[2]
 	);
+#endif
 }
