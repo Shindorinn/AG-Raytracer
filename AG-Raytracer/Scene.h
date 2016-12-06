@@ -10,6 +10,7 @@
 class Scene
 {
 public:
+<<<<<<< Updated upstream
 #if TUNNEL_SCENE
 	Primitive* primitives[8];
 	Light* lights[2];
@@ -20,6 +21,10 @@ public:
 	Primitive* primitives[1];
 	Light* lights[2];
 #endif
+=======
+	Primitive* primitives[12];
+	Light* lights[1];
+>>>>>>> Stashed changes
 	Camera* camera;
 	Scene();
 };

@@ -255,6 +255,7 @@
     <ClInclude Include="cone.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="_3DObject.h" />
     <ClInclude Include="Camera.h" />

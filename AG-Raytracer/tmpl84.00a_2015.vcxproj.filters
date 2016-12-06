@@ -71,6 +71,7 @@
     <ClInclude Include="cone.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="template code">
