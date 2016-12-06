@@ -112,39 +112,21 @@ void Game::KeyDown(int a_Key)
 		camera->transformMatrix = previousTransform;
 	}
 
-
-	printf("%i", a_Key);
 }
 
 // -----------------------------------------------------------
 // Main game tick function
 // -----------------------------------------------------------
 void Game::Tick(float dt)
-{
-	renderer->Render();
 
-	printout_d = renderer->scene->camera->d;
-	printout_position_x = renderer->scene->camera->position.x;
-	printout_position_y = renderer->scene->camera->position.y;
-	printout_position_z = renderer->scene->camera->position.z;
-	printout_viewDirection_x = renderer->scene->camera->viewDirection.x;
-	printout_viewDirection_y = renderer->scene->camera->viewDirection.y;
-	printout_viewDirection_z = renderer->scene->camera->viewDirection.z;
+{	renderer->Render();
 
 	char buffer[500];
 	sprintf(
 		buffer,
-		"FPS: %f \n Resolution : %f x %f \n d : %f \n Camera Position : %f, %f, %f \n View Direction : %f, %f, %f",
+		"FPS: %f \n Resolution : %i x %i ",
 		1 / dt,
 		SCRWIDTH,
-		SCRHEIGHT,
-		printout_d,
-		printout_position_x,
-		printout_position_y,
-		printout_position_z,
-		printout_viewDirection_x,
-		printout_viewDirection_y,
-		printout_viewDirection_z
-		);
+		SCRHEIGHT);
 	renderSurface->Print(buffer, 2, 2, 0xffffff);
 }

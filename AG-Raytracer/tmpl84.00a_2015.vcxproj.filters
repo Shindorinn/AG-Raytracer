@@ -22,7 +22,6 @@
     </ClCompile>
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -58,7 +57,6 @@
     </ClInclude>
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Screen.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
