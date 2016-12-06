@@ -32,6 +32,9 @@
     <ClCompile Include="Triangle.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="cone.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -63,6 +66,9 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Triangle.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="cone.h">
       <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
