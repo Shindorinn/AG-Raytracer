@@ -19,14 +19,6 @@ void Game::Init()
 {
 	Scene* myScene = new Scene();
 	renderer = new Renderer(myScene, renderSurface);
-
-	printout_d = renderer->scene->camera->d;
-	printout_position_x = renderer->scene->camera->position.x;
-	printout_position_y = renderer->scene->camera->position.y;
-	printout_position_z = renderer->scene->camera->position.z;
-	printout_viewDirection_x = renderer->scene->camera->viewDirection.x;
-	printout_viewDirection_y = renderer->scene->camera->viewDirection.y;
-	printout_viewDirection_z = renderer->scene->camera->viewDirection.z;
 }
 
 // -----------------------------------------------------------
@@ -130,6 +122,14 @@ void Game::KeyDown(int a_Key)
 void Game::Tick(float dt)
 {
 	renderer->Render();
+
+	printout_d = renderer->scene->camera->d;
+	printout_position_x = renderer->scene->camera->position.x;
+	printout_position_y = renderer->scene->camera->position.y;
+	printout_position_z = renderer->scene->camera->position.z;
+	printout_viewDirection_x = renderer->scene->camera->viewDirection.x;
+	printout_viewDirection_y = renderer->scene->camera->viewDirection.y;
+	printout_viewDirection_z = renderer->scene->camera->viewDirection.z;
 
 	char buffer[500];
 	sprintf(
