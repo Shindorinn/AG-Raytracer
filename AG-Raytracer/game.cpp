@@ -1,7 +1,17 @@
 #include "template.h"
 #include "Scene.h"
 #include "Renderer.h"
+
+
 Renderer* renderer;
+
+float printout_d				= 0.0f;
+float printout_position_x		= 0.0f;
+float printout_position_y		= 0.0f;
+float printout_position_z		= 0.0f;
+float printout_viewDirection_x  = 0.0f;
+float printout_viewDirection_y  = 0.0f;
+float printout_viewDirection_z  = 0.0f;
 // -----------------------------------------------------------
 // Initialize the game
 // -----------------------------------------------------------
@@ -9,6 +19,14 @@ void Game::Init()
 {
 	Scene* myScene = new Scene();
 	renderer = new Renderer(myScene, renderSurface);
+
+	printout_d = renderer->scene->camera->d;
+	printout_position_x = renderer->scene->camera->position.x;
+	printout_position_y = renderer->scene->camera->position.y;
+	printout_position_z = renderer->scene->camera->position.z;
+	printout_viewDirection_x = renderer->scene->camera->viewDirection.x;
+	printout_viewDirection_y = renderer->scene->camera->viewDirection.y;
+	printout_viewDirection_z = renderer->scene->camera->viewDirection.z;
 }
 
 // -----------------------------------------------------------
@@ -113,7 +131,20 @@ void Game::Tick(float dt)
 {
 	renderer->Render();
 
-	char buffer[100];
-	sprintf(buffer, "FPS: %f", 1 / dt);
+	char buffer[500];
+	sprintf(
+		buffer,
+		"FPS: %f \n Resolution : %f x %f \n d : %f \n Camera Position : %f, %f, %f \n View Direction : %f, %f, %f",
+		1 / dt,
+		SCRWIDTH,
+		SCRHEIGHT,
+		printout_d,
+		printout_position_x,
+		printout_position_y,
+		printout_position_z,
+		printout_viewDirection_x,
+		printout_viewDirection_y,
+		printout_viewDirection_z
+		);
 	renderSurface->Print(buffer, 2, 2, 0xffffff);
 }
