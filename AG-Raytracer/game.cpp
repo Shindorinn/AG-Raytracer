@@ -160,19 +160,21 @@ void Game::KeyUp(int a_Key) {}
 //		camera->TransformCamera(transform);
 //	}
 //}
-
+float movementSpeed = 0.1f;
 void Game::KeyDown(int a_Key)
 {
 	Camera* camera = renderer->scene->camera;
 	mat4 transform = camera->transformMatrix;
+	mat4 previousTransform = transform;
 
 	float rotationSpeed = 0.05f;
 
 	// Adjust viewdirection
+
+	//LeftRight
 	if (a_Key == 79 || a_Key == 80)
 	{
-		mat4 previousTransform = transform;
-		if (a_Key == 79)
+		if (a_Key == 80)
 			transform = rotate(transform, -1 * rotationSpeed, camera->rUp);
 		else
 			transform = rotate(transform, rotationSpeed, camera->rUp);
@@ -180,10 +182,9 @@ void Game::KeyDown(int a_Key)
 		camera->transformMatrix = previousTransform;
 
 	}
-
+	//UpDown
 	if (a_Key == 82 || a_Key == 81)
 	{
-		mat4 previousTransform = transform;
 		if (a_Key == 82)
 			transform = rotate(transform, -1 * rotationSpeed, camera->rRight);
 		else
@@ -192,10 +193,9 @@ void Game::KeyDown(int a_Key)
 		camera->transformMatrix = previousTransform;
 
 	}
-
+	//Left/RightCtrl
 	if (a_Key == 224 || a_Key == 228)
 	{
-		mat4 previousTransform = transform;
 		if (a_Key == 224)
 			transform = rotate(transform, -1 * rotationSpeed, camera->viewDirection);
 		else
@@ -204,6 +204,44 @@ void Game::KeyDown(int a_Key)
 		camera->transformMatrix = previousTransform;
 
 	}
+	//a,d
+	if (a_Key == 4 || a_Key == 7)
+	{
+		if (a_Key == 4)
+			transform = translate(transform, -camera->rRight *movementSpeed);
+
+		else
+			transform = translate(transform, camera->rRight *movementSpeed);
+		camera->TransformCamera(transform);
+		camera->transformMatrix = previousTransform;
+	}
+
+	//w,s
+	if (a_Key == 26 || a_Key == 22)
+	{
+		if (a_Key == 26)
+			transform = translate(transform, camera->viewDirection *movementSpeed);
+
+		else
+			transform = translate(transform, -camera->viewDirection * movementSpeed);
+		camera->TransformCamera(transform);
+		camera->transformMatrix = previousTransform;
+	}
+
+	//lShift-rShift
+	if (a_Key == 225 || a_Key == 229)
+	{
+		if (a_Key == 225)
+			transform = translate(transform, camera->rUp *movementSpeed);
+
+		else
+			transform = translate(transform, -camera->rUp  *movementSpeed);
+		camera->TransformCamera(transform);
+		camera->transformMatrix = previousTransform;
+	}
+
+
+	printf("%i", a_Key);
 }
 
 // -----------------------------------------------------------
