@@ -88,17 +88,34 @@ void Game::HandleInput(float dt)
 		(up + -down),
 		(rctrl + -lctrl)
 	);
+#if DEBUG
+	printf("TransformMatrix \n");
+	printf("%f %f %f %f  \n", camera->transformMatrix[0].x, camera->transformMatrix[0].y, camera->transformMatrix[0].z, camera->transformMatrix[0].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[1].x, camera->transformMatrix[1].y, camera->transformMatrix[1].z, camera->transformMatrix[1].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[2].x, camera->transformMatrix[2].y, camera->transformMatrix[2].z, camera->transformMatrix[2].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[3].x, camera->transformMatrix[3].y, camera->transformMatrix[3].z, camera->transformMatrix[3].w);
+#endif
 	// Adjust viewdirection
-	vec3 screenCenterRotateRight = normalize(camera->screenCenter + camera->rUp * rotationAmount * rotationMask.x);
-	transform = inverse(lookAt(camera->position, screenCenterRotateRight - camera->position, camera->wUp));
-
-	camera->TransformCamera(transform);
-
-	vec3 screenCenterRotateUp = normalize(camera->screenCenter + camera->rRight * rotationAmount * rotationMask.y);
-	transform = inverse(lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp));
-
-	camera->TransformCamera(transform);
-
+	vec3 screenCenterRotateRight = normalize(camera->screenCenter + camera->rRight * rotationAmount * rotationMask.x);
+	//printf("screenCenterRotateRight :  %f, %f, %f \n", screenCenterRotateRight.x, screenCenterRotateRight.y, screenCenterRotateRight.z);
+	camera->TransformCamera(inverse(lookAt(camera->position, screenCenterRotateRight - camera->position, camera->wUp)));
+#if DEBUG
+	printf("TransformMatrix \n");
+	printf("%f %f %f %f  \n", camera->transformMatrix[0].x, camera->transformMatrix[0].y, camera->transformMatrix[0].z, camera->transformMatrix[0].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[1].x, camera->transformMatrix[1].y, camera->transformMatrix[1].z, camera->transformMatrix[1].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[2].x, camera->transformMatrix[2].y, camera->transformMatrix[2].z, camera->transformMatrix[2].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[3].x, camera->transformMatrix[3].y, camera->transformMatrix[3].z, camera->transformMatrix[3].w);
+#endif 
+	vec3 screenCenterRotateUp = normalize(camera->screenCenter + camera->rUp * rotationAmount * rotationMask.y);
+	//printf("screenCenterRotateUp :  %f, %f, %f \n", screenCenterRotateUp.x, screenCenterRotateUp.y, screenCenterRotateUp.z);
+	camera->TransformCamera(inverse(lookAt(camera->position, screenCenterRotateUp - camera->position, camera->wUp)));
+#if DEBUG
+	printf("TransformMatrix \n");
+	printf("%f %f %f %f  \n", camera->transformMatrix[0].x, camera->transformMatrix[0].y, camera->transformMatrix[0].z, camera->transformMatrix[0].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[1].x, camera->transformMatrix[1].y, camera->transformMatrix[1].z, camera->transformMatrix[1].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[2].x, camera->transformMatrix[2].y, camera->transformMatrix[2].z, camera->transformMatrix[2].w);
+	printf("%f %f %f %f  \n", camera->transformMatrix[3].x, camera->transformMatrix[3].y, camera->transformMatrix[3].z, camera->transformMatrix[3].w);
+#endif
 	//TODO : add rotate around z?
 	//vec3 screenCenterRotateForward = normalize(camera->screenCenter + camera->viewDirection * rotationAmount * rotationMask.z);
 	//transform = inverse(lookAt(camera->position, screenCenterRotateForward - camera->position, camera->wUp));
@@ -116,7 +133,7 @@ void Game::HandleInput(float dt)
 		(w + -s)
 	);
 	
-	printf("Movementmask :  %f, %f, %f \n", movementMask.x, movementMask.y, movementMask.z);
+	//printf("Movementmask :  %f, %f, %f \n", movementMask.x, movementMask.y, movementMask.z);
 
 	float movementAmount = movementSpeed * dt;
 	movementMask = movementAmount * movementMask;
@@ -146,7 +163,6 @@ void Game::Tick(float dt)
 {
 	//renderSurface->Clear(0);
 	HandleInput(dt);
-	renderer->scene->camera->UpdateRays();
 	renderer->Render();
 
 	char buffer[100];
