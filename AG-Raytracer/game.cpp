@@ -2,16 +2,8 @@
 #include "Scene.h"
 #include "Renderer.h"
 
-
 Renderer* renderer;
 
-float printout_d				= 0.0f;
-float printout_position_x		= 0.0f;
-float printout_position_y		= 0.0f;
-float printout_position_z		= 0.0f;
-float printout_viewDirection_x  = 0.0f;
-float printout_viewDirection_y  = 0.0f;
-float printout_viewDirection_z  = 0.0f;
 // -----------------------------------------------------------
 // Initialize the game
 // -----------------------------------------------------------
@@ -26,7 +18,7 @@ void Game::Init()
 // -----------------------------------------------------------
 #define DEBUG 0
 
-void Game::HandleInput(float dt){}
+void Game::HandleInput(float dt) {}
 void Game::MouseUp(int _Button) { /* implement if you want to detect mouse button presses */ }
 void Game::MouseDown(int _Button) { /* implement if you want to detect mouse button presses */ }
 void Game::MouseMove(int _X, int _Y) { /* implement if you want to detect mouse movement */ }
@@ -119,7 +111,8 @@ void Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Game::Tick(float dt)
 
-{	renderer->Render();
+{
+	renderer->Render();
 
 	char buffer[500];
 	sprintf(
