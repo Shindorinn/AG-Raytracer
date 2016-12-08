@@ -1,20 +1,17 @@
 #pragma once
 #include "template.h";
 #include "Primitive.h";
-
-struct AABB{};
-
+#include "BVHNode.h"
 
 class BVH {
-	void ConstructBVH(Primitive* primitives);
+public:
+	uint N = 0;
+	BVHNode* rootNode;
+	BVHNode* pool;
 	
+	uint* indices;
+	uint poolPtr;
+
+	void ConstructBVH(Primitive* primitives);
 };
 
-class BVHNode {
-	struct BVHNode {
-		AABB bounds
-		int leftFirst;
-		int count;
-	};
-	void Subdivide();
-};
