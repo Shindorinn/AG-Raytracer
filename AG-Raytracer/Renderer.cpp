@@ -12,9 +12,6 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-	//this->scene->camera->GenerateRays();
-
-
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		#pragma omp parallel
 		#pragma omp for
@@ -35,10 +32,11 @@ void Renderer::Render() {
 	}
 
 	for (int y = 0; y < SCRHEIGHT; y++)
+		#pragma omp parallel
+		#pragma omp for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
-
 
 vec3 Renderer::Trace(Ray* ray, int x, int y)
 {
@@ -64,8 +62,6 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 		
 		if (hit->material.materialKind == Material::MaterialKind::DIFFUSE)
 		{
-			
-
 			for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
 			{
 				vec3 direction = glm::normalize(scene->lights[i]->position - intersectionPoint);
@@ -92,10 +88,10 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 		if (hit->material.materialKind == Material::MaterialKind::GLASS)
 		{
 			printf("glass hit");
-			//TODO: IMPLEMENT REFRACTION
+			return this->Refract(intersectionPoint, hit);
+			
 		}
 		return colorResult;
-
 	}
 }
 
@@ -124,5 +120,24 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		dot(normal, direction) *
 		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
 		(material.color / PI);
+}
 
+vec3 Renderer::Refract(vec3 direction, Primitive* primitive) {
+	//TODO: IMPLEMENT REFRACTION
+	// TODO: SPLIT INTO OUTTOINREFRACT AND VICE VERSA
+	// TODO: FIND A GOOD WAY TO DETERMINE REFLECTION
+	// First find reflection element and if TIR happens
+	vec3 normal = primitive->GetNormal(direction);
+	float incidentCos = dot(normal, direction);
+	// Then do refraction ( out to in )
+	float sinT2 = primitive->material.ndiv2 * (1 - incidentCos * incidentCos);
+	if (sinT2 > 1.0) // TIR
+		return vec3(0, 0, 0);
+	float ndiv = primitive->material.ndiv;
+	return ndiv * direction - (ndiv + sqrtf(1.0 - sinT2)) * normal;
+	// Return both parts.
+	
+	// two refraction indices, n1 and n2
+	// 𝐹𝑟 = 𝑅0 + (1 − 𝑅0)(1 − 𝑐𝑜𝑠𝜃)^5
+	// where 𝑅0 = (	(𝑛1−𝑛2) / (𝑛1 + 𝑛2) )^2
 }
