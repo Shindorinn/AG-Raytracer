@@ -22,7 +22,6 @@
     </ClCompile>
     <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Screen.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -33,6 +32,9 @@
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="BVH.cpp" />
+    <ClCompile Include="cone.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -56,7 +58,6 @@
     </ClInclude>
     <ClInclude Include="Ray.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Screen.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
@@ -66,7 +67,11 @@
     <ClInclude Include="Triangle.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="BVH.h" />
+	<ClInclude Include="BVH.h" />
+    <ClInclude Include="cone.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="template code">

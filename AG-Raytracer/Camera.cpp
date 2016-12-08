@@ -11,8 +11,9 @@ Camera::Camera()
 void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
-
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			u = (float) x / SCRWIDTH;
@@ -38,8 +39,9 @@ void Camera::GenerateRays()
 void Camera::UpdateRays()
 {
 	float u, v = 0.0f;
-
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			u = (float)x / SCRWIDTH;
@@ -60,7 +62,6 @@ void Camera::UpdateRays()
 	}
 }
 
-//TODO : Check if the order of the matrix multiplication is correct
 void Camera::TransformCamera(mat4 transformMatrix)
 {
 	this->transformMatrix = transformMatrix;
@@ -70,7 +71,7 @@ void Camera::TransformCamera(mat4 transformMatrix)
 
 void Camera::Init()
 {
-	this->wUp = vec3(0, -1, 0);
+	this->wUp = vec3(0, 1, 0);
 	this->viewDirection = vec3(0.0f, 0.0f, 1.0f);
 	this->position = vec3(0);
 
@@ -88,31 +89,14 @@ void Camera::Init()
 	this->rRight = vec3(this->transformMatrix[0]);
 	this->rUp = vec3(this->transformMatrix[1]);
 	this->viewDirection = vec3(this->transformMatrix[2]);
-
-	//this->rRight =			vec3(this->transformMatrix[0].x, this->transformMatrix[1].x, this->transformMatrix[2].x);
-	//this->rUp =				vec3(this->transformMatrix[0].y, this->transformMatrix[1].y, this->transformMatrix[2].y);
-	//this->viewDirection =	vec3(this->transformMatrix[0].z, this->transformMatrix[1].z, this->transformMatrix[2].z);
 }
 
 void Camera::UpdatePosition()
 {
-	/*decompose(transformMatrix, scale, rotation, position, skew, perspective);
-	rotation = conjugate(rotation);
-
-	viewDirection = rotation * viewDirection;
-
-	screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
-	p0 = (transformMatrix * vec4(p0, 1)).xyz;
-	p1 = (transformMatrix * vec4(p1, 1)).xyz;
-	p2 = (transformMatrix * vec4(p2, 1)).xyz;*/
 	this->viewDirection = vec3(this->transformMatrix[2]);
 	this->position = vec3(this->transformMatrix[3]);
 	this->rUp = vec3(this->transformMatrix[1]);
 	this->rRight = vec3(this->transformMatrix[0]);
-	//this->rRight = vec3(this->transformMatrix[0].x, this->transformMatrix[1].x, this->transformMatrix[2].x);
-	//this->rUp = vec3(this->transformMatrix[0].y, this->transformMatrix[1].y, this->transformMatrix[2].y);
-	//this->viewDirection = vec3(this->transformMatrix[0].z, this->transformMatrix[1].z, this->transformMatrix[2].z);
-	//this->position = vec3(this->transformMatrix[0].w, this->transformMatrix[1].w, this->transformMatrix[2].w);
 
 	this->screenCenter = vec3(position.x, position.y, position.z) + d*viewDirection;
 	this->p0 = (transformMatrix * vec4(p0, 1)).xyz;
