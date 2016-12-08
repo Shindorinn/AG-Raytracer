@@ -1,5 +1,4 @@
 ﻿#include "template.h"
-#include "Renderer.h"
 
 #define DEBUG 1
 #define EPSILON 0.01f

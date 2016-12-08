@@ -1,7 +1,4 @@
 ﻿#pragma once
-#include "Primitive.h"
-#include "Light.h"
-#include "Camera.h"
 
 #define TUNNEL_SCENE 1
 #define MIRROR_SCENE 0

@@ -1,13 +1,8 @@
-#pragma once
-
-#include "template.h"
-#include "Ray.h"
-#include "BVH.h"
-
-struct AABB {};
+﻿#pragma once
 
 
-class BVHNode {
+class BVHNode
+{
 public:
 	AABB bounds;
 	int leftFirst;
@@ -17,4 +12,5 @@ public:
 	void Traverse(Ray ray);
 	void Partition();
 	bool IsLeaf();
+	
 };

@@ -1,5 +1,4 @@
 ﻿#include "template.h"
-#include "Triangle.h"
 
 bool Triangle::CheckIntersection(Ray* ray)
 {

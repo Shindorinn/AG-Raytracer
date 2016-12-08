@@ -1,17 +1,16 @@
-#pragma once
-#include "template.h";
-#include "Primitive.h";
-#include "BVHNode.h"
+﻿#pragma once
+
+class Primitive;
+class BVHNode;
 
 class BVH {
 public:
-	uint N = 0;
+	glm::uint N = 0;
 	BVHNode* rootNode;
 	BVHNode* pool;
-	
-	uint* indices;
-	uint poolPtr;
+
+	glm::uint* indices;
+	glm::uint poolPtr;
 
 	void ConstructBVH(Primitive* primitives);
 };
-

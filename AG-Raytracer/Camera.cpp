@@ -1,7 +1,4 @@
 ﻿#include "template.h"
-#include "Camera.h"
-#include "Ray.h"
-#include <random>
 
 Camera::Camera()
 {

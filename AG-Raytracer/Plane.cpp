@@ -1,5 +1,4 @@
 ﻿#include "template.h"
-#include "Plane.h"
 
 bool Plane::CheckIntersection(Ray* ray)
 {

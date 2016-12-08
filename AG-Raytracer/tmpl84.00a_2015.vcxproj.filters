@@ -31,11 +31,9 @@
     <ClCompile Include="Triangle.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="BVH.cpp" />
-    <ClCompile Include="cone.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="BVHNode.cpp" />
+    <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="BVH.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -68,12 +66,10 @@
     <ClInclude Include="Triangle.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="BVH.h" />
-    <ClInclude Include="cone.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="BVHNode.h" />
+    <ClInclude Include="AABB.h" />
+    <ClInclude Include="BVH.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="template code">

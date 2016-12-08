@@ -1,8 +1,5 @@
 ﻿#include "template.h"
-#include "Scene.h"
-#include "Sphere.h"
-#include "Triangle.h"
-#include "Plane.h"
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 

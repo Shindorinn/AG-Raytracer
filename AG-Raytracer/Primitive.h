@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "Ray.h"
-#include "Material.h"
 
 class Primitive
 {

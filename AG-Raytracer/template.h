@@ -90,4 +90,19 @@ typedef unsigned char byte;
 
 #define BADFLOAT(x) ((*(uint*)&x & 0x7f000000) == 0x7f000000)
 
+
+#include "Light.h"
+#include "Material.h"
+#include "AABB.h"
+#include "Ray.h"
+#include "Primitive.h"
+#include "Sphere.h"
+#include "Triangle.h"
+#include "Plane.h"
+#include "BVHNode.h"
+#include "BVH.h"
+#include "Camera.h"
+#include "Scene.h"
+#include "Renderer.h"
+
 }; // namespace Tmpl8

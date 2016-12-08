@@ -1,6 +1,4 @@
 #include "template.h"
-#include "Scene.h"
-#include "Renderer.h"
 
 Renderer* renderer;
 
