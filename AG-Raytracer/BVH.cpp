@@ -14,6 +14,30 @@ void BVH::ConstructBVH(Primitive* primitives)
 	// subdivide root node
 	rootNode->leftFirst = 0;
 	rootNode->count = N;
-	//rootNode->bounds = CalculateBounds(primitives, rootNode->first, rootNode->count);
-	rootNode->Subdivide();
+	rootNode->bounds = CalculateBounds(primitives, rootNode->leftFirst, rootNode->count);
+	rootNode->Subdivide(pool, poolPtr);
+}
+
+AABB BVH::CalculateBounds(Primitive* primitives, int first, int count)
+{
+	float minx = -INFINITY, miny = -INFINITY, minz = -INFINITY, maxx = INFINITY, maxy = INFINITY, maxz = INFINITY;
+
+	for (int i = first; i < count; i++)
+	{
+		vec3 pos = primitives[i].GetPosition();
+
+		if (pos.x < minx)
+			minx = pos.x;
+		else if (pos.x > maxx)
+			maxx = pos.x;
+		if (pos.y < miny)
+			miny = pos.y;
+		else if (pos.y > maxy)
+			maxy = pos.y;
+		if (pos.z < minz)
+			minz = pos.z;
+		else if (pos.z > maxz)
+			maxz = pos.z;
+	}
+	return AABB(vec3(minx,miny,minz),vec3(maxx,maxy,maxz));
 }

@@ -1,19 +1,16 @@
 ﻿#include "template.h"
 
-//BVH* bvh;
-
-void BVHNode::Subdivide()
+void BVHNode::Subdivide(BVHNode* pool, glm::uint poolPtr)
 {
-	//TODO
-	if (count < 3) return;
+	//if (count < 3) return;
 
-	//this->left = bvh->pool[bvh->poolPtr++];
-	//this->right = bvh->pool[bvh->poolPtr++];
+	//this->leftFirst = pool[poolPtr++];
+	//this->leftFirst + 1 = pool[>poolPtr++];
 
-	Partition();
+	//Partition();
 
-	//this->left->Subdivide();
-	//this->right->Subdivide();
+	//this->leftFirst->Subdivide();
+	//this->leftFirst+1->Subdivide();
 
 }
 

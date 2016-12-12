@@ -1,8 +1,5 @@
 ﻿#pragma once
 
-class Primitive;
-class BVHNode;
-
 class BVH {
 public:
 	glm::uint N = 0;
@@ -13,4 +10,11 @@ public:
 	glm::uint poolPtr;
 
 	void ConstructBVH(Primitive* primitives);
+	AABB CalculateBounds(Primitive* primitives, int first, int count);
+
+	BVH(Primitive* primitives)
+	{
+		this->N = sizeof(primitives) / sizeof(Primitive);
+		ConstructBVH(primitives);
+	}
 };
