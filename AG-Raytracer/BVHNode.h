@@ -7,9 +7,9 @@ public:
 	int leftFirst;
 	int count;
 
-	void Subdivide(BVHNode* pool, glm::uint poolPtr);
+	void Subdivide(BVHNode* pool, int* nodeIndices, glm::uint poolPtr);
 	void Traverse(Ray ray);
-	void Partition();
+	void Partition(BVHNode* pool, int* nodeIndices, glm::uint poolPtr);
 	bool IsLeaf();
 
 	BVHNode() {};

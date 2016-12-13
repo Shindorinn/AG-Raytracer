@@ -3,10 +3,13 @@
 class BVH {
 public:
 	glm::uint N = 0;
+
 	BVHNode* rootNode;
 	BVHNode* pool;
 
-	glm::uint* indices;
+	int* nodeIndices;
+	glm::uint* primitiveIndices;
+
 	glm::uint poolPtr;
 
 	void ConstructBVH(Primitive* primitives);

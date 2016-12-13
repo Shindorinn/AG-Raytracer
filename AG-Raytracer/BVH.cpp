@@ -3,8 +3,12 @@
 void BVH::ConstructBVH(Primitive* primitives)
 {
 	// create index array
-	indices = new uint[N];
-	for (int i = 0; i < N; i++) indices[i] = i;
+	primitiveIndices = new uint[N];
+	for (int i = 0; i < N; i++) primitiveIndices[i] = i;
+
+	// also create node indices
+	nodeIndices = new int[N * 2 - 1];
+	for (int i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
 
 	// allocate BVH root node
 	pool = new BVHNode[N * 2 - 1];
@@ -13,9 +17,9 @@ void BVH::ConstructBVH(Primitive* primitives)
 
 	// subdivide root node
 	rootNode->leftFirst = 0;
-	rootNode->count = N;
+	rootNode->count = 0;
 	rootNode->bounds = CalculateBounds(primitives, rootNode->leftFirst, rootNode->count);
-	rootNode->Subdivide(pool, poolPtr);
+	rootNode->Subdivide(pool, nodeIndices, poolPtr);
 }
 
 AABB BVH::CalculateBounds(Primitive* primitives, int first, int count)
@@ -39,5 +43,5 @@ AABB BVH::CalculateBounds(Primitive* primitives, int first, int count)
 		else if (pos.z > maxz)
 			maxz = pos.z;
 	}
-	return AABB(vec3(minx,miny,minz),vec3(maxx,maxy,maxz));
+	return AABB(vec3(minx, miny, minz), vec3(maxx, maxy, maxz));
 }

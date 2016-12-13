@@ -8,6 +8,7 @@ public:
 
 	bool CheckIntersection(Ray* ray) override;
 	vec3 GetNormal(vec3 point) override;
+	vec3 GetCentroid();
 
 	Triangle(vec3 position, vec3 v1, vec3 v2) : Primitive(position)
 	{

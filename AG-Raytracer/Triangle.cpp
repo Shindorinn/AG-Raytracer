@@ -56,4 +56,9 @@ bool Triangle::CheckIntersection(Ray* ray)
 vec3 Triangle::GetNormal(vec3 point)
 {
 	return this->normal;
-} 
+}
+
+vec3 Triangle::GetCentroid()
+{
+	return vec3((v0.x + v1.x + v2.x)/ 3, (v0.y + v1.y + v2.y) / 3, (v0.z + v1.z + v2.z) / 3);
+}
