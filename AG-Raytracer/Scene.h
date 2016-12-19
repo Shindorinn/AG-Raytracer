@@ -7,6 +7,7 @@
 class Scene
 {
 public:
+	
 #if TUNNEL_SCENE
 	Primitive* primitives[8];
 	Light* lights[2];
@@ -22,5 +23,9 @@ public:
 #endif
 
 	Camera* camera;
+	AABB* sceneBounds;
 	Scene();
+
+	// TODO : Method to calculate maximal bounding box given all internal primitives?
+	AABB* CalculateSceneBounds();
 };

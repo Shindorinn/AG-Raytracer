@@ -6,6 +6,7 @@
 Scene::Scene()
 {
 	camera = new Camera();
+	//sceneBounds = new AABB(vec3(-100, -100, -100), vec3(100, 100, 100));
 
 #if TUNNEL_SCENE 1
 	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
@@ -104,4 +105,34 @@ Scene::Scene()
 		}
 	}
 #endif
+	sceneBounds = this->CalculateSceneBounds();
+}
+
+AABB* Scene::CalculateSceneBounds()
+{
+	float maxX = 0.0f;
+	float maxY = 0.0f;
+	float maxZ = 0.0f;
+
+	float minX = 0.0f;
+	float minY = 0.0f;
+	float minZ = 0.0f;
+
+	for (int i = 0; i < sizeof(this->primitives) / sizeof(this->primitives[0]); i++) {
+		AABB* currentAABB = primitives[i]->boundingBox;
+		if (currentAABB->max.x >= maxX)
+			maxX = currentAABB->max.x;
+		if (currentAABB->max.y >= maxY)
+			maxY = currentAABB->max.y;
+		if (currentAABB->max.z >= maxZ)
+			maxZ = currentAABB->max.z;
+		if (currentAABB->min.x <= minX)
+			minX = currentAABB->min.x;
+		if (currentAABB->min.y <= minY)
+			minY = currentAABB->min.y;
+		if (currentAABB->min.z <= minZ)
+			minZ = currentAABB->min.z;
+	}
+
+	return new AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }

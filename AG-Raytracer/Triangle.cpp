@@ -62,3 +62,58 @@ vec3 Triangle::GetCentroid()
 {
 	return vec3((v0.x + v1.x + v2.x)/ 3, (v0.y + v1.y + v2.y) / 3, (v0.z + v1.z + v2.z) / 3);
 }
+
+AABB* Triangle::CalcAABB()
+{
+	float maxX = 0.0f;
+	float maxY = 0.0f;
+	float maxZ = 0.0f;
+
+	float minX = 0.0f;
+	float minY = 0.0f;
+	float minZ = 0.0f;
+
+	if (v0.x >= maxX)
+		maxX = v0.x;
+	if (v1.x >= maxX)
+		maxX = v1.x;
+	if (v2.x >= maxX)
+		maxX = v2.x;
+
+	if (v0.y >= maxY)
+		maxY = v0.y;
+	if (v1.y >= maxY)
+		maxY = v1.y;
+	if (v2.y >= maxY)
+		maxY = v2.y;
+
+	if (v0.z >= maxZ)
+		maxZ = v0.z;
+	if (v1.z>= maxZ)
+		maxZ = v1.z;
+	if (v2.z >= maxZ)
+		maxZ = v2.z;
+
+	if (v0.x <= minX)
+		minX = v0.x;
+	if (v1.x <= minX)
+		minX = v1.x;
+	if (v2.x <= minX)
+		minX = v2.x;
+
+	if (v0.y<= minY)
+		minY = v0.y;
+	if (v1.y <= minY)
+		minY = v1.y;
+	if (v2.y <= minY)
+		minY = v2.y;
+		
+	if (v0.z <= minZ)
+		minZ = v0.z;
+	if (v1.z <= minZ)
+		minZ = v1.z;
+	if (v2.z <= minZ)
+		minZ = v2.z;
+
+	return new AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
+}

@@ -12,9 +12,11 @@ public:
 	vec4 perspective;
 
 	Material material = Material(vec3(1,0,0), Material::MaterialKind::DIFFUSE);
+	AABB* boundingBox;
 
 	virtual bool CheckIntersection(Ray* ray) = 0;
 	virtual vec3 GetNormal(vec3 point) = 0;
+	virtual AABB* CalcAABB() = 0;
 
 	Primitive(vec3 position);
 	Primitive(mat4 transformMatrix);
@@ -25,4 +27,5 @@ public:
 	vec3 GetDirectionVector();
 
 	void UpdatePosition();
+	
 };

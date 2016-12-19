@@ -9,6 +9,8 @@ public:
 
 	vec3 GetNormal(vec3 point) override;
 
+	AABB* CalcAABB() override;
+
 	Plane(vec3 position, vec3 normal) : Primitive(position)
 	{
 		this->normal = normal;

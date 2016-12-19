@@ -24,3 +24,9 @@ vec3 Sphere::GetNormal(vec3 point)
 {
 	return normalize(point - this->GetPosition());
 }
+
+AABB* Sphere::CalcAABB()
+{
+	vec3 position = this->GetPosition();
+	return new AABB(position.xyz - radius, position.xyz - -radius);
+}

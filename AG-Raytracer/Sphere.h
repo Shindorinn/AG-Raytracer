@@ -7,6 +7,7 @@ public:
 
 	bool CheckIntersection(Ray* ray) override;
 	vec3 GetNormal(vec3 point);
+	AABB* CalcAABB() override;
 
 	Sphere(vec3 position, float radius) : Primitive(position)
 	{
