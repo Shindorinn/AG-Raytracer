@@ -15,5 +15,6 @@ public:
 	{
 		this->normal = normal;
 		this->position = position;
+		this->boundingBox = CalcAABB();
 	}
 };

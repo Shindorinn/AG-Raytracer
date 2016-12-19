@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "template.h"
 
 class Renderer
 {

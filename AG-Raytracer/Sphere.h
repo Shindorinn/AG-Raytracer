@@ -13,5 +13,6 @@ public:
 	{
 		this->radius = radius;
 		this->radius2 = radius*radius;
+		this->boundingBox = CalcAABB();
 	}
 };

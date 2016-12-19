@@ -18,5 +18,6 @@ public:
 		this->v2 = v2;
 
 		this->normal = normalize(cross(v1 - v0, v2 - v0));
+		this->boundingBox = CalcAABB();
 	}
 };

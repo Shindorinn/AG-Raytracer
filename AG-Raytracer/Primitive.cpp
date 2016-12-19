@@ -28,7 +28,6 @@ void Primitive::Init(mat4 transformMatrix)
 	this->skew = vec3();
 	this->perspective = vec4();
 	this->UpdatePosition();
-	this->boundingBox = CalcAABB();
 };
 
 vec3 Primitive::GetPosition()
