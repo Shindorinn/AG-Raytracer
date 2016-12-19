@@ -110,13 +110,13 @@ Scene::Scene()
 
 AABB* Scene::CalculateSceneBounds()
 {
-	float maxX = INFINITY;
-	float maxY = INFINITY;
-	float maxZ = INFINITY;
+	float maxX = -INFINITY;
+	float maxY = -INFINITY;
+	float maxZ = -INFINITY;
 
-	float minX = -INFINITY;
-	float minY = -INFINITY;
-	float minZ = -INFINITY;
+	float minX = INFINITY;
+	float minY = INFINITY;
+	float minZ = INFINITY;
 
 	for (int i = 0; i < sizeof(this->primitives) / sizeof(this->primitives[0]); i++) {
 		AABB* currentAABB = primitives[i]->boundingBox;
