@@ -65,13 +65,13 @@ vec3 Triangle::GetCentroid()
 
 AABB* Triangle::CalcAABB()
 {
-	float maxX = 0.0f;
-	float maxY = 0.0f;
-	float maxZ = 0.0f;
+	float maxX = INFINITY;
+	float maxY = INFINITY;
+	float maxZ = INFINITY;
 
-	float minX = 0.0f;
-	float minY = 0.0f;
-	float minZ = 0.0f;
+	float minX = -INFINITY;
+	float minY = -INFINITY;
+	float minZ = -INFINITY;
 
 	if (v0.x >= maxX)
 		maxX = v0.x;
