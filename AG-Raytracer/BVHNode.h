@@ -10,8 +10,8 @@ public:
 	//void Traverse(Ray ray, BVHNode** pool);
 	//void BVHNode::IntersectPrimitives(Ray ray, BVHNode** pool);
 
-	void Subdivide(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr);
-	void Partition(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr);
+	void Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr);
+	void Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr);
 
 	bool IsLeaf();
 

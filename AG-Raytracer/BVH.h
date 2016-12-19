@@ -8,7 +8,7 @@ public:
 	BVHNode** pool;
 	Primitive** primitives;
 
-	glm::uint* nodeIndices;
+	//glm::uint* nodeIndices;
 	glm::uint* primitiveIndices;
 	glm::uint poolPtr;
 	

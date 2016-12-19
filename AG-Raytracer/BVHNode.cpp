@@ -29,25 +29,35 @@
 //
 //}
 
-void BVHNode::Subdivide(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
 {
 	if (count < 3) return;
 
-	this->leftFirst = nodeIndices[poolPtr++];
+	uint tempPoolPtr = poolPtr;
 
-	//In partition, pool and nodeIndices need to be kept in sync!
-	Partition(pool, nodeIndices, poolPtr);
+	/*this->leftFirst = primitives[poolPtr++];*/
 
-	//TODO: CHECK THIS    |  leftFirst + 1 will be right. Can we do this implicitly as done in the following line?  (order with partition is swapped on purpose)
-	poolPtr++;
+	////Get the BVHNodes temporarily, but they're not saved.
+	//BVHNode* left = pool[poolPtr];
+	//BVHNode* right = pool[poolPtr + 1];
+
+	////In partition, pool and nodeIndices need to be kept in sync!
+	Partition(pool, primitives, poolPtr);
+
+	////TODO: CHECK THIS    |  leftFirst + 1 will be right. Can we do this implicitly as done in the following line?  (order with partition is swapped on purpose)
+	//poolPtr++;
 	//this->leftFirst + 1 = nodeIndices[>poolPtr++];
 
-	pool[leftFirst]->Subdivide(pool, nodeIndices, poolPtr);
-	pool[leftFirst + 1]->Subdivide(pool, nodeIndices, poolPtr);
+	pool[leftFirst]->Subdivide(pool, primitives, poolPtr);
+	pool[leftFirst + 1]->Subdivide(pool, primitives, poolPtr);
+
+
+	this->leftFirst = tempPoolPtr;
+	//count = 0 hier nog ??!
 }
 
 
-void BVHNode::Partition(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr)
+void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
 {
 	//Use SAH (Surface Area Heuristic, described here: http://graphics.ucsd.edu/courses/cse168_s06/ucsd/heuristics.pdf 
 
@@ -63,12 +73,14 @@ void BVHNode::Partition(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPt
 	//	P1 = left node primitive count
 	//	P2 = left node primitive count
 	//	Ci = primitive intersection cost
-	
+
 	//Continue to split if  c < np*ci
 
 	//	c = estimated cost of traversing p and its children(l, r)
 	//	ci = ~cost of performing one intersection test
 	//	np = number of elements in parent node
+
+
 }
 
 //If a node has a count of primitives, it's a leaf.

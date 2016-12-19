@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#define TUNNEL_SCENE 1
+#define TRI_SCENE 1
+#define TUNNEL_SCENE 0
 #define MIRROR_SCENE 0
 #define OBJ_LOAD 0
 
@@ -8,7 +9,10 @@ class Scene
 {
 public:
 	
-#if TUNNEL_SCENE
+#if TRI_SCENE
+	Primitive* primitives[9];
+	Light* lights[1];
+#elif TUNNEL_SCENE
 	Primitive* primitives[8];
 	Light* lights[2];
 #elif MIRROR_SCENE

@@ -40,14 +40,15 @@ void BVH::ConstructBVH(Primitive** primitives)
 	primitiveIndices = new glm::uint[N];
 	for (uint i = 0; i < N; i++) primitiveIndices[i] = i;
 
-	// also create node indices
-	nodeIndices = new glm::uint[N * 2 - 1];
-	for (uint i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
+	//// also create node indices
+	//nodeIndices = new glm::uint[N * 2 - 1];
+	//for (uint i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
 
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
 
-	for (int i = 0; i < sizeof(this->pool) / sizeof(this->pool[0]); i++) {
+	for (int i = 0; i < sizeof(this->pool) / sizeof(this->pool[0]); i++)
+	{
 		pool[i] = new BVHNode();
 	}
 
@@ -57,13 +58,13 @@ void BVH::ConstructBVH(Primitive** primitives)
 	// subdivide root node
 	rootNode->leftFirst = 0;
 	rootNode->count = 0;
-	rootNode->bounds = CalculateBounds(primitives, rootNode->leftFirst, rootNode->count);
-	rootNode->Subdivide(pool, nodeIndices, poolPtr);
+	rootNode->bounds = CalculateBounds(primitives, 0, N);
+	rootNode->Subdivide(pool, primitives, poolPtr);
 }
 
 AABB BVH::CalculateBounds(Primitive** primitives, int first, int count)
 {
-	float minx = -INFINITY, miny = -INFINITY, minz = -INFINITY, maxx = INFINITY, maxy = INFINITY, maxz = INFINITY;
+	float minx = INFINITY, miny = INFINITY, minz = INFINITY, maxx = -INFINITY, maxy = -INFINITY, maxz = -INFINITY;
 
 	for (int i = first; i < count; i++)
 	{

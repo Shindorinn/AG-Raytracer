@@ -8,7 +8,38 @@ Scene::Scene()
 	camera = new Camera();
 	//sceneBounds = new AABB(vec3(-100, -100, -100), vec3(100, 100, 100));
 
-#if TUNNEL_SCENE 1
+#if TRI_SCENE 1
+	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
+	//lights[1] = new Light(vec3(-2, 0, 0), vec3(50, 50, 50));
+
+	primitives[0] = new Triangle(vec3(-3, 0, 8), vec3(-3, 2, 8), vec3(-1, 0, 8));
+	primitives[0]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[1] = new Triangle(vec3(0, 0, 8), vec3(0, 2, 8), vec3(2, 0, 8));
+	primitives[1]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
+
+	primitives[2] = new Triangle(vec3(3, 0, 8), vec3(3, 2, 8), vec3(5, 0, 8));
+	primitives[2]->material = Material(vec3(0, 1, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[3] = new Triangle(vec3(-3, 2.5, 8), vec3(-3, 4.5, 8), vec3(-1, 2.5, 8));
+	primitives[3]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+
+	primitives[4] = new Triangle(vec3(0, 2.5, 8), vec3(0, 4.5, 8), vec3(2, 2.5, 8));
+	primitives[4]->material = Material(vec3(1, 0, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[5] = new Triangle(vec3(3, 2.5, 8), vec3(3, 4.5, 8), vec3(5, 2.5, 8));
+	primitives[5]->material = Material(vec3(1, 1, 0), Material::MaterialKind::DIFFUSE);
+
+	primitives[6] = new Triangle(vec3(-3, -2.5, 8), vec3(-3, -0.5, 8), vec3(-1, -2.5, 8));
+	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[7] = new Triangle( vec3(0, -2.5, 8),vec3(0, -0.5, 8), vec3(2, -2.5, 8));
+	primitives[7]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[8] = new Triangle(vec3(3, -2.5, 8), vec3(3, -0.5, 8), vec3(5, -2.5, 8));
+	primitives[8]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+#elif TUNNEL_SCENE 
 	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
 	lights[1] = new Light(vec3(-2, 0, 0), vec3(50, 50, 50));
 
