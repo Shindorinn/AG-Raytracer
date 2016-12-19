@@ -1,16 +1,48 @@
 ﻿#include "template.h"
 
+void BVH::Traverse(Ray* ray, BVHNode* node) {
+	// TODO
+	if (!ray->Intersects(node->bounds)) {
+		return;
+	}
+	if
+		(node->IsLeaf())
+	{
+		//IntersectPrimitives();
+	}
+	else {
+		this->Traverse(ray, pool[node->leftFirst]);
+		this->Traverse(ray, pool[node->leftFirst + 1]);
+	}
+}
+
+void BVH::IntersectPrimitives(Ray* ray, BVHNode* node)
+{
+	float smallestT = INFINITY;
+	for (int i = node->leftFirst; i < node->count; i++)
+	{
+		if (primitives[primitiveIndices[i]]->CheckIntersection(ray) && smallestT > ray->t)
+		{
+			smallestT = ray->t;
+			//ray->hit = pool[nodeIndices[i]];
+			ray->hit = primitives[primitiveIndices[i]];
+		}
+	}
+
+}
+
+
 void BVH::ConstructBVH(Primitive** primitives)
 {
 	this->N = sizeof(primitives) / sizeof(primitives[0]);
-	printf("N : %f \n", N);
+
 	// create index array
 	primitiveIndices = new glm::uint[N];
-	for (int i = 0; i < N; i++) primitiveIndices[i] = i;
+	for (uint i = 0; i < N; i++) primitiveIndices[i] = i;
 
 	// also create node indices
 	nodeIndices = new glm::uint[N * 2 - 1];
-	for (int i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
+	for (uint i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
 
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];

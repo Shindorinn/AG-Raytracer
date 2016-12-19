@@ -39,14 +39,13 @@ void Renderer::Render() {
 vec3 Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
-	Primitive* hit;
 
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
 		{
 			smallestT = ray->t;
-			hit = this->scene->primitives[x];
+			ray->hit = this->scene->primitives[x];
 		}
 	}
 
@@ -54,6 +53,7 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 		return vec3(0, 0, 0);
 	}
 	else {
+		Primitive* hit = ray->hit;
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
 		vec3 normal = hit->GetNormal(intersectionPoint);
 		vec3 colorResult = vec3(0, 0, 0);

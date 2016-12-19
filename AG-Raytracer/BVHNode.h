@@ -7,10 +7,14 @@ public:
 	int leftFirst;
 	int count;
 
+	//void Traverse(Ray ray, BVHNode** pool);
+	//void BVHNode::IntersectPrimitives(Ray ray, BVHNode** pool);
+
 	void Subdivide(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr);
-	void Traverse(Ray ray, BVHNode** pool);
 	void Partition(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr);
+
 	bool IsLeaf();
+
 
 	BVHNode() {};
 

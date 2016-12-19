@@ -1,5 +1,34 @@
 ﻿#include "template.h"
 
+//void BVHNode::Traverse(Ray ray, BVHNode** pool) {
+//	// TODO
+//	if (!ray.Intersects(bounds)) {
+//		return;
+//	}
+//	if
+//		(this->IsLeaf())
+//	{
+//		//IntersectPrimitives();
+//	}
+//	else {
+//		pool[leftFirst]->Traverse(ray, pool);
+//		pool[leftFirst + 1]->Traverse(ray, pool);
+//	}
+//}
+//
+//void BVHNode::IntersectPrimitives(Ray ray, BVHNode** pool)
+//{
+//	for (int i = leftFirst; i < count; i++)
+//	{
+//		if (pool[nodeindices[i]]->CheckIntersection(ray) && smallestT > ray->t)
+//		{
+//			smallestT = ray->t;
+//			ray->hit = pool[nodeindices[i]];
+//		}
+//	}
+//
+//}
+
 void BVHNode::Subdivide(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr)
 {
 	if (count < 3) return;
@@ -17,21 +46,6 @@ void BVHNode::Subdivide(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPt
 	pool[leftFirst + 1]->Subdivide(pool, nodeIndices, poolPtr);
 }
 
-void BVHNode::Traverse(Ray ray, BVHNode** pool) {
-	// TODO
-	if (!ray.Intersects(bounds)) {
-		return;
-	}
-	if
-		(this->IsLeaf())
-	{
-		//IntersectPrimitives();
-	}
-	else {
-		pool[leftFirst]->Traverse(ray, pool);
-		pool[leftFirst + 1]->Traverse(ray, pool);
-	}
-}
 
 void BVHNode::Partition(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr)
 {
