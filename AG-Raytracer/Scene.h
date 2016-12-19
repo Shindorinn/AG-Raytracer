@@ -24,6 +24,7 @@ public:
 
 	Camera* camera;
 	AABB* sceneBounds;
+	BVH* bvh;
 	Scene();
 
 	// TODO : Method to calculate maximal bounding box given all internal primitives?

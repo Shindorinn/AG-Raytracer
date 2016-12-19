@@ -1,6 +1,6 @@
 ﻿#include "template.h"
 
-void BVHNode::Subdivide(BVHNode* pool, int* nodeIndices, glm::uint poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr)
 {
 	if (count < 3) return;
 
@@ -13,11 +13,11 @@ void BVHNode::Subdivide(BVHNode* pool, int* nodeIndices, glm::uint poolPtr)
 	poolPtr++;
 	//this->leftFirst + 1 = nodeIndices[>poolPtr++];
 
-	pool[leftFirst].Subdivide(pool, nodeIndices, poolPtr);
-	pool[leftFirst + 1].Subdivide(pool, nodeIndices, poolPtr);
+	pool[leftFirst]->Subdivide(pool, nodeIndices, poolPtr);
+	pool[leftFirst + 1]->Subdivide(pool, nodeIndices, poolPtr);
 }
 
-void BVHNode::Traverse(Ray ray) {
+void BVHNode::Traverse(Ray ray, BVHNode** pool) {
 	// TODO
 	if (!ray.Intersects(bounds)) {
 		return;
@@ -28,12 +28,12 @@ void BVHNode::Traverse(Ray ray) {
 		//IntersectPrimitives();
 	}
 	else {
-		//bvh->pool[left].Traverse(ray);
-		//bvh->pool[left + 1].Traverse(ray);
+		pool[leftFirst]->Traverse(ray, pool);
+		pool[leftFirst + 1]->Traverse(ray, pool);
 	}
 }
 
-void BVHNode::Partition(BVHNode* pool, int* nodeIndices, glm::uint poolPtr)
+void BVHNode::Partition(BVHNode** pool, glm::uint* nodeIndices, glm::uint poolPtr)
 {
 	//Use SAH (Surface Area Heuristic, described here: http://graphics.ucsd.edu/courses/cse168_s06/ucsd/heuristics.pdf 
 

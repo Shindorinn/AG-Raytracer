@@ -106,6 +106,8 @@ Scene::Scene()
 	}
 #endif
 	sceneBounds = this->CalculateSceneBounds();
+	bvh = new BVH(primitives);
+	printf("BVH Rootnode Count : %i \n", bvh->rootNode->count);
 }
 
 AABB* Scene::CalculateSceneBounds()

@@ -1,18 +1,25 @@
 ﻿#include "template.h"
 
-void BVH::ConstructBVH(Primitive* primitives)
+void BVH::ConstructBVH(Primitive** primitives)
 {
+	this->N = sizeof(primitives) / sizeof(primitives[0]);
+	printf("N : %f \n", N);
 	// create index array
-	primitiveIndices = new uint[N];
+	primitiveIndices = new glm::uint[N];
 	for (int i = 0; i < N; i++) primitiveIndices[i] = i;
 
 	// also create node indices
-	nodeIndices = new int[N * 2 - 1];
+	nodeIndices = new glm::uint[N * 2 - 1];
 	for (int i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
 
 	// allocate BVH root node
-	pool = new BVHNode[N * 2 - 1];
-	rootNode = &pool[0];
+	pool = new BVHNode*[N * 2 - 1];
+
+	for (int i = 0; i < sizeof(this->pool) / sizeof(this->pool[0]); i++) {
+		pool[i] = new BVHNode();
+	}
+
+	rootNode = pool[0];
 	poolPtr = 2;
 
 	// subdivide root node
@@ -22,13 +29,13 @@ void BVH::ConstructBVH(Primitive* primitives)
 	rootNode->Subdivide(pool, nodeIndices, poolPtr);
 }
 
-AABB BVH::CalculateBounds(Primitive* primitives, int first, int count)
+AABB BVH::CalculateBounds(Primitive** primitives, int first, int count)
 {
 	float minx = -INFINITY, miny = -INFINITY, minz = -INFINITY, maxx = INFINITY, maxy = INFINITY, maxz = INFINITY;
 
 	for (int i = first; i < count; i++)
 	{
-		vec3 pos = primitives[i].GetPosition();
+		vec3 pos = primitives[i]->GetPosition();
 
 		if (pos.x < minx)
 			minx = pos.x;
