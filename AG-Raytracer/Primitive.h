@@ -11,7 +11,9 @@ public:
 	vec3 skew;
 	vec4 perspective;
 
-	Material material = Material(vec3(1,0,0), Material::MaterialKind::DIFFUSE);
+	vec3 centroid;
+
+	Material material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
 	AABB* boundingBox;
 
 	virtual bool CheckIntersection(Ray* ray) = 0;
@@ -27,5 +29,5 @@ public:
 	vec3 GetDirectionVector();
 
 	void UpdatePosition();
-	
+
 };

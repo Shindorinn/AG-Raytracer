@@ -19,5 +19,6 @@ public:
 
 		this->normal = normalize(cross(v1 - v0, v2 - v0));
 		this->boundingBox = CalcAABB();
+		this->centroid = GetCentroid();
 	}
 };
