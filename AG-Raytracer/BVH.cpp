@@ -59,7 +59,7 @@ void BVH::ConstructBVH(Primitive** primitives)
 	rootNode->leftFirst = 0;
 	rootNode->count = N;
 	rootNode->bounds = CalculateBounds(primitives, 0, N);
-	rootNode->Subdivide(pool, primitives, poolPtr);
+	rootNode->Subdivide(pool, primitives, poolPtr, primitiveIndices);
 }
 
 AABB BVH::CalculateBounds(Primitive** primitives, int first, int count)

@@ -29,7 +29,7 @@
 //
 //}
 
-void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
 	if (count < 3) return;
 
@@ -42,21 +42,22 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	//BVHNode* right = pool[poolPtr + 1];
 
 	////In partition, pool and nodeIndices need to be kept in sync!
-	Partition(pool, primitives, poolPtr);
+	Partition(pool, primitives, poolPtr, primitiveIndices);
 
 	////TODO: CHECK THIS    |  leftFirst + 1 will be right. Can we do this implicitly as done in the following line?  (order with partition is swapped on purpose)
 	//poolPtr++;
 	//this->leftFirst + 1 = nodeIndices[>poolPtr++];
 
-	pool[poolPtr]->Subdivide(pool, primitives, poolPtr);
-	pool[poolPtr + 1]->Subdivide(pool, primitives, poolPtr);
+	pool[poolPtr]->Subdivide(pool, primitives, poolPtr, primitiveIndices);
+	pool[poolPtr + 1]->Subdivide(pool, primitives, poolPtr, primitiveIndices);
+	poolPtr++;
 
 	this->leftFirst = tempPoolPtr;
 	//count = 0 hier nog ??!
 }
 
 
-void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
+void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
 	//Use SAH (Surface Area Heuristic, described here: http://graphics.ucsd.edu/courses/cse168_s06/ucsd/heuristics.pdf 
 
@@ -79,6 +80,25 @@ void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	//	ci = ~cost of performing one intersection test
 	//	np = number of elements in parent node
 
+	vec3 splitAxis = vec3(1, 0, 0);
+	float width = this->bounds.max.x - this->bounds.min.x;
+
+	vec3 newMin = vec3(this->bounds.min.x + width / 2, this->bounds.min.y, this->bounds.min.z);
+	vec3 newMax = vec3(this->bounds.max.x + width / 2, this->bounds.max.y, this->bounds.max.z);
+
+	//primitives left
+	// x component less than newMin and newMax ( or whatever axis we are splitting on)
+
+	//primitives right
+	// x component more than '' ''
+	uint swapLocation = poolPtr;
+	for (uint i = leftFirst; i < poolPtr; i++) {
+		if (primitives[primitiveIndices[i]]->centroid.x < newMin.x) {
+			uint temp = primitiveIndices[i];
+			primitiveIndices[i] = primitiveIndices[swapLocation];
+			primitiveIndices[swapLocation] = temp;
+		}
+	}
 
 }
 
