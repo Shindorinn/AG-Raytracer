@@ -48,9 +48,8 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	//poolPtr++;
 	//this->leftFirst + 1 = nodeIndices[>poolPtr++];
 
-	pool[leftFirst]->Subdivide(pool, primitives, poolPtr);
-	pool[leftFirst + 1]->Subdivide(pool, primitives, poolPtr);
-
+	pool[poolPtr]->Subdivide(pool, primitives, poolPtr);
+	pool[poolPtr + 1]->Subdivide(pool, primitives, poolPtr);
 
 	this->leftFirst = tempPoolPtr;
 	//count = 0 hier nog ??!

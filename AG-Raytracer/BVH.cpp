@@ -34,7 +34,7 @@ void BVH::IntersectPrimitives(Ray* ray, BVHNode* node)
 
 void BVH::ConstructBVH(Primitive** primitives)
 {
-	this->N = sizeof(primitives) / sizeof(primitives[0]);
+	//this->N = sizeof(primitives) / sizeof(primitives[0]);
 
 	// create index array
 	primitiveIndices = new glm::uint[N];
@@ -57,7 +57,7 @@ void BVH::ConstructBVH(Primitive** primitives)
 
 	// subdivide root node
 	rootNode->leftFirst = 0;
-	rootNode->count = 0;
+	rootNode->count = N;
 	rootNode->bounds = CalculateBounds(primitives, 0, N);
 	rootNode->Subdivide(pool, primitives, poolPtr);
 }
