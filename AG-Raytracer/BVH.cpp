@@ -47,7 +47,7 @@ void BVH::ConstructBVH(Primitive** primitives)
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
 
-	for (int i = 0; i < sizeof(this->pool) / sizeof(this->pool[0]); i++)
+	for (int i = 0; i < (N * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
 	}
@@ -62,26 +62,26 @@ void BVH::ConstructBVH(Primitive** primitives)
 	rootNode->Subdivide(pool, primitives, poolPtr, primitiveIndices);
 }
 
-AABB BVH::CalculateBounds(Primitive** primitives, int first, int count)
+AABB BVH::CalculateBounds(Primitive** primitives, int first, int last)
 {
 	float minx = INFINITY, miny = INFINITY, minz = INFINITY, maxx = -INFINITY, maxy = -INFINITY, maxz = -INFINITY;
 
-	for (int i = first; i < count; i++)
+	for (int i = first; i < last; i++)
 	{
-		vec3 pos = primitives[i]->GetPosition();
+		AABB* bounds = primitives[i]->boundingBox;
 
-		if (pos.x < minx)
-			minx = pos.x;
-		else if (pos.x > maxx)
-			maxx = pos.x;
-		if (pos.y < miny)
-			miny = pos.y;
-		else if (pos.y > maxy)
-			maxy = pos.y;
-		if (pos.z < minz)
-			minz = pos.z;
-		else if (pos.z > maxz)
-			maxz = pos.z;
+		if (bounds->min.x < minx)
+			minx = bounds->min.x;
+		if (bounds->max.x > maxx)
+			maxx = bounds->max.x;
+		if (bounds->min.y < miny)
+			miny = bounds->min.y;
+		if (bounds->max.y > maxy)
+			maxy = bounds->max.y;
+		if (bounds->min.z < minz)
+			minz = bounds->min.z;
+		if (bounds->max.z > maxz)
+			maxz = bounds->max.z;
 	}
 	return AABB(vec3(minx, miny, minz), vec3(maxx, maxy, maxz));
 }

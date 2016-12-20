@@ -16,7 +16,7 @@ public:
 	void IntersectPrimitives(Ray* ray, BVHNode* node);
 
 	void ConstructBVH(Primitive** primitives);
-	AABB CalculateBounds(Primitive** primitives, int first, int count);
+	static AABB CalculateBounds(Primitive** primitives, int first, int count);
 
 	BVH(Primitive** primitives, glm::uint N)
 	{

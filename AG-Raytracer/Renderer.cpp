@@ -40,15 +40,15 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
 
-	//for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
-	//{
-	//	if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
-	//	{
-	//		smallestT = ray->t;
-	//		ray->hit = this->scene->primitives[x];
-	//	}
-	//}
-	scene->bvh->Traverse(ray, scene->bvh->rootNode);
+	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
+	{
+		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
+		{
+			smallestT = ray->t;
+			ray->hit = this->scene->primitives[x];
+		}
+	}
+	//scene->bvh->Traverse(ray, scene->bvh->rootNode);
 
 	if (smallestT == INFINITY) {
 		return vec3(0, 0, 0);

@@ -31,29 +31,21 @@
 
 void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
-	if (count < 3) return;
+	if ((count - leftFirst) < 5) return;
 
 	uint tempPoolPtr = poolPtr;
 
-	/*this->leftFirst = primitives[poolPtr++];*/
+	//Get the BVHNodes temporarily, but they're not saved.
+	BVHNode* left = pool[poolPtr];
+	BVHNode* right = pool[poolPtr + 1];
 
-	////Get the BVHNodes temporarily, but they're not saved.
-	//BVHNode* left = pool[poolPtr];
-	//BVHNode* right = pool[poolPtr + 1];
-
-	////In partition, pool and nodeIndices need to be kept in sync!
 	Partition(pool, primitives, poolPtr, primitiveIndices);
 
-	////TODO: CHECK THIS    |  leftFirst + 1 will be right. Can we do this implicitly as done in the following line?  (order with partition is swapped on purpose)
-	//poolPtr++;
-	//this->leftFirst + 1 = nodeIndices[>poolPtr++];
-
-	pool[poolPtr]->Subdivide(pool, primitives, poolPtr, primitiveIndices);
-	pool[poolPtr + 1]->Subdivide(pool, primitives, poolPtr, primitiveIndices);
-	poolPtr++;
+	left->Subdivide(pool, primitives, poolPtr, primitiveIndices);
+	right->Subdivide(pool, primitives, poolPtr, primitiveIndices);
 
 	this->leftFirst = tempPoolPtr;
-	//count = 0 hier nog ??!
+	count = 0;
 }
 
 
@@ -80,26 +72,46 @@ void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	//	ci = ~cost of performing one intersection test
 	//	np = number of elements in parent node
 
-	vec3 splitAxis = vec3(1, 0, 0);
-	float width = this->bounds.max.x - this->bounds.min.x;
+	//vec3 splitAxis = vec3(1, 0, 0);
+	float xwidth = this->bounds.max.x - this->bounds.min.x;
+	float ywidth = this->bounds.max.y - this->bounds.min.y;
+	float zwidth = this->bounds.max.z - this->bounds.min.z;
 
-	vec3 newMin = vec3(this->bounds.min.x + width / 2, this->bounds.min.y, this->bounds.min.z);
-	vec3 newMax = vec3(this->bounds.max.x + width / 2, this->bounds.max.y, this->bounds.max.z);
+	int dimension;
 
-	//primitives left
-	// x component less than newMin and newMax ( or whatever axis we are splitting on)
+	float biggest = max(xwidth, max(ywidth, zwidth));
+	if (biggest == xwidth)
+		dimension = 0;
+	else if (biggest == ywidth)
+		dimension = 1;
+	else
+		dimension = 2;
 
-	//primitives right
-	// x component more than '' ''
-	uint swapLocation = poolPtr;
-	for (uint i = leftFirst; i < poolPtr; i++) {
-		if (primitives[primitiveIndices[i]]->centroid.x < newMin.x) {
-			uint temp = primitiveIndices[i];
-			primitiveIndices[i] = primitiveIndices[swapLocation];
-			primitiveIndices[swapLocation] = temp;
+	float splitCoord = 0.5f*(bounds.max[dimension] + bounds.min[dimension]);
+
+	uint32_t mid = leftFirst;
+	for (uint32_t i = leftFirst; i < count; i++)
+	{
+		if (primitives[i]->centroid[dimension] < splitCoord)
+		{
+			std::swap(primitives[i], primitives[mid]);
+			mid++;
 		}
 	}
 
+	//Left node.
+	pool[poolPtr]->leftFirst = leftFirst;
+	pool[poolPtr]->count = mid;
+	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	//Right node.
+	pool[poolPtr]->leftFirst = mid;
+	pool[poolPtr]->count = count;
+	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
 }
 
 //If a node has a count of primitives, it's a leaf.
