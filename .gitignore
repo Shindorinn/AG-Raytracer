@@ -50,7 +50,6 @@ artifacts/
 *_i.h
 *.ilk
 *.meta
-*.obj
 *.pch
 *.pdb
 *.pgc
@@ -259,7 +258,6 @@ paket-files/
 *.slo
 *.lo
 *.o
-*.obj
 
 # Precompiled Headers
 *.gch

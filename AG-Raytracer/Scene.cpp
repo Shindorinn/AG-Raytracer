@@ -33,7 +33,7 @@ Scene::Scene()
 	primitives[6] = new Triangle(vec3(-3, -2.5, 8), vec3(-3, -0.5, 8), vec3(-1, -2.5, 8));
 	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
-	primitives[7] = new Triangle( vec3(0, -2.5, 8),vec3(0, -0.5, 8), vec3(2, -2.5, 8));
+	primitives[7] = new Triangle(vec3(0, -2.5, 8), vec3(0, -0.5, 8), vec3(2, -2.5, 8));
 	primitives[7]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	primitives[8] = new Triangle(vec3(3, -2.5, 8), vec3(3, -0.5, 8), vec3(5, -2.5, 8));
@@ -91,9 +91,10 @@ Scene::Scene()
 
 #elif OBJ_LOAD
 
-	lights[0] = new Light(vec3(-2, 6, 3), vec3(200, 200, 200));
+	lights[0] = new Light(vec3(-3, -5, 0), vec3(100, 100, 100));
+	lights[1] = new Light(vec3(3, -3, -5), vec3(100, 100, 100));
 
-	string inputfile = "cube.obj";
+	string inputfile = "cruiser.obj";
 	tinyobj::attrib_t attrib;
 	vector<tinyobj::shape_t> shapes;
 	vector<tinyobj::material_t> materials;
@@ -104,8 +105,10 @@ Scene::Scene()
 	if (!err.empty()) { // `err` may contain warning message.
 		std::cerr << err << std::endl;
 	}
-
 	// Loop over shapes
+
+	int counter = 0;
+
 	for (size_t s = 0; s < shapes.size(); s++) {
 		// Loop over faces(polygon)
 		size_t index_offset = 0;
@@ -117,7 +120,7 @@ Scene::Scene()
 			// Loop over vertices in the face.
 			for (size_t v = 0; v < fv; v++) {
 				// access to vertex
-				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];	
+				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				float vx = attrib.vertices[3 * idx.vertex_index + 0];
 				float vy = attrib.vertices[3 * idx.vertex_index + 1];
 				float vz = attrib.vertices[3 * idx.vertex_index + 2];
@@ -132,14 +135,16 @@ Scene::Scene()
 
 			Triangle* triangle = new Triangle(vertices[0], vertices[1], vertices[2]);
 			//triangle->normal = vec3(normal.x / 3, normal.y / 3, normal.z / 3);
-			primitives[f] = triangle;
+			primitives[counter] = triangle;
+
+			counter++;
 		}
 	}
 #endif
-	sceneBounds = this->CalculateSceneBounds();
-	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
-	for (int i = 0; i < sizeof(this->primitives) / sizeof(this->primitives[0]); i++)
-		printf("\n BVH Node Count : %i , LeftFirst : %i \n", bvh->pool[i]->count, bvh->pool[i]->leftFirst);
+	//sceneBounds = this->CalculateSceneBounds();
+	//bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
+	//for (int i = 0; i < sizeof(this->primitives) / sizeof(this->primitives[0]); i++)
+	//	printf("\n BVH Node Count : %i , LeftFirst : %i \n", bvh->pool[i]->count, bvh->pool[i]->leftFirst);
 }
 
 AABB* Scene::CalculateSceneBounds()
