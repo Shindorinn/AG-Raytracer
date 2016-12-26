@@ -1,34 +1,5 @@
 ﻿#include "template.h"
 
-//void BVHNode::Traverse(Ray ray, BVHNode** pool) {
-//	// TODO
-//	if (!ray.Intersects(bounds)) {
-//		return;
-//	}
-//	if
-//		(this->IsLeaf())
-//	{
-//		//IntersectPrimitives();
-//	}
-//	else {
-//		pool[leftFirst]->Traverse(ray, pool);
-//		pool[leftFirst + 1]->Traverse(ray, pool);
-//	}
-//}
-//
-//void BVHNode::IntersectPrimitives(Ray ray, BVHNode** pool)
-//{
-//	for (int i = leftFirst; i < count; i++)
-//	{
-//		if (pool[nodeindices[i]]->CheckIntersection(ray) && smallestT > ray->t)
-//		{
-//			smallestT = ray->t;
-//			ray->hit = pool[nodeindices[i]];
-//		}
-//	}
-//
-//}
-
 void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
 	if ((count - leftFirst) < 5) return;
