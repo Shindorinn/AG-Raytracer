@@ -12,7 +12,7 @@ public:
 	glm::uint* primitiveIndices;
 	glm::uint poolPtr;
 
-	void Traverse(Ray* ray, BVHNode* node);
+	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false);
 	float IntersectPrimitives(Ray* ray, BVHNode* node);
 
 	void ConstructBVH(Primitive** primitives);

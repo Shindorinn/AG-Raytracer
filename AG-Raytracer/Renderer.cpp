@@ -3,7 +3,7 @@
 #define DEBUG 1
 #define EPSILON 0.01f
 
-#define USEBVH 0
+#define USEBVH 1
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
@@ -110,6 +110,9 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 
 	float tToLight = (lightSource->position.x - intersectionWithEpsilon.x) / direction.x;
 
+
+
+#if !USEBVH
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		this->scene->primitives[x]->CheckIntersection(&shadowRay);
@@ -118,6 +121,15 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		if (shadowRay.t < tToLight)
 			return vec3(0.0f, 0.0f, 0.0f);
 	}
+
+#elif USEBVH
+	scene->bvh->Traverse(&shadowRay, scene->bvh->rootNode);
+
+	//Check if the intersection is between the original intersection and the light. If it is, return black.
+	if (shadowRay.t < tToLight)
+		return vec3(0.0f, 0.0f, 0.0f);
+#endif
+
 
 	float euclidianDistanceToLight = distance(intersectionPoint, lightSource->position);
 

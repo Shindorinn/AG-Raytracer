@@ -1,8 +1,12 @@
 ﻿#include "template.h"
 
-void BVH::Traverse(Ray* ray, BVHNode* node) 
+void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 {
 	float previousT = ray->t;
+
+	//If we are tracing a shadow ray in the BVH, and we hit something, we can stop (improves efficiency).
+	if (isShadowRay && previousT != INFINITY)
+		return;
 
 	if (!ray->Intersects(node->bounds))
 	{
@@ -11,13 +15,14 @@ void BVH::Traverse(Ray* ray, BVHNode* node)
 	if (node->IsLeaf())
 	{
 		float newT = IntersectPrimitives(ray, node);
+
 		if (newT > previousT)
 			ray->t = previousT;
 	}
 	else
 	{
-		this->Traverse(ray, pool[node->leftFirst]);
-		this->Traverse(ray, pool[node->leftFirst + 1]);
+		this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
 	}
 }
 
