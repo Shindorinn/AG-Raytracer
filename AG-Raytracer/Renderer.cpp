@@ -3,6 +3,8 @@
 #define DEBUG 1
 #define EPSILON 0.01f
 
+#define USEBVH 0
+
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
 	this->scene = scene;
@@ -11,9 +13,9 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
@@ -29,9 +31,9 @@ void Renderer::Render() {
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
-		#pragma omp parallel for
+		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
@@ -40,6 +42,7 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 {
 	float smallestT = INFINITY;
 
+#if !USEBVH
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
 		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
@@ -48,7 +51,11 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 			ray->hit = this->scene->primitives[x];
 		}
 	}
-	//scene->bvh->Traverse(ray, scene->bvh->rootNode);
+#elif USEBVH
+	scene->bvh->Traverse(ray, scene->bvh->rootNode);
+
+	smallestT = ray->t;
+#endif
 
 	if (smallestT == INFINITY) {
 		return vec3(0, 0, 0);

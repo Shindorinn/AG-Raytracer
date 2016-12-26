@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#define TRI_SCENE 0
+#define TRI_SCENE 1
 #define TUNNEL_SCENE 0
 #define MIRROR_SCENE 0
-#define OBJ_LOAD 1
+#define OBJ_LOAD 0
 
 class Scene
 {

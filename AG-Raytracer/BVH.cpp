@@ -1,36 +1,42 @@
 ﻿#include "template.h"
 
-void BVH::Traverse(Ray* ray, BVHNode* node) {
-	// TODO
-	if (!ray->Intersects(node->bounds)) {
+void BVH::Traverse(Ray* ray, BVHNode* node) 
+{
+	float previousT = ray->t;
+
+	if (!ray->Intersects(node->bounds))
+	{
 		return;
 	}
-	if
-		(node->IsLeaf())
+	if (node->IsLeaf())
 	{
-		//IntersectPrimitives();
+		float newT = IntersectPrimitives(ray, node);
+		if (newT > previousT)
+			ray->t = previousT;
 	}
-	else {
+	else
+	{
 		this->Traverse(ray, pool[node->leftFirst]);
 		this->Traverse(ray, pool[node->leftFirst + 1]);
 	}
 }
 
-void BVH::IntersectPrimitives(Ray* ray, BVHNode* node)
+float BVH::IntersectPrimitives(Ray* ray, BVHNode* node)
 {
 	float smallestT = INFINITY;
 	for (int i = node->leftFirst; i < node->count; i++)
 	{
-		if (primitives[primitiveIndices[i]]->CheckIntersection(ray) && smallestT > ray->t)
+		//TODO: Use Indices maybe.
+		if (primitives[i]->CheckIntersection(ray) && smallestT > ray->t)
 		{
 			smallestT = ray->t;
-			//ray->hit = pool[nodeIndices[i]];
-			ray->hit = primitives[primitiveIndices[i]];
+			ray->hit = primitives[i];
 		}
 	}
-
+	if (ray->t > smallestT)
+		ray->t = smallestT;
+	return ray->t;
 }
-
 
 void BVH::ConstructBVH(Primitive** primitives)
 {

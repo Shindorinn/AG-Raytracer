@@ -13,7 +13,7 @@ public:
 	glm::uint poolPtr;
 
 	void Traverse(Ray* ray, BVHNode* node);
-	void IntersectPrimitives(Ray* ray, BVHNode* node);
+	float IntersectPrimitives(Ray* ray, BVHNode* node);
 
 	void ConstructBVH(Primitive** primitives);
 	static AABB CalculateBounds(Primitive** primitives, int first, int count);
