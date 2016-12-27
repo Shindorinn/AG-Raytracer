@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#define TRI_SCENE 1
+#define TRI_SCENE 0
 #define TUNNEL_SCENE 0
 #define MIRROR_SCENE 0
-#define OBJ_LOAD 0
+#define OBJ_LOAD 1
 
 class Scene
 {
@@ -22,7 +22,7 @@ public:
 	Primitive* primitives[1];
 	Light* lights[2];
 #elif OBJ_LOAD
-	Primitive* primitives[2875];
+	Primitive* primitives[12];
 	Light* lights[2];
 #endif
 

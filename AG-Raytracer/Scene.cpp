@@ -94,7 +94,7 @@ Scene::Scene()
 	lights[0] = new Light(vec3(-3, -5, 0), vec3(100, 100, 100));
 	lights[1] = new Light(vec3(3, -3, -5), vec3(100, 100, 100));
 
-	string inputfile = "cruiser.obj";
+	string inputfile = "cube.obj";
 	tinyobj::attrib_t attrib;
 	vector<tinyobj::shape_t> shapes;
 	vector<tinyobj::material_t> materials;

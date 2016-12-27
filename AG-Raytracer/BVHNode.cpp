@@ -2,7 +2,7 @@
 
 void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
-	if ((count - leftFirst) < 5) return;
+	if ((count - leftFirst) < 7) return;
 
 	uint tempPoolPtr = poolPtr;
 

@@ -2,7 +2,9 @@
 
 void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 {
+	//These temp/previous variables are needed, if we find multiple intersections with primitives, but we want to save the primitive with lowest t.
 	float previousT = ray->t;
+	Primitive* previousHit = ray->hit;
 
 	//If we are tracing a shadow ray in the BVH, and we hit something, we can stop (improves efficiency).
 	if (isShadowRay && previousT != INFINITY)
@@ -17,7 +19,10 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 		float newT = IntersectPrimitives(ray, node);
 
 		if (newT > previousT)
+		{
 			ray->t = previousT;
+			ray->hit = previousHit;
+		}
 	}
 	else
 	{
