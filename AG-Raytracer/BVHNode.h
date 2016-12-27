@@ -11,7 +11,7 @@ public:
 	//void BVHNode::IntersectPrimitives(Ray ray, BVHNode** pool);
 
 	void Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices);
-	void Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices);
+	bool Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices);
 
 	bool IsLeaf();
 

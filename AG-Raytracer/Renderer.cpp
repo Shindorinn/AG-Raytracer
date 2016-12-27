@@ -13,9 +13,9 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-	//#pragma omp parallel for
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
@@ -31,9 +31,9 @@ void Renderer::Render() {
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-	//#pragma omp parallel for
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
@@ -51,7 +51,7 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 			ray->hit = this->scene->primitives[x];
 		}
 	}
-#elif USEBVH
+#else 
 	scene->bvh->Traverse(ray, scene->bvh->rootNode);
 
 	smallestT = ray->t;
@@ -65,7 +65,7 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
 		vec3 normal = hit->GetNormal(intersectionPoint);
 		vec3 colorResult = vec3(0, 0, 0);
-		
+
 		if (hit->material.materialKind == Material::MaterialKind::DIFFUSE)
 		{
 			for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
@@ -95,7 +95,7 @@ vec3 Renderer::Trace(Ray* ray, int x, int y)
 		{
 			printf("glass hit");
 			return this->Refract(intersectionPoint, hit);
-			
+
 		}
 		return colorResult;
 	}

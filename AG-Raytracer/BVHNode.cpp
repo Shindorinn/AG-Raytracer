@@ -1,8 +1,12 @@
 ﻿#include "template.h"
 
+#define USESAH 1
+
 void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
-	if ((count - leftFirst) < 7) return;
+#if !USESAH
+	if ((count - leftFirst) < 5) return;
+#endif
 
 	uint tempPoolPtr = poolPtr;
 
@@ -10,7 +14,8 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	BVHNode* left = pool[poolPtr];
 	BVHNode* right = pool[poolPtr + 1];
 
-	Partition(pool, primitives, poolPtr, primitiveIndices);
+	if (!Partition(pool, primitives, poolPtr, primitiveIndices))
+		return;
 
 	left->Subdivide(pool, primitives, poolPtr, primitiveIndices);
 	right->Subdivide(pool, primitives, poolPtr, primitiveIndices);
@@ -20,30 +25,92 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 }
 
 
-void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
+bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
-	//Use SAH (Surface Area Heuristic, described here: http://graphics.ucsd.edu/courses/cse168_s06/ucsd/heuristics.pdf 
+#if USESAH 1
+	float parentCost = this->bounds.GetVolume() * (count - leftFirst);
 
-	//C = Ct + SA(B1) / SA(B) * P1 *Ci + SA(B2) / SA(B) * P2 *Ci
+	float lowestCost = INFINITE;
+	int bestDimension;
+	float bestCoord;
 
-	//where:
+	//Iterate over all possible splits, calculate A * R
+	for (int i = leftFirst; i < count; i++)
+	{
+		for (int dimension = 0; dimension < 3; dimension++)
+		{
+			float splitCoord = primitives[i]->centroid[dimension];
 
-	//  Ct = node traversal cost
-	//	SA() = surface area
-	//	B1 = left node bounding box
-	//	B2 = right node bounding box
-	//	B = parent node bounding box
-	//	P1 = left node primitive count
-	//	P2 = left node primitive count
-	//	Ci = primitive intersection cost
+			//Arrays to store the primitives for the current split.
+			Primitive** left = new Primitive*[count - leftFirst];
+			Primitive** right = new Primitive*[count - leftFirst];
 
-	//Continue to split if  c < np*ci
+			int leftCounter = 0, rightCounter = 0;
 
-	//	c = estimated cost of traversing p and its children(l, r)
-	//	ci = ~cost of performing one intersection test
-	//	np = number of elements in parent node
+			for (uint32_t i = leftFirst; i < count; i++)
+			{
+				if (primitives[i]->centroid[dimension] < splitCoord)
+				{
+					left[leftCounter] = primitives[i];
+					leftCounter++;
+				}
+				else
+				{
+					right[rightCounter] = primitives[i];
+					rightCounter++;
+				}
+			}
 
-	//vec3 splitAxis = vec3(1, 0, 0);
+			AABB leftBounds = BVH::CalculateBounds(left, 0, leftCounter);
+			AABB rightBounds = BVH::CalculateBounds(right, 0, rightCounter);
+
+			//Calculate left- and rightCost, save this value (and corresponding dimension/coord) if it's better than the previous best solution.
+			float splitCost = leftBounds.GetVolume() * leftCounter + rightBounds.GetVolume() * rightCounter;
+
+			if (splitCost < lowestCost)
+			{
+				lowestCost = splitCost;
+				bestDimension = dimension;
+				bestCoord = splitCoord;
+			}
+
+			delete left;
+			delete right;
+		}
+
+	}
+
+	if (lowestCost >= parentCost)
+		//We know that we don't need to split now; the node has become a child node.
+		return false;
+
+	uint32_t mid = leftFirst;
+	for (uint32_t i = leftFirst; i < count; i++)
+	{
+		if (primitives[i]->centroid[bestDimension] < bestCoord)
+		{
+			std::swap(primitives[i], primitives[mid]);
+			mid++;
+		}
+	}
+
+	//Left node.
+	pool[poolPtr]->leftFirst = leftFirst;
+	pool[poolPtr]->count = mid;
+	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	//Right node.
+	pool[poolPtr]->leftFirst = mid;
+	pool[poolPtr]->count = count;
+	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	return true;
+#else
+	//Median split
 	float xwidth = this->bounds.max.x - this->bounds.min.x;
 	float ywidth = this->bounds.max.y - this->bounds.min.y;
 	float zwidth = this->bounds.max.z - this->bounds.min.z;
@@ -83,6 +150,9 @@ void BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
+
+	return true;
+#endif
 }
 
 //If a node has a count of primitives, it's a leaf.

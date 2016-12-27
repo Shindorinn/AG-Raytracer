@@ -8,6 +8,8 @@ struct AABB
 
 	AABB(){};
 
+	float GetVolume();
+
 	AABB(vec3 min, vec3 max)
 	{
 		this->min = min;

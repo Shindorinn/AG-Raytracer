@@ -22,7 +22,7 @@ public:
 	Primitive* primitives[1];
 	Light* lights[2];
 #elif OBJ_LOAD
-	Primitive* primitives[12];
+	Primitive* primitives[2875];
 	Light* lights[2];
 #endif
 
