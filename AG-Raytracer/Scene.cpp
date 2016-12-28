@@ -48,10 +48,10 @@ Scene::Scene()
 	primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
 	primitives[3] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
 	primitives[4] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
-	
+
 	primitives[5] = new Sphere(vec3(-1, 0, 5), 1.0f);
 	primitives[5]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
-	
+
 	primitives[6] = new Sphere(vec3(1.5, 0, 5), 0.7f);
 	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
 
@@ -91,7 +91,7 @@ Scene::Scene()
 
 #elif OBJ_LOAD
 
-	lights[0] = new Light(vec3(-3, -5, 0), vec3(100, 100, 100));
+	lights[0] = new Light(vec3(-3, -5, 0), vec3(0, 0, 0));
 	lights[1] = new Light(vec3(3, -3, -5), vec3(100, 100, 100));
 
 	string inputfile = "bunny.obj";
@@ -122,8 +122,8 @@ Scene::Scene()
 				// access to vertex
 				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				float vx = attrib.vertices[3 * idx.vertex_index + 0];
-				float vy = attrib.vertices[3 * idx.vertex_index + 1];
-				float vz = attrib.vertices[3 * idx.vertex_index + 2];
+				float vy = -attrib.vertices[3 * idx.vertex_index + 1];
+				float vz = -attrib.vertices[3 * idx.vertex_index + 2];
 				float nx = attrib.normals[3 * idx.normal_index + 0];
 				float ny = attrib.normals[3 * idx.normal_index + 1];
 				float nz = attrib.normals[3 * idx.normal_index + 2];
@@ -140,6 +140,17 @@ Scene::Scene()
 			counter++;
 		}
 	}
+
+	Triangle* tri1 = new Triangle(vec3(8, -8, 8),vec3(-8, -8, 8) , vec3(-8, 8, 8));
+	tri1->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[counter++] = tri1;
+
+	Triangle* tri2 = new Triangle( vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
+	tri2->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[counter++] = tri2;
+
+
+
 #endif
 	sceneBounds = this->CalculateSceneBounds();
 	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
