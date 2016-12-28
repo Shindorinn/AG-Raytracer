@@ -1,6 +1,7 @@
 ﻿#include "template.h"
 
 #define USESAH 1
+#define BINNING 1
 
 void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
 {
@@ -33,7 +34,7 @@ bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	float lowestCost = INFINITE;
 	int bestDimension;
 	float bestCoord;
-
+#if !BINNING
 	//Iterate over all possible splits, calculate A * R
 	for (int i = leftFirst; i < count; i++)
 	{
@@ -41,6 +42,17 @@ bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 		{
 			float splitCoord = primitives[i]->centroid[dimension];
 
+#else
+	float xwidth = this->bounds.max.x - this->bounds.min.x;
+	float ywidth = this->bounds.max.y - this->bounds.min.y;
+	float zwidth = this->bounds.max.z - this->bounds.min.z;
+	vec3 widths = vec3(xwidth, ywidth, zwidth);
+	for (int i = 1; i < 7; i++)
+	{
+		for (int dimension = 0; dimension < 3; dimension++)
+		{
+			float splitCoord = this->bounds.min[dimension] + widths[dimension] * (i / 7.0f);
+#endif
 			//Arrays to store the primitives for the current split.
 			Primitive** left = new Primitive*[count - leftFirst];
 			Primitive** right = new Primitive*[count - leftFirst];

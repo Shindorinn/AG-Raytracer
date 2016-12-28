@@ -22,7 +22,8 @@ public:
 	Primitive* primitives[1];
 	Light* lights[2];
 #elif OBJ_LOAD
-	Primitive* primitives[2875];
+	Primitive* primitives[69630];
+	//cube 12, suzanne 15488, cruiser 2875, f16 4056, bunny 69630, bunnyLow: 4968
 	Light* lights[2];
 #endif
 

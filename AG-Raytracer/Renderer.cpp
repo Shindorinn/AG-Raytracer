@@ -13,9 +13,9 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		#pragma omp parallel for
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
@@ -31,9 +31,9 @@ void Renderer::Render() {
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
-		#pragma omp parallel for
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
@@ -123,7 +123,7 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 	}
 
 #elif USEBVH
-	scene->bvh->Traverse(&shadowRay, scene->bvh->rootNode);
+	scene->bvh->Traverse(&shadowRay, scene->bvh->rootNode, true);
 
 	//Check if the intersection is between the original intersection and the light. If it is, return black.
 	if (shadowRay.t < tToLight)

@@ -6,7 +6,7 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 	float previousT = ray->t;
 	Primitive* previousHit = ray->hit;
 
-	//If we are tracing a shadow ray in the BVH, and we hit something, we can stop (improves efficiency).
+	//If we are tracing a shadow ray in the BVH, and we hit something, we can stop (improves efficiency: we early-out).
 	if (isShadowRay && previousT != INFINITY)
 		return;
 
