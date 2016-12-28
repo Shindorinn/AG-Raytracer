@@ -53,31 +53,34 @@ bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 		{
 			float splitCoord = this->bounds.min[dimension] + widths[dimension] * (i / 7.0f);
 #endif
-			//Arrays to store the primitives for the current split.
-			Primitive** left = new Primitive*[count - leftFirst];
-			Primitive** right = new Primitive*[count - leftFirst];
 
 			int leftCounter = 0, rightCounter = 0;
 
+			vec3 leftMin = vec3(INFINITY), leftMax = vec3(-INFINITY), rightMin = vec3(INFINITY), rightMax = vec3(-INFINITY);
+
+			//Bounds are calculated when objects are added. This is faster than doing it afterwards (no double looping over objects).
 			for (uint32_t i = leftFirst; i < count; i++)
 			{
 				if (primitives[i]->centroid[dimension] < splitCoord)
 				{
-					left[leftCounter] = primitives[i];
+					AABB* bounds = primitives[i]->boundingBox;
+
+					UpdateBounds(bounds, leftMin, leftMax);
+
 					leftCounter++;
 				}
 				else
 				{
-					right[rightCounter] = primitives[i];
+					AABB* bounds = primitives[i]->boundingBox;
+
+					UpdateBounds(bounds, rightMin, rightMax);
+
 					rightCounter++;
 				}
 			}
 
-			AABB leftBounds = BVH::CalculateBounds(left, 0, leftCounter);
-			AABB rightBounds = BVH::CalculateBounds(right, 0, rightCounter);
-
 			//Calculate left- and rightCost, save this value (and corresponding dimension/coord) if it's better than the previous best solution.
-			float splitCost = leftBounds.GetVolume() * leftCounter + rightBounds.GetVolume() * rightCounter;
+			float splitCost = AABB(leftMin, leftMax).GetVolume() * leftCounter + AABB(rightMin, rightMax).GetVolume() * rightCounter;
 
 			if (splitCost < lowestCost)
 			{
@@ -85,9 +88,6 @@ bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 				bestDimension = dimension;
 				bestCoord = splitCoord;
 			}
-
-			delete left;
-			delete right;
 		}
 
 	}
@@ -165,7 +165,24 @@ bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 
 	return true;
 #endif
+		}
+
+void BVHNode::UpdateBounds(AABB* bounds, vec3& min, vec3& max)
+{
+	if (bounds->min.x < min.x)
+		min.x = bounds->min.x;
+	if (bounds->max.x > max.x)
+		max.x = bounds->max.x;
+	if (bounds->min.y < min.y)
+		min.y = bounds->min.y;
+	if (bounds->max.y > max.y)
+		max.y = bounds->max.y;
+	if (bounds->min.z < min.z)
+		min.z = bounds->min.z;
+	if (bounds->max.z > max.z)
+		max.z = bounds->max.z;
 }
+
 
 //If a node has a count of primitives, it's a leaf.
 bool BVHNode::IsLeaf() {
