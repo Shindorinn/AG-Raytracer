@@ -8,9 +8,7 @@ Camera::Camera()
 void Camera::GenerateRays()
 {
 	float u, v = 0.0f;
-	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			u = (float) x / SCRWIDTH;
@@ -24,9 +22,6 @@ void Camera::GenerateRays()
 			vec3 direction = normalize(pointOnScreen3d - position3d);
 
 			Ray* ray = new Ray(position3d, direction);
-
-			if (y == SCRHEIGHT / 2 && x == SCRWIDTH / 2)
-				printf("\n middle of the screen : %f, %f, %f \n", ray->direction[0], ray->direction[1], ray->direction[2]);
 
 			primaryRays[y * SCRWIDTH + x] = ray;
 		}

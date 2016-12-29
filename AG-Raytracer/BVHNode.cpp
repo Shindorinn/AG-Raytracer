@@ -28,7 +28,7 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 
 bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
 {
-#if USESAH 1
+#if USESAH
 	float parentCost = this->bounds.GetVolume() * (count - leftFirst);
 
 	float lowestCost = INFINITE;
