@@ -154,8 +154,6 @@ Scene::Scene()
 #endif
 	sceneBounds = this->CalculateSceneBounds();
 	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
-	for (int i = 0; i < sizeof(this->primitives) / sizeof(this->primitives[0]); i++)
-		printf("\n BVH Node Count : %i , LeftFirst : %i \n", bvh->pool[i]->count, bvh->pool[i]->leftFirst);
 }
 
 AABB* Scene::CalculateSceneBounds()

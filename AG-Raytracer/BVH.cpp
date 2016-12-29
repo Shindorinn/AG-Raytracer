@@ -26,6 +26,28 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 	}
 	else
 	{
+		////We use ordered traversal here to speed up the raytracing process. We use square-dist to compare, to remove root operation :).
+
+		//float distLeftSquared = PointBoundsDist(pool[node->leftFirst]->bounds, ray->origin);
+		//float distRightSquared = PointBoundsDist(pool[node->leftFirst + 1]->bounds, ray->origin);
+
+		//if (distLeftSquared > distRightSquared)
+		//{
+		//	//Right first.
+		//	this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//	if (ray->t * ray->t < distLeftSquared)
+		//		return;
+		//	this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//}
+		//else
+		//{
+		//	//Left first.
+		//	this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//	if (ray->t * ray->t < distRightSquared)
+		//		return;
+		//	this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//}
+
 		this->Traverse(ray, pool[node->leftFirst], isShadowRay);
 		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
 	}
@@ -76,6 +98,15 @@ void BVH::ConstructBVH(Primitive** primitives)
 	rootNode->count = N;
 	rootNode->bounds = CalculateBounds(primitives, 0, N);
 	rootNode->Subdivide(pool, primitives, poolPtr, primitiveIndices);
+}
+
+float BVH::PointBoundsDist(AABB bounds, vec3 point)
+{
+	float dx = max(bounds.min.x - point.x, max(0.f, point.x - bounds.max.x));
+	float dy = max(bounds.min.y - point.y, max(0.f, point.y - bounds.max.y));
+	float dz = max(bounds.min.z - point.z, max(0.f, point.z - bounds.max.z));
+
+	return (dx*dx + dy*dy + dz*dz);
 }
 
 AABB BVH::CalculateBounds(Primitive** primitives, int first, int last)

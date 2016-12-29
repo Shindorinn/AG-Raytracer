@@ -17,6 +17,7 @@ public:
 
 	void ConstructBVH(Primitive** primitives);
 	static AABB CalculateBounds(Primitive** primitives, int first, int count);
+	float PointBoundsDist(AABB bounds, vec3 point);
 
 	BVH(Primitive** primitives, glm::uint N)
 	{
