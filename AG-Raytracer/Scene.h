@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #define TRI_SCENE 0
-#define TUNNEL_SCENE 0
-#define MIRROR_SCENE 0
 #define OBJ_LOAD 1
+#define BUNNY_LOAD 1
+#define SUZANNE_LOAD 0
+#define f16_LOAD 0
 
 class Scene
 {
@@ -12,19 +13,19 @@ public:
 #if TRI_SCENE
 	Primitive* primitives[9];
 	Light* lights[1];
-#elif TUNNEL_SCENE
-	Primitive* primitives[8];
-	Light* lights[2];
-#elif MIRROR_SCENE
-	Primitive* primitives[9];
-	Light* lights[2];
-#elif TINY_SCENE
-	Primitive* primitives[1];
-	Light* lights[2];
-#elif OBJ_LOAD
+
+#elif BUNNY_LOAD
 	Primitive* primitives[69632];
-	//cube 12, suzanne 15488, cruiser 2875, f16 4056, bunny 69630, bunnyLow: 4968
 	Light* lights[2];
+
+#elif SUZANNE_LOAD
+	Primitive* primitives[15490];
+	Light* lights[2];
+
+#elif f16_LOAD
+	Primitive* primitives[4058];
+	Light* lights[2];
+
 #endif
 
 	Camera* camera;

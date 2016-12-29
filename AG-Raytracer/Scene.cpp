@@ -39,62 +39,19 @@ Scene::Scene()
 	primitives[8] = new Triangle(vec3(3, -2.5, 8), vec3(3, -0.5, 8), vec3(5, -2.5, 8));
 	primitives[8]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
-#elif TUNNEL_SCENE 
-	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
-	lights[1] = new Light(vec3(-2, 0, 0), vec3(50, 50, 50));
-
-	primitives[0] = new Plane(vec3(0, -3, 5), vec3(0, 1, 0));
-	primitives[1] = new Plane(vec3(-3, 0, 5), vec3(1, 0, 0));
-	primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
-	primitives[3] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
-	primitives[4] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
-
-	primitives[5] = new Sphere(vec3(-1, 0, 5), 1.0f);
-	primitives[5]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
-
-	primitives[6] = new Sphere(vec3(1.5, 0, 5), 0.7f);
-	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
-
-	primitives[7] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
-	primitives[7]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
-
-#elif MIRROR_SCENE
-	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
-	lights[1] = new Light(vec3(-5, 2, 0), vec3(50, 50, 50));
-
-	primitives[0] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
-	primitives[0]->material = Material(vec3(0.5, 1, 0.7), Material::MaterialKind::DIFFUSE);
-
-	primitives[1] = new Plane(vec3(0, 0, -5), vec3(0, 0, 1));
-	primitives[1]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
-
-	primitives[2] = new Plane(vec3(0, 7, 0), vec3(0, -1, 0));
-	primitives[2]->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::MaterialKind::DIFFUSE);
-
-	primitives[3] = new Sphere(vec3(1.5, 0, 5), 0.7f);
-	primitives[3]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
-
-	primitives[4] = new Triangle(vec3(-1, 4, 8), vec3(-1, 6, 5), vec3(1, 4, 8));
-	primitives[4]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
-
-	primitives[5] = new Sphere(vec3(-3, 3, 4), 1.0f);
-	primitives[5]->material = Material(vec3(0.5f, 0.5f, 0), Material::MaterialKind::DIFFUSE);
-
-	primitives[6] = new Sphere(vec3(3, 2, 4), 1.0f);
-	primitives[6]->material = Material(vec3(0, 0.5f, 0.5f), Material::MaterialKind::DIFFUSE);
-
-	primitives[7] = new Plane(vec3(10, 0, 0), vec3(-1, 0, 0));
-	primitives[7]->material = Material(vec3(0.8f, 0.0f, 0.8f), Material::MaterialKind::DIFFUSE);
-
-	primitives[8] = new Plane(vec3(-10, 0, 0), vec3(1, 0, 0));
-	primitives[8]->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::MaterialKind::MIRROR);
-
 #elif OBJ_LOAD
 
-	lights[0] = new Light(vec3(-3, -5, 0), vec3(0, 0, 0));
-	lights[1] = new Light(vec3(3, -3, -5), vec3(100, 100, 100));
+	lights[0] = new Light(vec3(-3, 2, -3), vec3(70, 70, 70));
+	lights[1] = new Light(vec3(3, -3, -5), vec3(70, 70, 70));
 
+#if BUNNY_LOAD
 	string inputfile = "bunny.obj";
+#elif SUZANNE_LOAD
+	string inputfile = "suzanne.obj";
+#elif f16_LOAD
+	string inputfile = "f16.obj";
+#endif
+
 	tinyobj::attrib_t attrib;
 	vector<tinyobj::shape_t> shapes;
 	vector<tinyobj::material_t> materials;
@@ -141,15 +98,13 @@ Scene::Scene()
 		}
 	}
 
-	Triangle* tri1 = new Triangle(vec3(8, -8, 8),vec3(-8, -8, 8) , vec3(-8, 8, 8));
+	Triangle* tri1 = new Triangle(vec3(8, -8, 8), vec3(-8, -8, 8), vec3(-8, 8, 8));
 	tri1->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 	primitives[counter++] = tri1;
 
-	Triangle* tri2 = new Triangle( vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
+	Triangle* tri2 = new Triangle(vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
 	tri2->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 	primitives[counter++] = tri2;
-
-
 
 #endif
 	sceneBounds = this->CalculateSceneBounds();

@@ -104,8 +104,6 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 
 	float tToLight = (lightSource->position.x - intersectionWithEpsilon.x) / direction.x;
 
-
-
 #if !USEBVH
 	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
 	{
@@ -123,7 +121,6 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 	if (shadowRay.t < tToLight)
 		return vec3(0.0f, 0.0f, 0.0f);
 #endif
-
 
 	float euclidianDistanceToLight = distance(intersectionPoint, lightSource->position);
 
