@@ -26,6 +26,7 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 	}
 	else
 	{
+		//Ordered Traversal Option 1
 		////We use ordered traversal here to speed up the raytracing process. We use square-dist to compare, to remove root operation :).
 
 		//float distLeftSquared = PointBoundsDist(pool[node->leftFirst]->bounds, ray->origin);
@@ -48,6 +49,101 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 		//	this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
 		//}
 
+		////Ordered Traversal Option 3
+
+		//if (whichChildFirst[node->leftFirst] == 1)
+		//{
+		//	//Do left first
+		//	this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+
+		//	if (ray->t < dists[node->leftFirst][dists[node->leftFirst].w])
+		//		return;
+
+		//	this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//}
+		//else if (whichChildFirst[node->leftFirst] == 2)
+		//{
+		//	//Do right first
+		//	this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+
+		//	if (ray->t < dists[node->leftFirst][dists[node->leftFirst].w])
+		//		return;
+
+		//	this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//}
+
+		////If it's not already computed, compute it.
+		//else
+		//{
+		//	vec3 leftCentroid = pool[node->leftFirst]->bounds.centroid;
+		//	vec3 rightCentroid = pool[node->leftFirst + 1]->bounds.centroid;
+
+		//	float xdist = abs(rightCentroid.x - leftCentroid.x);
+		//	float ydist = abs(rightCentroid.y - leftCentroid.y);
+		//	float zdist = abs(rightCentroid.z - leftCentroid.z);
+		//	vec3 dist = vec3(xdist, ydist, zdist);
+
+		//	int dim = 0;
+		//	if (ydist >= xdist && ydist >= zdist)
+		//		dim = 1;
+		//	if (zdist >= xdist && zdist >= ydist)
+		//		dim = 2;
+
+		//	//If this is true, the sign is +, else -.
+		//	bool sign = ray->direction[dim] > 0;
+
+		//	dists[node->leftFirst] = vec4(dist, dim);
+
+		//	if (sign)
+		//	{
+		//		//We know that left is closer, so do left first.
+		//		if (leftCentroid[dim] < rightCentroid[dim])
+		//		{
+		//			whichChildFirst[node->leftFirst] = 1;
+		//			//Left first.
+		//			this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//			if (ray->t < dist[dim])
+		//				return;
+		//			this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//		}
+		//		else
+		//		{
+		//			whichChildFirst[node->leftFirst] = 2;
+		//			//Right first.
+		//			this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//			if (ray->t < dist[dim])
+		//				return;
+		//			this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//		}
+
+
+		//	}
+		//	else
+		//	{
+		//		//We know that left is closer, so do left first.
+		//		if (leftCentroid[dim] > rightCentroid[dim])
+		//		{
+		//			whichChildFirst[node->leftFirst] = 1;
+		//			//Left first.
+		//			this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//			if (ray->t < dist[dim])
+		//				return;
+		//			this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//		}
+		//		else
+		//		{
+		//			whichChildFirst[node->leftFirst] = 2;
+		//			//Right first.
+		//			this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		//			if (ray->t < dist[dim])
+		//				return;
+		//			this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		//		}
+		//	}
+		//}
+
+
+		//Naive Traversal
 		this->Traverse(ray, pool[node->leftFirst], isShadowRay);
 		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
 	}
@@ -74,9 +170,15 @@ void BVH::ConstructBVH(Primitive** primitives)
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
 
+	//whichChildFirst is used for ordered traversal precomputing, as well as dists.
+	whichChildFirst = new byte[N * 2 - 1];
+	dists = new vec4[N * 2 - 1];
+
 	for (int i = 0; i < (N * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
+		whichChildFirst[i] = 0;
+		dists[i] = vec4(0);
 	}
 
 	rootNode = pool[0];

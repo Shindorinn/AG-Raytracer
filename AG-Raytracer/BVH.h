@@ -8,6 +8,9 @@ public:
 	BVHNode** pool;
 	Primitive** primitives;
 
+	byte* whichChildFirst;
+	vec4* dists;
+
 	glm::uint poolPtr;
 
 	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false);
