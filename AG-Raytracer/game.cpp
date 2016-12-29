@@ -108,7 +108,6 @@ void Game::KeyDown(int a_Key)
 // Main game tick function
 // -----------------------------------------------------------
 void Game::Tick(float dt)
-
 {
 	renderer->Render();
 

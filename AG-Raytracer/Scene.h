@@ -32,6 +32,5 @@ public:
 	BVH* bvh;
 	Scene();
 
-	// TODO : Method to calculate maximal bounding box given all internal primitives?
 	AABB* CalculateSceneBounds();
 };

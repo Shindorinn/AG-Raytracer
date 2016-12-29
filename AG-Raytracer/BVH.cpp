@@ -58,7 +58,6 @@ float BVH::IntersectPrimitives(Ray* ray, BVHNode* node)
 	float smallestT = INFINITY;
 	for (int i = node->leftFirst; i < node->count; i++)
 	{
-		//TODO: Use Indices maybe.
 		if (primitives[i]->CheckIntersection(ray) && smallestT > ray->t)
 		{
 			smallestT = ray->t;
@@ -71,17 +70,7 @@ float BVH::IntersectPrimitives(Ray* ray, BVHNode* node)
 }
 
 void BVH::ConstructBVH(Primitive** primitives)
-{
-	//this->N = sizeof(primitives) / sizeof(primitives[0]);
-
-	// create index array
-	primitiveIndices = new glm::uint[N];
-	for (uint i = 0; i < N; i++) primitiveIndices[i] = i;
-
-	//// also create node indices
-	//nodeIndices = new glm::uint[N * 2 - 1];
-	//for (uint i = 0; i < N * 2 - 1; i++) nodeIndices[i] = i;
-
+{	
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
 
@@ -97,7 +86,7 @@ void BVH::ConstructBVH(Primitive** primitives)
 	rootNode->leftFirst = 0;
 	rootNode->count = N;
 	rootNode->bounds = CalculateBounds(primitives, 0, N);
-	rootNode->Subdivide(pool, primitives, poolPtr, primitiveIndices);
+	rootNode->Subdivide(pool, primitives, poolPtr);
 }
 
 float BVH::PointBoundsDist(AABB bounds, vec3 point)

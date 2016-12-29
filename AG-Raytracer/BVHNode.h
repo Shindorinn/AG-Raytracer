@@ -7,15 +7,11 @@ public:
 	int leftFirst;
 	int count;
 
-	//void Traverse(Ray ray, BVHNode** pool);
-	//void BVHNode::IntersectPrimitives(Ray ray, BVHNode** pool);
-
-	void Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices);
+	void Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr);
 	void UpdateBounds(AABB* bounds, vec3& min, vec3& max);
-	bool Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices);
+	bool Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr);
 
 	bool IsLeaf();
-
 
 	BVHNode() {};
 

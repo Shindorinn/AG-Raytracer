@@ -3,7 +3,7 @@
 #define USESAH 1
 #define BINNING 1
 
-void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
+void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
 {
 #if !USESAH
 	if ((count - leftFirst) < 5) return;
@@ -15,18 +15,18 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolP
 	BVHNode* left = pool[poolPtr];
 	BVHNode* right = pool[poolPtr + 1];
 
-	if (!Partition(pool, primitives, poolPtr, primitiveIndices))
+	if (!Partition(pool, primitives, poolPtr))
 		return;
 
-	left->Subdivide(pool, primitives, poolPtr, primitiveIndices);
-	right->Subdivide(pool, primitives, poolPtr, primitiveIndices);
+	left->Subdivide(pool, primitives, poolPtr);
+	right->Subdivide(pool, primitives, poolPtr);
 
 	this->leftFirst = tempPoolPtr;
 	count = 0;
 }
 
 
-bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr, glm::uint* primitiveIndices)
+bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr)
 {
 #if USESAH 1
 	float parentCost = this->bounds.GetVolume() * (count - leftFirst);
