@@ -61,44 +61,44 @@ namespace Tmpl8 {
 #define broadcastps(ps)		_mm_shuffle_ps((ps),(ps), 0)
 #define broadcastss(ss)		broadcastps(loadss((ss)))
 
-struct timer 
-{ 
-	typedef long long value_type; 
-	static double inv_freq; 
-	value_type start; 
-	timer() : start( get() ) { init(); } 
-	float elapsed() const { return (float)((get() - start) * inv_freq); } 
-	static value_type get() 
-	{ 
-		LARGE_INTEGER c; 
-		QueryPerformanceCounter( &c ); 
-		return c.QuadPart; 
-	} 
-	static double to_time(const value_type vt) { return double(vt) * inv_freq; } 
-	void reset() { start = get(); }
-	static void init() 
-	{ 
-		LARGE_INTEGER f; 
-		QueryPerformanceFrequency( &f ); 
-		inv_freq = 1000./double(f.QuadPart); 
-	} 
-}; 
+	struct timer
+	{
+		typedef long long value_type;
+		static double inv_freq;
+		value_type start;
+		timer() : start(get()) { init(); }
+		float elapsed() const { return (float)((get() - start) * inv_freq); }
+		static value_type get()
+		{
+			LARGE_INTEGER c;
+			QueryPerformanceCounter(&c);
+			return c.QuadPart;
+		}
+		static double to_time(const value_type vt) { return double(vt) * inv_freq; }
+		void reset() { start = get(); }
+		static void init()
+		{
+			LARGE_INTEGER f;
+			QueryPerformanceFrequency(&f);
+			inv_freq = 1000. / double(f.QuadPart);
+		}
+	};
 
-typedef unsigned int uint;
-typedef unsigned char uchar;
-typedef unsigned char byte;
+	typedef unsigned int uint;
+	typedef unsigned char uchar;
+	typedef unsigned char byte;
 
 #define BADFLOAT(x) ((*(uint*)&x & 0x7f000000) == 0x7f000000)
 
-
-#include "Light.h"
 #include "Material.h"
 #include "AABB.h"
 #include "Ray.h"
+#include "Entity.h"
 #include "Primitive.h"
 #include "Sphere.h"
 #include "Triangle.h"
 #include "Plane.h"
+#include "Light.h"
 #include "BVHNode.h"
 #include "BVH.h"
 #include "Camera.h"

@@ -11,6 +11,8 @@ public:
 	float ndiv = n1 / n2;
 	float ndiv2 = ndiv*ndiv;
 
+	//TODO: Do something with Albedo
+	float albedo = 1;
 
 	//float n1 = 1.0f;
 	//float n2 = 1.548f;

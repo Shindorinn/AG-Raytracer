@@ -1,12 +1,12 @@
 ﻿#include "template.h"
 
-Primitive::Primitive(vec3 position)
+Primitive::Primitive(vec3 position) : Entity(position, false)
 {
-	this->Init(position); 
+	this->Init(position);
 };
 
 
-Primitive::Primitive(mat4 transformMatrix)
+Primitive::Primitive(mat4 transformMatrix) : Entity(position, false)
 {
 	this->Init(transformMatrix);
 };
@@ -15,7 +15,7 @@ void Primitive::Init(vec3 position)
 {
 	this->Init(
 		translate(mat4(1.0f), position)
-	); // x3,y3,z3,w3
+		); // x3,y3,z3,w3
 
 };
 

@@ -1,7 +1,6 @@
 ﻿#include "template.h"
 
-Light::Light(vec3 position, vec3 color)
+bool Light::CheckIntersection(Ray* ray)
 {
-	this->position = position;
-	this->color = color;
+	return this->tri->CheckIntersection(ray);
 }

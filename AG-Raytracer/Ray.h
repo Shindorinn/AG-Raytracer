@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-class Primitive;
+class Entity;
 class Ray
 {
 public:
 	vec3 origin;
 	vec3 direction;
 	float t;
-	Primitive* hit;
+	Entity* hit;
 
 	//Extra information used for faster AABB intersection test.
 	vec3 inv_direction;

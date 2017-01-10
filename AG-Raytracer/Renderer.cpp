@@ -3,7 +3,9 @@
 #define DEBUG 1
 #define EPSILON 0.01f
 
-#define USEBVH 1
+#define USEBVH 0
+
+#define MAXRAYDEPTH 10
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
@@ -13,12 +15,14 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
-#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-#pragma omp parallel for
+		printf("Current y:%i% \n", y);
+		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
-		{
-			vec3 colorResult = Trace(this->scene->camera->primaryRays[y*SCRWIDTH + x], x, y);
+		{		
+
+			vec3 colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -31,67 +35,131 @@ void Renderer::Render() {
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
-#pragma omp parallel for
+		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 }
 
-vec3 Renderer::Trace(Ray* ray, int x, int y)
+vec3 Renderer::Sample(Ray* ray, int depth)
+{
+	if (depth > MAXRAYDEPTH)
+	{
+		return vec3(0);
+	}
+	// trace ray
+	vec3 intersect = Trace(ray);
+	// terminate if ray left the scene
+	if (ray->t == INFINITY)
+	{
+		return vec3(0, 0, 0);
+	}
+
+	Entity* hit = ray->hit;
+
+	// terminate if we hit a light source
+	if (hit->isLight)
+		return static_cast<Light*>(hit)->color;
+
+	Primitive* primitiveHit = static_cast<Primitive*>(hit);
+
+	vec3 normal = primitiveHit->GetNormal(intersect);
+
+	// continue in random direction
+	vec3 R = CosineWeightedDiffuseReflection(normal);
+	Ray newRay = Ray(intersect, R);
+
+	// update throughput
+	float BRDF = primitiveHit->material.albedo / PI;
+
+	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
+
+	return PI * 2.0f * BRDF * Ei;
+}
+
+vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
+{
+	float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float r = sqrt(r0);
+	float theta = 2 * PI * r1;
+	float x = r * cosf(theta);
+	float y = r * sinf(theta);
+
+	vec3 dir = vec3(x, y, sqrt(1 - r0));
+
+	vec3 randomDir = normalize(vec3(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
+
+	vec3 t = cross(randomDir, normal);
+	vec3 b = cross(normal, t);
+
+	mat3 tangentSpace = mat3(b, t, normal);
+
+	//TODO: CHECK THIS
+	vec3 transformedDir = tangentSpace * dir;
+
+	return transformedDir;
+}
+
+////Internet, https://www.shadertoy.com/view/4tl3z4
+//vec3 cosWeightedRandomHemisphereDirection(const vec3 n) {
+//	vec2 r = hash2();
+//
+//	vec3  uu = normalize(cross(n, vec3(0.0, 1.0, 1.0)));
+//	vec3  vv = cross(uu, n);
+//
+//	float ra = sqrt(r.y);
+//	float rx = ra*cos(6.2831*r.x);
+//	float ry = ra*sin(6.2831*r.x);
+//	float rz = sqrt(1.0 - r.y);
+//	vec3  rr = vec3(rx*uu + ry*vv + rz*n);
+//
+//	return normalize(rr);
+//}
+
+vec3 Renderer::Trace(Ray* ray)
 {
 	float smallestT = INFINITY;
 
 #if !USEBVH
-	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
+	for (int x = 0; x < sizeof(this->scene->entities) / sizeof(this->scene->entities[0]); x++)
 	{
-		if (this->scene->primitives[x]->CheckIntersection(ray) && smallestT > ray->t)
+		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT> ray->t)
 		{
 			smallestT = ray->t;
-			ray->hit = this->scene->primitives[x];
+			ray->hit = this->scene->entities[x];
 		}
 	}
+	//for (int x = 0; x < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); x++)
+	//{
+	//	//TODO: save this AABB beforehand, or better, add it beforehand to the primitives.
+	//	if (this->scene->lights[x]->sphere.CheckIntersection(ray) && smallestT> ray->t)
+	//	{
+	//		smallestT = ray->t;
+	//		ray->hit = this->scene->lights[x];
+	//	}
+
+	//}
+
+
 #else 
 	scene->bvh->Traverse(ray, scene->bvh->rootNode);
 
 	smallestT = ray->t;
 #endif
 
-	if (smallestT == INFINITY) {
-		return vec3(0, 0, 0);
+	if (smallestT == INFINITY)
+	{
+		return vec3(0);
 	}
-	else {
-		Primitive* hit = ray->hit;
+	else
+	{
+
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
-		vec3 normal = hit->GetNormal(intersectionPoint);
+		//vec3 normal = hit->GetNormal(intersectionPoint);
 		vec3 colorResult = vec3(0, 0, 0);
 
-		if (hit->material.materialKind == Material::MaterialKind::DIFFUSE)
-		{
-			for (int i = 0; i < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); i++)
-			{
-				vec3 direction = glm::normalize(scene->lights[i]->position - intersectionPoint);
-
-				if (dot(direction, normal) < 0)
-					continue;
-
-				colorResult += DirectIllumination(
-					intersectionPoint,
-					direction,
-					normal,
-					scene->lights[i],
-					hit->material);
-			}
-
-			ray->t = INFINITY;
-		}
-		if (hit->material.materialKind == Material::MaterialKind::MIRROR)
-		{
-			ray->t = INFINITY;
-			return hit->material.color * Trace(&Ray(intersectionPoint, reflect(ray->direction, normal)), x, y);
-		}
-
-		return colorResult;
+		return intersectionPoint;
 	}
 }
 
@@ -129,4 +197,4 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		dot(normal, direction) *
 		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
 		(material.color / PI);
-}
+	}

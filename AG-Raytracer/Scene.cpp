@@ -39,6 +39,34 @@ Scene::Scene()
 	primitives[8] = new Triangle(vec3(3, -2.5, 8), vec3(3, -0.5, 8), vec3(5, -2.5, 8));
 	primitives[8]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
+
+#elif TUNNEL_SCENE 
+	lights[0] = new Light(vec3(-1, 3, 5), vec3(1, 3, 5), vec3(-1, 3, 7), vec3(100, 100, 100));
+	lights[1] = new Light(vec3(-1, 3, 7), vec3(1, 3, 5), vec3(1, 3, 7), vec3(100, 100, 100));
+
+	primitives[0] = new Plane(vec3(0, -3, 5), vec3(0, 1, 0));
+	primitives[1] = new Plane(vec3(-3, 0, 5), vec3(1, 0, 0));
+	primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
+	primitives[3] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
+	primitives[4] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
+
+	primitives[5] = new Sphere(vec3(-1, 0, 5), 1.0f);
+	primitives[5]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
+
+	primitives[6] = new Sphere(vec3(1.5, 0, 5), 0.7f);
+	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[7] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
+	primitives[7]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
+
+	for (int i = 0; i < 8; i++)
+	{
+		entities[i] = primitives[i];
+	}
+	entities[8] = lights[0];
+	entities[9] = lights[1];
+
+
 #elif OBJ_LOAD
 
 	lights[0] = new Light(vec3(-3, 2, -3), vec3(70, 70, 70));
@@ -108,7 +136,7 @@ Scene::Scene()
 
 #endif
 	sceneBounds = this->CalculateSceneBounds();
-	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
+	//bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
 }
 
 AABB* Scene::CalculateSceneBounds()

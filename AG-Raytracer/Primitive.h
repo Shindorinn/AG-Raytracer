@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-class Primitive
+class Primitive : public Entity
 {
 public:
 	//check glm documentation for rotation of camera.
