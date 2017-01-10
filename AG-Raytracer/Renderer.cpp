@@ -5,34 +5,49 @@
 
 #define USEBVH 0
 
-#define MAXRAYDEPTH 10
+#define MAXRAYDEPTH 5
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
 	this->scene = scene;
 	this->renderSurface = renderSurface;
 	this->scene->camera->GenerateRays();
+	this->frameCount = 0;
 }
 
 void Renderer::Render() {
-	//#pragma omp parallel for
+
+	//Increase frameCount, which is used for averaging multiple frames of path tracing.
+	frameCount++;
+
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		printf("Current y:%i% \n", y);
-		//#pragma omp parallel for
+		#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
-		{		
-
+		{
 			vec3 colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
+
 			// Then clamp
 			int r = min((int)colorResult.x, 255);
 			int g = min((int)colorResult.y, 255);
 			int b = min((int)colorResult.z, 255);
+
+			// Retrieve current buffer values.
+			int currentR = buffer[y][x] >> 16;
+			int currentG = (buffer[y][x] >> 8) - (currentR << 8);
+			int currentB = buffer[y][x] - (currentR << 16) - (currentG << 8);
+
+			int nextR = currentR + (r - currentR) / static_cast<float>(frameCount);
+			int nextG = currentG + (g - currentG) / static_cast<float>(frameCount);
+			int nextB = currentB + (b - currentB) / static_cast<float>(frameCount);
+
 			// Then merge
 
-			buffer[y][x] = ((r << 16) + (g << 8) + (b));
+			buffer[y][x] = ((nextR << 16) + (nextG << 8) + (nextB));
 		}
 	}
 	//#pragma omp parallel for
@@ -197,4 +212,4 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		dot(normal, direction) *
 		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
 		(material.color / PI);
-	}
+}

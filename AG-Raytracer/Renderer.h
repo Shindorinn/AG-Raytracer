@@ -7,6 +7,8 @@ public:
 	Scene* scene;
 	Pixel buffer[SCRHEIGHT][SCRWIDTH];
 	Renderer(Scene* scene, Surface* renderSurface);
+	
+	int frameCount;
 
 	void Render();
 
