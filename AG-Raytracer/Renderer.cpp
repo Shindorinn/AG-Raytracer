@@ -20,16 +20,17 @@ void Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		printf("Current y:%i% \n", y);
-		#pragma omp parallel for
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
+			//printf("r: %f%, g: %f%, b: %f% \n", colorResult.r, colorResult.g, colorResult.b);
 
 			// Then clamp
 			int r = min((int)colorResult.x, 255);
@@ -86,7 +87,9 @@ vec3 Renderer::Sample(Ray* ray, int depth)
 	Ray newRay = Ray(intersect, R);
 
 	// update throughput
-	float BRDF = primitiveHit->material.albedo / PI;
+
+	//float BRDF = primitiveHit->material.albedo / PI;
+	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
 
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
@@ -212,4 +215,4 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		dot(normal, direction) *
 		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
 		(material.color / PI);
-}
+	}
