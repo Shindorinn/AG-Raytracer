@@ -157,11 +157,6 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	//end of direct sampling code
 	//Sum both direct and indirect lighting...
 
-
-
-
-
-
 	//float BRDF = primitiveHit->material.albedo / PI;
 	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
 
@@ -262,17 +257,6 @@ vec3 Renderer::Trace(Ray* ray)
 			ray->hit = this->scene->entities[x];
 		}
 	}
-	//for (int x = 0; x < sizeof(this->scene->lights) / sizeof(this->scene->lights[0]); x++)
-	//{
-	//	//TODO: save this AABB beforehand, or better, add it beforehand to the primitives.
-	//	if (this->scene->lights[x]->sphere.CheckIntersection(ray) && smallestT> ray->t)
-	//	{
-	//		smallestT = ray->t;
-	//		ray->hit = this->scene->lights[x];
-	//	}
-
-	//}
-
 
 #else 
 	scene->bvh->Traverse(ray, scene->bvh->rootNode);
@@ -293,40 +277,3 @@ vec3 Renderer::Trace(Ray* ray)
 
 		return intersectionPoint;
 	}
-}
-
-vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material)
-{
-	vec3 intersectionWithEpsilon = intersectionPoint + EPSILON * direction;
-	Ray shadowRay = Ray(intersectionWithEpsilon, direction);
-	shadowRay.t = INFINITY;
-	float lightIntensity = 0.0f;
-
-	float tToLight = (lightSource->position.x - intersectionWithEpsilon.x) / direction.x;
-
-#if !USEBVH
-	for (int x = 0; x < sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]); x++)
-	{
-		this->scene->primitives[x]->CheckIntersection(&shadowRay);
-
-		//Check if the intersection is between the original intersection and the light. If it is, return black.
-		if (shadowRay.t < tToLight)
-			return vec3(0.0f, 0.0f, 0.0f);
-	}
-
-#elif USEBVH
-	scene->bvh->Traverse(&shadowRay, scene->bvh->rootNode, true);
-
-	//Check if the intersection is between the original intersection and the light. If it is, return black.
-	if (shadowRay.t < tToLight)
-		return vec3(0.0f, 0.0f, 0.0f);
-#endif
-
-	float euclidianDistanceToLight = distance(intersectionPoint, lightSource->position);
-
-	// I = LightColor * N. L * 1/d^2 * BRDF/PI
-	return lightSource->color *
-		dot(normal, direction) *
-		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
-		(material.color / PI);
-}
