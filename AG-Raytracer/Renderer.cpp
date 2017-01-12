@@ -23,13 +23,13 @@ int Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-	//#pragma omp parallel for
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		//printf("Current y:%i% \n", y);
-//#pragma omp parallel for
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			vec3 colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			vec3 colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -67,7 +67,7 @@ int Renderer::Render() {
 	return pixelCount;
 }
 
-vec3 Renderer::Sample(Ray* ray, int depth, bool isToLight)
+vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 {
 	if (depth > MAXRAYDEPTH)
 	{
@@ -87,10 +87,10 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool isToLight)
 	// terminate if we hit a light source
 	if (hit->isLight)
 	{
-		if (isToLight)
-			return static_cast<Light*>(hit)->color;
-		else
-			return vec3(0);
+		//if (secondaryRay)
+		//	return vec3(0);
+		//else
+		return static_cast<Light*>(hit)->color;
 	}
 
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
@@ -111,12 +111,65 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool isToLight)
 	// update throughput
 
 
-	//float BRDF = primitiveHit->material.albedo / PI;
+
+	//This code is for directly sampling the lights.
+	//TODO: Don't hardcode the 2, but get #lights.
+	int lightIndex = rand() % 2;
+	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
+
+	float a = 1.0; float b = 1.0;
+	while (a + b > 1)
+	{
+		a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+	vec3 point = lightTri->v0 + a*(lightTri->v1 - lightTri->v0) + b*(lightTri->v2 - lightTri->v0);
+
+	vec3 L = point - intersect;
+	float dist = length(L);
+	L /= dist;
+
+	float cos_o = dot(-L, lightTri->normal);
+
+	//TODO: check if normal should indeed be used here.
+	float cos_i = dot(L, normal);
+
+	float multiplier = 1.0f;
+	if ((cos_o <= 0) || (cos_i <= 0)) multiplier = 0.0f;
+
+	Ray r = Ray(intersect + EPSILON * L, L);
+	//r.t = dist - 2 * EPSILON;
+
+	//If our ray to a light hits something on its path towards the light, we can't see light, so we will multiply directIllumination with 0.
+	Trace(&r);
+	if (r.t + EPSILON * dist < dist)
+		multiplier = 0.0f;
+
+	//(not true anymore)  //If we reach this code, we know that the light is visible.
 	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
 
-	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
-	return PI * 2.0f * BRDF * Ei;
+	//TODO: Don't hardcode the 2, but get #lights.
+	vec3 directIllumination = BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i * multiplier;
+
+
+	//end of direct sampling code
+	//Sum both direct and indirect lighting...
+
+
+
+
+
+
+	//float BRDF = primitiveHit->material.albedo / PI;
+	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+
+	vec3 indirectIllumination = Sample(&newRay, depth + 1, true) * dot(normal, R) * PI * 2.0f * BRDFIndirect; // irradiance
+
+
+	return directIllumination + indirectIllumination;
+	//return PI * 2.0f * BRDFIndirect *;
 }
 
 //This is the "old", slow, noisy sampling function. But it works, so it's useful for testing.
@@ -148,37 +201,6 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 	Ray newRay = Ray(intersect, R);
-
-	// update throughput
-
-	//This code is for directly sampling the lights.
-	//TODO: Don't hardcode the 2, but get #lights.
-	int lightIndex = rand() % 2;
-	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
-
-	float a = 1.0; float b = 1.0;
-	while (a + b > 1)
-	{
-		a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	}
-	vec3 point = lightTri->v0 + a*(lightTri->v1 - lightTri->v0) + b*(lightTri->v2 - lightTri->v0);
-
-	vec3 L = point - intersect;
-	float dist = length(L);
-	L /= dist;
-
-	float cos_o = dot(-L, lightTri->normal);
-	//float cos_i = dot(L, ray.N);
-	//if ((cos_o <= 0) || (cos_i <= 0)) return vec3(0);
-
-
-
-
-
-
-
-
 
 	//float BRDF = primitiveHit->material.albedo / PI;
 	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
@@ -307,4 +329,4 @@ vec3 Renderer::DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 n
 		dot(normal, direction) *
 		(1 / (euclidianDistanceToLight*euclidianDistanceToLight)) *
 		(material.color / PI);
-	}
+}

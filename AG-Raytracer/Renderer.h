@@ -14,7 +14,7 @@ public:
 	int Render();
 
 	vec3 Trace(Ray* ray);
-	vec3 Sample(Ray* ray, int depth, bool isToLight = false);
+	vec3 Sample(Ray* ray, int depth, bool secondaryRay = false);
 	vec3 BasicSample(Ray* ray, int depth);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 
