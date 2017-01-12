@@ -109,7 +109,7 @@ void Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Game::Tick(float dt)
 {
-	renderer->Render();
+	int pixelCount = renderer->Render();
 
 	char buffer[500];
 	sprintf(
@@ -119,4 +119,10 @@ void Game::Tick(float dt)
 		SCRWIDTH,
 		SCRHEIGHT);
 	renderSurface->Print(buffer, 2, 2, 0xffffff);
+
+	char pixCountBuffer[500];
+	sprintf(
+		pixCountBuffer, "Pixels summed: %i%", pixelCount);
+
+	renderSurface->Print(pixCountBuffer, 300, 2, 0xffffff);
 }

@@ -15,7 +15,10 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 	this->frameCount = 0;
 }
 
-void Renderer::Render() {
+//Int, so it can return the total pixel values summed
+int Renderer::Render() {
+
+	int pixelCount = 0;
 
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
@@ -45,10 +48,11 @@ void Renderer::Render() {
 			int nextR = currentR + (r - currentR) / static_cast<float>(frameCount);
 			int nextG = currentG + (g - currentG) / static_cast<float>(frameCount);
 			int nextB = currentB + (b - currentB) / static_cast<float>(frameCount);
+			pixelCount += nextR + nextG + nextB;
 
 			// Then merge
 
-			buffer[y][x] = ((nextR << 16) + (nextG << 8) + (nextB));
+			buffer[y][x] = (nextR << 16) + (nextG << 8) + (nextB);
 		}
 	}
 	//#pragma omp parallel for
@@ -56,6 +60,8 @@ void Renderer::Render() {
 		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
+
+	return pixelCount;
 }
 
 vec3 Renderer::Sample(Ray* ray, int depth)

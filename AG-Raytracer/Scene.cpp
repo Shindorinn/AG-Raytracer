@@ -41,13 +41,13 @@ Scene::Scene()
 
 
 #elif TUNNEL_SCENE 
-	lights[0] = new Light(vec3(-1, 3, 5), vec3(1, 3, 5), vec3(-1, 3, 7), vec3(1, 1, 1));
-	lights[1] = new Light(vec3(-1, 3, 7), vec3(1, 3, 5), vec3(1, 3, 7), vec3(1, 1, 1));
+	lights[0] = new Light(vec3(-1, -3, 5), vec3(1, -3, 5), vec3(-1, -3, 7), vec3(1, 1, 1));
+	lights[1] = new Light(vec3(-1, -3, 7), vec3(1, -3, 5), vec3(1, -3, 7), vec3(1, 1, 1));
 
-	primitives[0] = new Plane(vec3(0, -3, 5), vec3(0, 1, 0));
+	//primitives[0] = new Plane(vec3(0, -3, 5), vec3(0, 1, 0));
 	primitives[1] = new Plane(vec3(-3, 0, 5), vec3(1, 0, 0));
 	primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
-	//primitives[3] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
+	primitives[0] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
 	primitives[4] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
 
 	primitives[5] = new Sphere(vec3(-1, 0, 5), 1.0f);

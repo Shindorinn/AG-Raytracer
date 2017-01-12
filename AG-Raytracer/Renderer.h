@@ -10,7 +10,7 @@ public:
 	
 	int frameCount;
 
-	void Render();
+	int Render();
 
 	vec3 Trace(Ray* ray);
 	vec3 Sample(Ray* ray, int depth);
