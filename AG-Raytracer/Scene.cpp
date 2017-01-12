@@ -44,10 +44,10 @@ Scene::Scene()
 	lights[0] = new Light(vec3(-1, -3, 5), vec3(1, -3, 5), vec3(-1, -3, 7), vec3(1, 1, 1));
 	lights[1] = new Light(vec3(-1, -3, 7), vec3(1, -3, 5), vec3(1, -3, 7), vec3(1, 1, 1));
 
-	//primitives[0] = new Plane(vec3(0, -3, 5), vec3(0, 1, 0));
+	primitives[0] = new Plane(vec3(0, -5, 5), vec3(0, 1, 0));
 	primitives[1] = new Plane(vec3(-3, 0, 5), vec3(1, 0, 0));
 	primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
-	primitives[0] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
+	primitives[3] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
 	primitives[4] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
 
 	primitives[5] = new Sphere(vec3(-1, 0, 5), 1.0f);
@@ -56,15 +56,15 @@ Scene::Scene()
 	primitives[6] = new Sphere(vec3(1.5, 0, 5), 0.7f);
 	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
-	primitives[3] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
-	primitives[3]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
+	primitives[7] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
+	primitives[7]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		entities[i] = primitives[i];
 	}
-	entities[7] = lights[0];
-	entities[8] = lights[1];
+	entities[8] = lights[0];
+	entities[9] = lights[1];
 
 
 #elif OBJ_LOAD

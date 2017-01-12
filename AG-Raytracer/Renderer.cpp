@@ -23,35 +23,38 @@ int Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		printf("Current y:%i% \n", y);
-#pragma omp parallel for
+		//printf("Current y:%i% \n", y);
+//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			vec3 colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			vec3 colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
 			//printf("r: %f%, g: %f%, b: %f% \n", colorResult.r, colorResult.g, colorResult.b);
 
-			// Then clamp
-			int r = min((int)colorResult.x, 255);
-			int g = min((int)colorResult.y, 255);
-			int b = min((int)colorResult.z, 255);
+			//Put our newly calculated values in the accumulator.
+			accumulator[y][x].r += colorResult.r;
+			accumulator[y][x].g += colorResult.g;
+			accumulator[y][x].b += colorResult.b;
 
-			// Retrieve current buffer values.
-			int currentR = buffer[y][x] >> 16;
-			int currentG = (buffer[y][x] >> 8) - (currentR << 8);
-			int currentB = buffer[y][x] - (currentR << 16) - (currentG << 8);
+			//Now, we can use the values stored in the accumulator to calculate the correct pixel value to draw.
+			//We first need to calculate correct float values, and then clamp.
 
-			int nextR = currentR + (r - currentR) / static_cast<float>(frameCount);
-			int nextG = currentG + (g - currentG) / static_cast<float>(frameCount);
-			int nextB = currentB + (b - currentB) / static_cast<float>(frameCount);
+			float r = accumulator[y][x].r / static_cast<float>(frameCount);
+			float g = accumulator[y][x].g / static_cast<float>(frameCount);
+			float b = accumulator[y][x].b / static_cast<float>(frameCount);
+
+			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
+			int nextR = min((int)r, 255);
+			int nextG = min((int)g, 255);
+			int nextB = min((int)b, 255);
+
 			pixelCount += nextR + nextG + nextB;
 
-			// Then merge
-
+			// Then merge it to the buffer.
 			buffer[y][x] = (nextR << 16) + (nextG << 8) + (nextB);
 		}
 	}
@@ -64,7 +67,7 @@ int Renderer::Render() {
 	return pixelCount;
 }
 
-vec3 Renderer::Sample(Ray* ray, int depth)
+vec3 Renderer::Sample(Ray* ray, int depth, bool isToLight)
 {
 	if (depth > MAXRAYDEPTH)
 	{
@@ -72,6 +75,60 @@ vec3 Renderer::Sample(Ray* ray, int depth)
 	}
 	// trace ray
 	vec3 intersect = Trace(ray);
+
+	// terminate if ray left the scene
+	if (ray->t == INFINITY)
+	{
+		return vec3(0, 0, 0);
+	}
+
+	Entity* hit = ray->hit;
+
+	// terminate if we hit a light source
+	if (hit->isLight)
+	{
+		if (isToLight)
+			return static_cast<Light*>(hit)->color;
+		else
+			return vec3(0);
+	}
+
+	Primitive* primitiveHit = static_cast<Primitive*>(hit);
+
+	vec3 normal = primitiveHit->GetNormal(intersect);
+
+	// continue in random direction
+	vec3 R = CosineWeightedDiffuseReflection(normal);
+	Ray newRay = Ray(intersect, R);
+
+	//This ray is for the indirect stuff, direct ding gaat naar lamp toe en moet niet lichtkleur returnen (err, andersom dus).
+
+	//UPDATE: wat we moeten doen, 2 verschillende Rays heel anders behandelen in je Sample.    //Je ray direct naar je licht toe returnt licht.color, je andere ray moet bij raken licht zwart returnen.
+	//Je licht 
+
+	//Hmm, heb je met  eneRay+andereRay  (alsin, licht optellen) niet dat je teveel licht gaat tellen? Of heb je dat juist niet, door je return BLACK als je ray een complete random ray was?
+
+	// update throughput
+
+
+	//float BRDF = primitiveHit->material.albedo / PI;
+	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+
+	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
+
+	return PI * 2.0f * BRDF * Ei;
+}
+
+//This is the "old", slow, noisy sampling function. But it works, so it's useful for testing.
+vec3 Renderer::BasicSample(Ray* ray, int depth)
+{
+	if (depth > MAXRAYDEPTH)
+	{
+		return vec3(0);
+	}
+	// trace ray
+	vec3 intersect = Trace(ray);
+
 	// terminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
@@ -94,10 +151,39 @@ vec3 Renderer::Sample(Ray* ray, int depth)
 
 	// update throughput
 
+	//This code is for directly sampling the lights.
+	//TODO: Don't hardcode the 2, but get #lights.
+	int lightIndex = rand() % 2;
+	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
+
+	float a = 1.0; float b = 1.0;
+	while (a + b > 1)
+	{
+		a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+	vec3 point = lightTri->v0 + a*(lightTri->v1 - lightTri->v0) + b*(lightTri->v2 - lightTri->v0);
+
+	vec3 L = point - intersect;
+	float dist = length(L);
+	L /= dist;
+
+	float cos_o = dot(-L, lightTri->normal);
+	//float cos_i = dot(L, ray.N);
+	//if ((cos_o <= 0) || (cos_i <= 0)) return vec3(0);
+
+
+
+
+
+
+
+
+
 	//float BRDF = primitiveHit->material.albedo / PI;
 	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
 
-	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
+	vec3 Ei = BasicSample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
 	return PI * 2.0f * BRDF * Ei;
 }
