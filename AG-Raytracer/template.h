@@ -4,7 +4,7 @@
 #pragma once
 
 #define GLM_FORCE_RADIANS
-#define GLM_SWIZZLE
+#define GLM_FORCE_SWIZZLE
 #define GLM_FORCE_LEFT_HANDED
 
 #include "math.h"
@@ -16,6 +16,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "glm\gtx\matrix_decompose.hpp"
 #include "glm\gtx\quaternion.hpp"
+#include "glm\gtx\rotate_vector.hpp"
+
 #include "surface.h"
 #include "game.h"
 #include <vector>
@@ -89,7 +91,7 @@ typedef unsigned char uchar;
 typedef unsigned char byte;
 
 #define BADFLOAT(x) ((*(uint*)&x & 0x7f000000) == 0x7f000000)
-
+#define EPSILON 0.000001f
 
 #include "Light.h"
 #include "Material.h"

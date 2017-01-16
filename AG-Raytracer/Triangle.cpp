@@ -2,7 +2,6 @@
 
 bool Triangle::CheckIntersection(Ray* ray)
 {
-#define Epsilon 0.000001
 	// Vectors from v0 to v1/v2 (edges)
 	vec3 e1, e2;
 
@@ -20,7 +19,7 @@ bool Triangle::CheckIntersection(Ray* ray)
 	det = dot(e1, p);
 
 	//if determinant is near zero, ray lies in plane of triangle otherwise not
-	if (det > -Epsilon && det < Epsilon) { return false; }
+	if (det > -EPSILON && det < EPSILON) { return false; }
 	invDet = 1.0f / det;
 
 	//calculate distance from v0 to ray origin
@@ -42,7 +41,7 @@ bool Triangle::CheckIntersection(Ray* ray)
 	if (v < 0 || u + v > 1) { return false; }
 
 	float tValue = dot(e2, q) * invDet;
-	if (tValue > Epsilon)
+	if (tValue > EPSILON)
 	{
 		//ray does intersect
 		ray->t = tValue;

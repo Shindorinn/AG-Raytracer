@@ -1,8 +1,6 @@
 ﻿#include "template.h"
 
 #define DEBUG 1
-#define EPSILON 0.01f
-
 #define USEBVH 1
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
@@ -13,6 +11,13 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 }
 
 void Renderer::Render() {
+	if (this->scene->camera->dirty()) {
+		this->scene->camera->buildCamera();
+		this->scene->camera->UpdateRays();
+		this->scene->camera->clearDirty();
+	}
+
+//#pragma omp parallel for collapse 2
 #pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 #pragma omp parallel for

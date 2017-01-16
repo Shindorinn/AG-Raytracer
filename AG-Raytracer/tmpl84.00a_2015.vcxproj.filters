@@ -21,7 +21,6 @@
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="Ray.cpp" />
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
