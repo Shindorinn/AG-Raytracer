@@ -23,13 +23,17 @@ int Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		//printf("Current y:%i% \n", y);
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			vec3 colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			vec3 colorResult;
+			if (x < SCRWIDTH / 2)
+				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			else
+				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -84,13 +88,13 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	Entity* hit = ray->hit;
 
-	// terminate if we hit a light source
 	if (hit->isLight)
 	{
-		//if (secondaryRay)
-		//	return vec3(0);
-		//else
-		return static_cast<Light*>(hit)->color;
+		//This is to check if the ray is an indirect illumination one.
+		if (secondaryRay)
+			return vec3(0);
+		else
+			return static_cast<Light*>(hit)->color;
 	}
 
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
@@ -99,20 +103,22 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
+
+	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect, R);
 
-	//This ray is for the indirect stuff, direct ding gaat naar lamp toe en moet niet lichtkleur returnen (err, andersom dus).
+	vec3 directIllumination = DirectSampleLights(intersect, normal);
+	
+	//TODO: Albedo setting maybe.
+	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
 
-	//UPDATE: wat we moeten doen, 2 verschillende Rays heel anders behandelen in je Sample.    //Je ray direct naar je licht toe returnt licht.color, je andere ray moet bij raken licht zwart returnen.
-	//Je licht 
+	vec3 indirectIllumination = Sample(&newRay, depth + 1, true) * dot(normal, R) * PI * 2.0f * BRDFIndirect; // irradiance
 
-	//Hmm, heb je met  eneRay+andereRay  (alsin, licht optellen) niet dat je teveel licht gaat tellen? Of heb je dat juist niet, door je return BLACK als je ray een complete random ray was?
+	return directIllumination + indirectIllumination;
+}
 
-	// update throughput
-
-
-
-	//This code is for directly sampling the lights.
+vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal)
+{
 	//TODO: Don't hardcode the 2, but get #lights.
 	int lightIndex = rand() % 2;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
@@ -134,37 +140,24 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	//TODO: check if normal should indeed be used here.
 	float cos_i = dot(L, normal);
 
-	float multiplier = 1.0f;
-	if ((cos_o <= 0) || (cos_i <= 0)) multiplier = 0.0f;
+	if ((cos_o <= 0) || (cos_i <= 0)) return vec3(0);
 
 	Ray r = Ray(intersect + EPSILON * L, L);
-	//r.t = dist - 2 * EPSILON;
 
-	//If our ray to a light hits something on its path towards the light, we can't see light, so we will multiply directIllumination with 0.
+	//If our ray to a light hits something on its path towards the light, we can't see light, so we will return black.
 	Trace(&r);
 	if (r.t + EPSILON * dist < dist)
-		multiplier = 0.0f;
+		return vec3(0);
 
-	//(not true anymore)  //If we reach this code, we know that the light is visible.
-	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+	Entity* hit = r.hit;
+	Light* lightHit = static_cast<Light*>(hit);
+
+	//The color that's used here should be the lightcolor.
+	vec3 BRDF = vec3(lightHit->color.r / PI, lightHit->color.g / PI, lightHit->color.b / PI);
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
 
-
 	//TODO: Don't hardcode the 2, but get #lights.
-	vec3 directIllumination = BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i * multiplier;
-
-
-	//end of direct sampling code
-	//Sum both direct and indirect lighting...
-
-	//float BRDF = primitiveHit->material.albedo / PI;
-	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
-
-	vec3 indirectIllumination = Sample(&newRay, depth + 1, true) * dot(normal, R) * PI * 2.0f * BRDFIndirect; // irradiance
-
-
-	return directIllumination + indirectIllumination;
-	//return PI * 2.0f * BRDFIndirect *;
+	return BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
 }
 
 //This is the "old", slow, noisy sampling function. But it works, so it's useful for testing.
@@ -277,3 +270,4 @@ vec3 Renderer::Trace(Ray* ray)
 
 		return intersectionPoint;
 	}
+		}

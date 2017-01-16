@@ -18,6 +18,9 @@ public:
 	vec3 BasicSample(Ray* ray, int depth);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 
+
+	vec3 DirectSampleLights(vec3 intersect, vec3 normal);
+
 	vec3 DirectIllumination(vec3 intersectionPoint, vec3 direction, vec3 normal, Light* lightSource, Material material);
 
 	vec3 Reflect(vec3 direction, vec3 normal);
