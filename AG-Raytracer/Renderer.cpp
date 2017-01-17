@@ -2,6 +2,7 @@
 
 #define DEBUG 1
 #define EPSILON 0.01f
+#define INVPI 0.31830988618379067153776752674503f
 
 #define USEBVH 0
 
@@ -29,6 +30,11 @@ int Renderer::Render() {
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
+			if (x == 570 & y == 400)
+				printf("570,400 ");
+
+
+
 			vec3 colorResult;
 			if (x < SCRWIDTH / 2)
 				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
@@ -68,7 +74,11 @@ int Renderer::Render() {
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 
+
+	//TODO: Use this for testing?
+	//this->renderSurface->Plot(570, 400, 0xffffff);
 	return pixelCount;
+
 }
 
 vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
@@ -83,7 +93,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	// terminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return vec3(0, 0, 0);
+		return vec3(0);
 	}
 
 	Entity* hit = ray->hit;
@@ -107,8 +117,8 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect, R);
 
-	vec3 directIllumination = DirectSampleLights(intersect, normal);
-	
+	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
+
 	//TODO: Albedo setting maybe.
 	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
 
@@ -117,18 +127,20 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	return directIllumination + indirectIllumination;
 }
 
-vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal)
+vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material)
 {
 	//TODO: Don't hardcode the 2, but get #lights.
 	int lightIndex = rand() % 2;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
 
+	//TODO: Check if this code could be made faster.
 	float a = 1.0; float b = 1.0;
 	while (a + b > 1)
 	{
 		a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	}
+
 	vec3 point = lightTri->v0 + a*(lightTri->v1 - lightTri->v0) + b*(lightTri->v2 - lightTri->v0);
 
 	vec3 L = point - intersect;
@@ -137,7 +149,6 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal)
 
 	float cos_o = dot(-L, lightTri->normal);
 
-	//TODO: check if normal should indeed be used here.
 	float cos_i = dot(L, normal);
 
 	if ((cos_o <= 0) || (cos_i <= 0)) return vec3(0);
@@ -152,11 +163,11 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal)
 	Entity* hit = r.hit;
 	Light* lightHit = static_cast<Light*>(hit);
 
-	//The color that's used here should be the lightcolor.
-	vec3 BRDF = vec3(lightHit->color.r / PI, lightHit->color.g / PI, lightHit->color.b / PI);
+	//TODO: Check if this should indeed just be "Material.color".
+	vec3 BRDF = vec3(material.color.r * INVPI, material.color.g * INVPI, material.color.b * INVPI);
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
 
-	//TODO: Don't hardcode the 2, but get #lights.
+	//TODO: Don't hardcode the 2.0f, but get #lights.
 	return BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
 }
 
@@ -214,8 +225,9 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 	vec3 b = cross(normal, t);
 
 	mat3 tangentSpace = mat3(b, t, normal);
+	mat3 test = mat3(b.x, t.x, normal.x, b.y, t.y, normal.y, b.z, t.z, normal.z);
 
-	//TODO: CHECK THIS
+	//TODO: CHECK THIS WITH JACCO
 	vec3 transformedDir = tangentSpace * dir;
 
 	return transformedDir;
