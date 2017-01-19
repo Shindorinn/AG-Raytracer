@@ -4,9 +4,13 @@
 #define EPSILON 0.01f
 #define INVPI 0.31830988618379067153776752674503f
 
+#define Psurvival 0.8f
+
 #define USEBVH 0
 
 #define MAXRAYDEPTH 5
+
+#define UseRR 0
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
@@ -30,10 +34,8 @@ int Renderer::Render() {
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			if (x == 570 & y == 400)
-				printf("570,400 ");
-
-
+			if (x == 600 && y == 350)
+				printf("if (x == 600,  & y == 350)");
 
 			vec3 colorResult;
 			if (x < SCRWIDTH / 2)
@@ -76,17 +78,36 @@ int Renderer::Render() {
 
 
 	//TODO: Use this for testing?
-	//this->renderSurface->Plot(570, 400, 0xffffff);
+//	this->renderSurface->Plot(600, 350, 0xffffff);
 	return pixelCount;
 
 }
 
 vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 {
+	/*
+	Over Russian Roulette:
+
+	Pak geen vaste waarde voor kans, maar pak (r+g+b)/3, en dit cappen tussen 0 en 1.
+	Verder: je DirectLight moet je altijd doen, 100%, dus die ook ZEKER NIET delen door je kans.
+	Je moet wel de RandomLights delen door die kans, maar dus NIET je totaal.
+	*/
+#if UseRR
+	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+	//Russian Roulette; check if we need to kill a ray.
+	if (a > Psurvival && secondaryRay)
+	{
+		return vec3(0);
+	}
+#else
+
 	if (depth > MAXRAYDEPTH)
 	{
 		return vec3(0);
 	}
+#endif
+
 	// trace ray
 	vec3 intersect = Trace(ray);
 
@@ -124,7 +145,13 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	vec3 indirectIllumination = Sample(&newRay, depth + 1, true) * dot(normal, R) * PI * 2.0f * BRDFIndirect; // irradiance
 
-	return directIllumination + indirectIllumination;
+#if UseRR
+	return vec3(indirectIllumination.x / Psurvival, indirectIllumination.y / Psurvival, indirectIllumination.z / Psurvival) + directIllumination;
+
+#else
+	return indirectIllumination + directIllumination;
+
+#endif
 }
 
 vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material)
@@ -133,7 +160,7 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	int lightIndex = rand() % 2;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
 
-	//TODO: Check if this code could be made faster.
+	//TODO: Check if this code could be made faster.  || ANSWER: It's okay, but could try 1-a and 1-b, if a+b > 1. In practice, however, this shouldn't have that big of an effect.
 	float a = 1.0; float b = 1.0;
 	while (a + b > 1)
 	{
@@ -282,4 +309,4 @@ vec3 Renderer::Trace(Ray* ray)
 
 		return intersectionPoint;
 	}
-		}
+}
