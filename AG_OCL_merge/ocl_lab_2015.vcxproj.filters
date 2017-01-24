@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="system.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="gltools.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="opencl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="system.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="gltools.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="opencl.h" />
+    <ClInclude Include="programs\program.h">
+      <Filter>programs</Filter>
+    </ClInclude>
+    <ClInclude Include="shared.h" />
+    <ClInclude Include="programs\randomnumbers.h">
+      <Filter>programs</Filter>
+    </ClInclude>
+    <ClInclude Include="programs\bitonic.h">
+      <Filter>programs</Filter>
+    </ClInclude>
+    <ClInclude Include="programs\scan.h">
+      <Filter>programs</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{f1d8fcfa-1de5-47e9-ad5c-79df4873eb22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="programs">
+      <UniqueIdentifier>{8ad831fb-dcc5-4488-9ec1-c4396019286b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="programs\program.cl">
+      <Filter>programs</Filter>
+    </None>
+    <None Include="shaders\vignette.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\vignette.vert">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
