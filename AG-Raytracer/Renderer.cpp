@@ -28,19 +28,19 @@ int Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-#pragma omp parallel for
+	#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		//printf("Current y:%i% \n", y);
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			if (x == 600 && y == 350)
-				printf("if (x == 600,  & y == 350)");
+			if (x == 634 && y == 579)
+				printf("634, 579");
 
 			vec3 colorResult;
-			if (x < SCRWIDTH / 2)
-				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			else
+		//	if (x < SCRWIDTH / 2)
+				//colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//else
 				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
@@ -59,12 +59,14 @@ int Renderer::Render() {
 			float g = accumulator[y][x].g / static_cast<float>(frameCount);
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
 
+			//printf("r: %f%,g: %f%,b:%f% \n", r, g, b);
+
 			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
 			int nextG = min((int)g, 255);
 			int nextB = min((int)b, 255);
 
-			pixelCount += nextR + nextG + nextB;
+			pixelCount += (int)r + (int)g + (int)b; //nextR + nextG + nextB;
 
 			// Then merge it to the buffer.
 			buffer[y][x] = (nextR << 16) + (nextG << 8) + (nextB);
@@ -218,11 +220,15 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 
 	// terminate if we hit a light source
 	if (hit->isLight)
-		return static_cast<Light*>(hit)->color;
+		if (dot(static_cast<Light*>(hit)->tri->normal, ray->direction) > 0)
+			return vec3(0);
+		else
+			return static_cast<Light*>(hit)->color;
 
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
+
 
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
@@ -302,6 +308,8 @@ vec3 Renderer::Trace(Ray* ray)
 	}
 	else
 	{
+		//Set t back, this is needed for the pathtracing code which checks if we need to return black (occlusion toward light)
+		ray->t = smallestT;
 
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
 		//vec3 normal = hit->GetNormal(intersectionPoint);
