@@ -1,24 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="system.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="gltools.cpp" />
-    <ClCompile Include="texture.cpp" />
-    <ClCompile Include="opencl.cpp" />
+    <ClCompile Include="AABB.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="BVH.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="BVHNode.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Primitive.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="surface.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="threads.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
+    <ClCompile Include="gltools.cpp">
+      <Filter>ocl_template</Filter>
+    </ClCompile>
+    <ClCompile Include="opencl.cpp">
+      <Filter>ocl_template</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>ocl_template</Filter>
+    </ClCompile>
+    <ClCompile Include="system.cpp">
+      <Filter>ocl_template</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>ocl_template</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="system.h" />
-    <ClInclude Include="shader.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="gltools.h" />
-    <ClInclude Include="texture.h" />
-    <ClInclude Include="opencl.h" />
     <ClInclude Include="programs\program.h">
       <Filter>programs</Filter>
     </ClInclude>
-    <ClInclude Include="shared.h" />
     <ClInclude Include="programs\randomnumbers.h">
       <Filter>programs</Filter>
     </ClInclude>
@@ -28,6 +78,75 @@
     <ClInclude Include="programs\scan.h">
       <Filter>programs</Filter>
     </ClInclude>
+    <ClInclude Include="AABB.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="BVH.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="BVHNode.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitive.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="surface.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="threads.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny_obj_loader.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="gltools.h">
+      <Filter>ocl_template</Filter>
+    </ClInclude>
+    <ClInclude Include="opencl.h">
+      <Filter>ocl_template</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>ocl_template</Filter>
+    </ClInclude>
+    <ClInclude Include="shared.h">
+      <Filter>ocl_template</Filter>
+    </ClInclude>
+    <ClInclude Include="system.h">
+      <Filter>ocl_template</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>ocl_template</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="shaders">
@@ -35,6 +154,12 @@
     </Filter>
     <Filter Include="programs">
       <UniqueIdentifier>{8ad831fb-dcc5-4488-9ec1-c4396019286b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ag_template">
+      <UniqueIdentifier>{247f3d3a-e69a-4c89-814a-7e7fb1a63336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ocl_template">
+      <UniqueIdentifier>{bce4620f-bfd9-4a90-af30-2bbf7568e467}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -117,14 +117,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>system.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(UniversalCRT_IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(UniversalCRT_IncludePath);lib\SDL2-2.0.3\include;</AdditionalIncludeDirectories>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(UniversalCRT_LibraryPath_x86)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencl.lib;glew32.lib;opengl32.lib;freeimage.lib;user32.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(UniversalCRT_LibraryPath_x86);lib\SDL2-2.0.3\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencl.lib;glew32.lib;opengl32.lib;freeimage.lib;user32.lib;gdi32.lib;sdl2main.lib;sdl2.lib</AdditionalDependencies>
       <OutputFile>ocllab32debug.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -184,9 +184,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="BVH.cpp" />
+    <ClCompile Include="BVHNode.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gltools.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="opencl.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Primitive.cpp" />
+    <ClCompile Include="Ray.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="surface.cpp" />
     <ClCompile Include="system.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -197,19 +210,37 @@
     </ClCompile>
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="threads.cpp" />
+    <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.h" />
+    <ClInclude Include="BVH.h" />
+    <ClInclude Include="BVHNode.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="Primitive.h" />
     <ClInclude Include="programs\bitonic.h" />
     <ClInclude Include="programs\randomnumbers.h" />
     <ClInclude Include="programs\scan.h" />
+    <ClInclude Include="Ray.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="shared.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gltools.h" />
     <ClInclude Include="opencl.h" />
     <ClInclude Include="programs\program.h" />
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="surface.h" />
     <ClInclude Include="system.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="threads.h" />
+    <ClInclude Include="tiny_obj_loader.h" />
+    <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="programs\program.cl">
