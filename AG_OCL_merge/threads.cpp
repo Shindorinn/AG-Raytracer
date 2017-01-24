@@ -1,6 +1,4 @@
-#include "template.h"
-
-using namespace Tmpl8;
+#include "system.h"
 
 const int Thread::P_ABOVE_NORMAL = THREAD_PRIORITY_ABOVE_NORMAL;
 const int Thread::P_BELOW_NORMAL = THREAD_PRIORITY_BELOW_NORMAL;
@@ -59,28 +57,28 @@ void Thread::SetName( char* _Name )
 
 DWORD JobThreadProc( LPVOID lpParameter )
 {
-	JobThread* JobThreadInstance = (JobThread*) lpParameter;
+	Tmpl8::JobThread* JobThreadInstance = (Tmpl8::JobThread*) lpParameter;
 	JobThreadInstance->BackgroundTask();
 	return 0;
 }
 
-void JobThread::CreateAndStartThread( unsigned int threadId )
+void Tmpl8::JobThread::CreateAndStartThread(unsigned int threadId)
 {
 	m_GoSignal = CreateEvent( 0, FALSE, FALSE, 0 );
 	m_ThreadHandle = CreateThread( 0, 0, (LPTHREAD_START_ROUTINE) &JobThreadProc, (LPVOID) this, 0, 0 );
 	m_ThreadID = threadId;
 }
-void JobThread::BackgroundTask()
+void Tmpl8::JobThread::BackgroundTask()
 {
 	while (1)
 	{
 		WaitForSingleObject( m_GoSignal, INFINITE );
 		while (1)
 		{
-			Job* job = JobManager::GetJobManager()->GetNextJob();
+			Tmpl8::Job* job = Tmpl8::JobManager::GetJobManager()->GetNextJob();
 			if (!job) 
 			{
-				JobManager::GetJobManager()->ThreadDone( m_ThreadID );
+				Tmpl8::JobManager::GetJobManager()->ThreadDone(m_ThreadID);
 				break;
 			}
 			job->RunCodeWrapper();
@@ -88,30 +86,30 @@ void JobThread::BackgroundTask()
 	}
 }
 
-void JobThread::Go()
+void Tmpl8::JobThread::Go()
 {
 	SetEvent( m_GoSignal );
 }
 
-void Job::RunCodeWrapper()
+void Tmpl8::Job::RunCodeWrapper()
 {
 	Main();
 }
-JobManager* JobManager::m_JobManager = 0;
+Tmpl8::JobManager* Tmpl8::JobManager::m_JobManager = 0;
 
-JobManager::JobManager( unsigned int threads ) : m_NumThreads( threads )
+Tmpl8::JobManager::JobManager(unsigned int threads) : m_NumThreads(threads)
 {
 	InitializeCriticalSection( &m_CS );
 }
 
-JobManager::~JobManager()
+Tmpl8::JobManager::~JobManager()
 {
 	DeleteCriticalSection( &m_CS );
 }
 
-void JobManager::CreateJobManager( unsigned int numThreads )
+void Tmpl8::JobManager::CreateJobManager(unsigned int numThreads)
 {
-	m_JobManager = new JobManager( numThreads );
+	m_JobManager = new Tmpl8::JobManager(numThreads);
 	m_JobManager->m_JobThreadList = new JobThread[numThreads];
 	for ( unsigned int i = 0 ; i < numThreads; i++ ) 
 	{
@@ -121,12 +119,12 @@ void JobManager::CreateJobManager( unsigned int numThreads )
 	m_JobManager->m_JobCount = 0;
 }
 
-void JobManager::AddJob2( Job* a_Job )
+void Tmpl8::JobManager::AddJob2(Tmpl8::Job* a_Job)
 {
 	m_JobList[m_JobCount++] = a_Job;
 }
 
-Job* JobManager::GetNextJob()
+Tmpl8::Job* Tmpl8::JobManager::GetNextJob()
 {
 	Job* job = 0;
 	EnterCriticalSection( &m_CS );
@@ -135,7 +133,7 @@ Job* JobManager::GetNextJob()
 	return job;
 }
 
-void JobManager::RunJobs()
+void Tmpl8::JobManager::RunJobs()
 {
 	for ( unsigned int i = 0; i < m_NumThreads; i++ ) 
 	{
@@ -144,7 +142,7 @@ void JobManager::RunJobs()
 	WaitForMultipleObjects( m_NumThreads, m_ThreadDone, TRUE, INFINITE );
 }
 
-void JobManager::ThreadDone( unsigned int n ) 
+void Tmpl8::JobManager::ThreadDone(unsigned int n)
 { 
 	SetEvent( m_ThreadDone[n] ); 
 }

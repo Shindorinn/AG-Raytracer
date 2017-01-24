@@ -61,6 +61,9 @@
     <ClCompile Include="game.cpp">
       <Filter>ag_template</Filter>
     </ClCompile>
+    <ClCompile Include="threads.cpp">
+      <Filter>ag_template</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="programs\program.h">
@@ -136,6 +139,9 @@
       <Filter>ag_template</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
+      <Filter>ag_template</Filter>
+    </ClInclude>
+    <ClInclude Include="threads.h">
       <Filter>ag_template</Filter>
     </ClInclude>
   </ItemGroup>
