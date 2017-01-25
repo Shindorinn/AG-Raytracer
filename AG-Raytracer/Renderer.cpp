@@ -39,11 +39,11 @@ int Renderer::Render() {
 
 			vec3 colorResult;
 			//	if (x < SCRWIDTH / 2)
-				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-				//else
-			//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//else
+		//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
-			// First convert range
+		// First convert range
 			colorResult *= 256.0f;
 			//printf("r: %f%, g: %f%, b: %f% \n", colorResult.r, colorResult.g, colorResult.b);
 
@@ -153,7 +153,11 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	//TODO: Albedo setting maybe.
 	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
 
-	vec3 indirectIllumination = Sample(&newRay, depth + 1, true) * dot(normal, R) * PI * 2.0f * BRDFIndirect; // irradiance
+
+	float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
+
+	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
+	vec3 indirectIllumination = BRDFIndirect * Ei;
 
 #if UseRR
 	return vec3(indirectIllumination.x / Psurvival, indirectIllumination.y / Psurvival, indirectIllumination.z / Psurvival) + directIllumination;
