@@ -28,7 +28,7 @@ int Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		//printf("Current y:%i% \n", y);
 #pragma omp parallel for
@@ -38,10 +38,10 @@ int Renderer::Render() {
 				printf("634, 579");
 
 			vec3 colorResult;
-		//	if (x < SCRWIDTH / 2)
-				//colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			//else
-				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//	if (x < SCRWIDTH / 2)
+				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+				//else
+			//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -133,6 +133,14 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
+
+
+	if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
+	{
+		// continue in fixed direction
+		Ray r(intersect, reflect(ray->direction, normal));
+		return primitiveHit->material.color * Sample(&r, depth + 1, false);
+	}
 
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
@@ -289,7 +297,7 @@ vec3 Renderer::Trace(Ray* ray)
 #if !USEBVH
 	for (int x = 0; x < sizeof(this->scene->entities) / sizeof(this->scene->entities[0]); x++)
 	{
-		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT> ray->t)
+		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
 		{
 			smallestT = ray->t;
 			ray->hit = this->scene->entities[x];

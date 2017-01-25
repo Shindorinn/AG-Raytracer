@@ -53,9 +53,9 @@ Scene::Scene()
 
 	//primitives[1] = new Plane(vec3(-3, 0, 5), vec3(1, 0, 0));
 	primitives[2] = new Triangle(vec3(-3, -5, 10), vec3(-3, -5, -5), vec3(-3, 3, -5));
-	primitives[2]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[2]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
 	primitives[3] = new Triangle(vec3(-3, -5, 10), vec3(-3, 3, -5), vec3(-3, 3, 10));
-	primitives[3]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[3]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
 
 
 	//primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
