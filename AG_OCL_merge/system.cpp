@@ -168,7 +168,7 @@ HWND GetWindowHandle()
 	return hwnd;
 }
 
-/*
+
 // WndProc
 // Handle windows messages.
 // ----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ void RedirectIOToConsole()
 	h1 = (long)GetStdHandle( STD_ERROR_HANDLE ), h2 = _open_osfhandle( h1, _O_TEXT );
 	fp = _fdopen( h2, "w" ), *stderr = *fp;
 	setvbuf( stderr, NULL, _IONBF, 0 );
-	ios::sync_with_stdio();
+	std::ios::sync_with_stdio();
 	freopen( "CON", "w", stdout );
 	freopen( "CON", "w", stderr );
 }
@@ -280,7 +280,7 @@ bool OpenWindow( const char* title, int width, int height )
 	windowClass.lpszClassName = title;
 	if (!RegisterClass( &windowClass )) return false;
 	hwnd = CreateWindowEx( dwExStyle, title, title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, width, height, NULL, NULL, hInstance, NULL );
-	if (!CreateGLContext()) FATALERROR( "Failed to create OpenGL context" );
+	if (!Tmpl8::CreateGLContext()) FATALERROR("Failed to create OpenGL context");
 	ShowWindow( hwnd, SW_SHOW );
 	UpdateWindow( hwnd );
 	return true;
@@ -303,7 +303,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	MSG msg;
 	RedirectIOToConsole();
 	OpenWindow( "OpenCL Laboratory", SCRWIDTH, SCRHEIGHT );
-	game = new Game();
+	game = new Tmpl8::Game();
 	game->Init();
 	while (running)
 	{
@@ -317,15 +317,17 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 		}
 		else 
 		{
-			game->Tick();
-			Present();
+			StartTimer();
+			game->Tick(lastftime);
+			lastftime = GetDuration();
+			Tmpl8::Present();
 		}
 	}
 	game->Shutdown();
-	ShutdownGL();
+	Tmpl8::ShutdownGL();
 	return (int)msg.wParam;
 }
-*/
+
 
 
 // AG Tmpl window code
