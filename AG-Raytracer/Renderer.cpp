@@ -34,13 +34,10 @@ int Renderer::Render() {
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			if (x == 634 && y == 579)
-				printf("634, 579");
-
 			vec3 colorResult;
-			//if (x < SCRWIDTH / 2)
-			//	colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-		//	else
+			if (x < SCRWIDTH / 2)
+				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			else
 				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
@@ -58,6 +55,9 @@ int Renderer::Render() {
 			float r = accumulator[y][x].r / static_cast<float>(frameCount);
 			float g = accumulator[y][x].g / static_cast<float>(frameCount);
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
+
+			if (r < 0 || g < 0 || b < 0)
+				printf("dingen zijn <0");
 
 			//printf("r: %f%,g: %f%,b:%f% \n", r, g, b);
 
@@ -146,12 +146,12 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
-	Ray newRay = Ray(intersect + R  *EPSILON, R);
+	Ray newRay = Ray(intersect + R * EPSILON, R);
 
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
 	//TODO: Albedo setting maybe.
-	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+	vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
 
 
 	float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
@@ -201,8 +201,6 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	//If our ray to a light hits something on its path towards the light, we can't see light, so we will return black.
 	Trace(&r);
 
-
-
 	if (r.hit)
 		//TODO: Check of geraakte primitive de lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
 		if (!r.hit->isLight)
@@ -249,13 +247,12 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
-
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
-	Ray newRay = Ray(intersect, R);
+	Ray newRay = Ray(intersect + R * EPSILON, R);
 
 	//float BRDF = primitiveHit->material.albedo / PI;
-	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+	vec3 BRDF = primitiveHit->material.color * INVPI;
 
 	vec3 Ei = BasicSample(&newRay, depth + 1) * dot(normal, R); // irradiance
 

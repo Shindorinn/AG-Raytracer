@@ -16,9 +16,9 @@ public:
 	Light* lights[1];
 
 #elif TUNNEL_SCENE
-	Primitive* primitives[11];
+	Primitive* primitives[13];
 	Light* lights[2];
-	Entity* entities[13];
+	Entity* entities[15];
 
 	//Primitive* primitives[8];
 	//Entity* entities[10];

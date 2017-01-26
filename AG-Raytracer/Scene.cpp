@@ -45,41 +45,46 @@ Scene::Scene()
 	lights[1] = new Light(vec3(-1.5, -3, 7), vec3(1.5, -3, 7), vec3(1.5, -3, 5), vec3(2, 2, 2));
 
 	//primitives[0] = new Plane(vec3(0, -5, 5), vec3(0, 1, 0));
-	primitives[0] = new Triangle(vec3(-3, -5, -5), vec3(-3, -5, 10),  vec3(3, -5, -5));
-	primitives[0]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
-	primitives[1] = new Triangle( vec3(3, -5, -5), vec3(-3, -5, 10), vec3(3, -5, 10));
-	primitives[1]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[0] = new Triangle(vec3(-3, -5, -5), vec3(-3, -5, 10), vec3(3, -5, -5));
+	primitives[0]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[1] = new Triangle(vec3(3, -5, -5), vec3(-3, -5, 10), vec3(3, -5, 10));
+	primitives[1]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 
 	//primitives[1] = new Plane(vec3(-3, 0, 5), vec3(1, 0, 0));
 	primitives[2] = new Triangle(vec3(-3, -5, 10), vec3(-3, -5, -5), vec3(-3, 3, -5));
-	primitives[2]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+	primitives[2]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
 	primitives[3] = new Triangle(vec3(-3, -5, 10), vec3(-3, 3, -5), vec3(-3, 3, 10));
-	primitives[3]->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+	primitives[3]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
 
 
 	//primitives[2] = new Plane(vec3(3, 0, 5), vec3(-1, 0, 0));
 	primitives[4] = new Triangle(vec3(3, -5, -5), vec3(3, -5, 10), vec3(3, 3, -5));
-	primitives[4]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[4]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
 	primitives[5] = new Triangle(vec3(3, 3, -5), vec3(3, -5, 10), vec3(3, 3, 10));
-	primitives[5]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[5]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
 
 
 	//primitives[3] = new Plane(vec3(0, 3, 5), vec3(0, -1, 0));
 	primitives[6] = new Triangle(vec3(-3, 3, 10), vec3(-3, 3, -5), vec3(3, 3, -5));
-	primitives[6]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 	primitives[7] = new Triangle(vec3(3, 3, 10), vec3(-3, 3, 10), vec3(3, 3, -5));
-	primitives[7]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[7]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 
 	//primitives[4] = new Plane(vec3(0, 0, 10), vec3(0, 0, -1));
 	primitives[8] = new Triangle(vec3(-3, -5, 10), vec3(-3, 3, 10), vec3(3, 3, 10));
-	primitives[8]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[8]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 	primitives[9] = new Triangle(vec3(3, -5, 10), vec3(-3, -5, 10), vec3(3, 3, 10));
-	primitives[9]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
+	primitives[9]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	primitives[10] = new Sphere(vec3(0, 0, 6), 1.0f);
-	primitives[10]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
+	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+	primitives[11] = new Triangle(vec3(-3, -5, -5.1), vec3(-3, 3, -5.1), vec3(3, 3, -5.1));
+	primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[12] = new Triangle(vec3(3, -5, -5.1), vec3(-3, -5, -5.1), vec3(3, 3, -5.1));
+	primitives[12]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	//primitives[11] = new Sphere(vec3(1.5, 0, 5), 0.7f);
 	//primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
@@ -87,12 +92,13 @@ Scene::Scene()
 	//primitives[12] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
 	//primitives[12]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
 
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 13; i++)
 	{
 		entities[i] = primitives[i];
 	}
-	entities[11] = lights[0];
-	entities[12] = lights[1];
+	entities[13] = lights[0];
+	entities[14] = lights[1];
+
 
 
 #elif OBJ_LOAD
