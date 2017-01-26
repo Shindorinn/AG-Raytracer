@@ -13,12 +13,13 @@ public:
 
 #if TRI_SCENE
 	Primitive* primitives[9];
-	Light* lights[1];
+	Light* lights[2];
+	Entity* entities[11];
 
 #elif TUNNEL_SCENE
-	Primitive* primitives[13];
+	Primitive* primitives[12];
 	Light* lights[2];
-	Entity* entities[15];
+	Entity* entities[14];
 
 	//Primitive* primitives[8];
 	//Entity* entities[10];

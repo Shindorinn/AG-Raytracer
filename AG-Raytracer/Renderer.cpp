@@ -315,6 +315,19 @@ vec3 Renderer::Trace(Ray* ray)
 
 #else 
 	scene->bvh->Traverse(ray, scene->bvh->rootNode);
+	smallestT = ray->t;
+
+	//Lights are not included in the BVH.
+
+	//TODO: Fix this hardcoding.
+	for (int x = 12; x < 14; x++)
+	{
+		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
+		{
+			smallestT = ray->t;
+			ray->hit = this->scene->entities[x];
+		}
+	}
 
 	smallestT = ray->t;
 #endif

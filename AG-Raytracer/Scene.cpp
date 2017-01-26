@@ -9,8 +9,8 @@ Scene::Scene()
 	//sceneBounds = new AABB(vec3(-100, -100, -100), vec3(100, 100, 100));
 
 #if TRI_SCENE
-	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
-	//lights[1] = new Light(vec3(-2, 0, 0), vec3(50, 50, 50));
+	lights[0] = new Light(vec3(-1.5, -3, 5), vec3(-1.5, -3, 7), vec3(1.5, -3, 5), vec3(2, 2, 2));
+	lights[1] = new Light(vec3(-1.5, -3, 7), vec3(1.5, -3, 7), vec3(1.5, -3, 5), vec3(2, 2, 2));
 
 	primitives[0] = new Triangle(vec3(-3, 0, 8), vec3(-3, 2, 8), vec3(-1, 0, 8));
 	primitives[0]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
@@ -38,6 +38,13 @@ Scene::Scene()
 
 	primitives[8] = new Triangle(vec3(3, -2.5, 8), vec3(3, -0.5, 8), vec3(5, -2.5, 8));
 	primitives[8]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+
+	for (int i = 0; i < 9; i++)
+	{
+		entities[i] = primitives[i];
+	}
+	entities[9] = lights[0];
+	entities[10] = lights[1];
 
 
 #elif TUNNEL_SCENE 
@@ -78,13 +85,13 @@ Scene::Scene()
 	primitives[9] = new Triangle(vec3(3, -5, 10), vec3(-3, -5, 10), vec3(3, 3, 10));
 	primitives[9]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
-	primitives[10] = new Sphere(vec3(0, 0, 6), 1.0f);
-	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	//primitives[10] = new Sphere(vec3(0, 0, 6), 1.0f);
+	//primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	primitives[11] = new Triangle(vec3(-3, -5, -5.1), vec3(-3, 3, -5.1), vec3(3, 3, -5.1));
 	primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-	primitives[12] = new Triangle(vec3(3, -5, -5.1), vec3(-3, -5, -5.1), vec3(3, 3, -5.1));
-	primitives[12]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[10] = new Triangle(vec3(3, -5, -5.1), vec3(-3, -5, -5.1), vec3(3, 3, -5.1));
+	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	//primitives[11] = new Sphere(vec3(1.5, 0, 5), 0.7f);
 	//primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
@@ -92,12 +99,12 @@ Scene::Scene()
 	//primitives[12] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
 	//primitives[12]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
 
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < 12; i++)
 	{
 		entities[i] = primitives[i];
 	}
-	entities[13] = lights[0];
-	entities[14] = lights[1];
+	entities[12] = lights[0];
+	entities[13] = lights[1];
 
 
 
@@ -170,7 +177,7 @@ Scene::Scene()
 
 #endif
 	sceneBounds = this->CalculateSceneBounds();
-	//bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
+	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
 }
 
 AABB* Scene::CalculateSceneBounds()
