@@ -1,7 +1,7 @@
 ﻿#include "template.h"
 
 #define DEBUG 1
-#define EPSILON 0.01f
+#define EPSILON 0.0001f
 #define INVPI 0.31830988618379067153776752674503f
 
 #define Psurvival 0.8f
@@ -38,12 +38,12 @@ int Renderer::Render() {
 				printf("634, 579");
 
 			vec3 colorResult;
-			//	if (x < SCRWIDTH / 2)
-			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			//else
-		//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//if (x < SCRWIDTH / 2)
+			//	colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+		//	else
+				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
-		// First convert range
+			// First convert range
 			colorResult *= 256.0f;
 			//printf("r: %f%, g: %f%, b: %f% \n", colorResult.r, colorResult.g, colorResult.b);
 
@@ -146,7 +146,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
-	Ray newRay = Ray(intersect, R);
+	Ray newRay = Ray(intersect + R  *EPSILON, R);
 
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
@@ -196,16 +196,24 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 
 	Ray r = Ray(intersect + EPSILON * L, L);
 
+	r.hit = 0;
+
 	//If our ray to a light hits something on its path towards the light, we can't see light, so we will return black.
 	Trace(&r);
-	if (r.t + EPSILON * dist < dist)
-		return vec3(0);
+
+
+
+	if (r.hit)
+		//TODO: Check of geraakte primitive de lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
+		if (!r.hit->isLight)
+			//Als we licht geraakt hebben niks ertussen, dus prima.
+			return vec3(0);
 
 	Entity* hit = r.hit;
 	Light* lightHit = static_cast<Light*>(hit);
 
 	//TODO: Check if this should indeed just be "Material.color".
-	vec3 BRDF = vec3(material.color.r * INVPI, material.color.g * INVPI, material.color.b * INVPI);
+	vec3 BRDF = material.color * INVPI;
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
 
 	//TODO: Don't hardcode the 2.0f, but get #lights.
