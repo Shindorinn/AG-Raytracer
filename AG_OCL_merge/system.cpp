@@ -8,14 +8,14 @@
 #include <GL/glee.c>
 #endif
 
-namespace Tmpl8 {
-	void NotifyUser(char* s)
+//namespace Tmpl8 {
+	void Tmpl8::NotifyUser(char* s)
 	{
 		HWND hApp = FindWindow(NULL, "Template");
 		MessageBox(hApp, s, "ERROR", MB_OK);
 		exit(0);
 	}
-}
+//}
 
 static bool running = true;
 static HINSTANCE hInstance;

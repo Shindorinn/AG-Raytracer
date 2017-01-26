@@ -23,7 +23,7 @@ void Tmpl8::CheckGL()
 
 // CreateGLContext
 // ----------------------------------------------------------------------------
-bool CreateGLContext()
+bool Tmpl8::CreateGLContext()
 {
 	PIXELFORMATDESCRIPTOR pfd;
 	hdc = GetDC( GetWindowHandle() );
@@ -76,14 +76,14 @@ bool CreateGLContext()
 
 // Present
 // ----------------------------------------------------------------------------
-void Present()
+void Tmpl8::Present()
 {
 	SwapBuffers( hdc );
 }
 
 // ShutdownGL
 // ----------------------------------------------------------------------------
-void ShutdownGL()
+void Tmpl8::ShutdownGL()
 {
 	wglMakeCurrent( hdc, 0 );
     wglDeleteContext( hrc );
@@ -92,7 +92,7 @@ void ShutdownGL()
 
 // CreateVBO
 // ----------------------------------------------------------------------------
-GLuint CreateVBO( const GLfloat* data, const unsigned int size )
+GLuint Tmpl8::CreateVBO(const GLfloat* data, const unsigned int size)
 {
 	GLuint id;
 	glGenBuffers( 1, &id );
@@ -103,7 +103,7 @@ GLuint CreateVBO( const GLfloat* data, const unsigned int size )
 
 // BindVBO
 // ----------------------------------------------------------------------------
-void BindVBO( const unsigned int idx, const unsigned int N, const GLuint id )
+void Tmpl8::BindVBO(const unsigned int idx, const unsigned int N, const GLuint id)
 {
 	glEnableVertexAttribArray( idx );
 	glBindBuffer( GL_ARRAY_BUFFER, id );
@@ -112,7 +112,7 @@ void BindVBO( const unsigned int idx, const unsigned int N, const GLuint id )
 
 // CheckFrameBuffer
 // ----------------------------------------------------------------------------
-void CheckFrameBuffer()
+void Tmpl8::CheckFrameBuffer()
 {
 	if (glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE) return;
 	FATALERROR("Incomplete frame buffer");
@@ -142,7 +142,7 @@ void Tmpl8::CheckProgram( GLuint id, const char* vshader, const char* fshader )
 
 // DrawQuad
 // ----------------------------------------------------------------------------
-void DrawQuad()
+void Tmpl8::DrawQuad()
 {
 	static GLuint vao = 0;
 	if (!vao)

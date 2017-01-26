@@ -9,13 +9,13 @@
 
 #include "system.h"
 
-namespace Tmpl8 {
+//namespace Tmpl8 {
 
-void NotifyUser( char* s );
+void Tmpl8::NotifyUser(char* s);
 
 //#define min(a,b) (((a)<(b))?(a):(b))
 
-Surface8::Surface8( char* a_File ) :
+Tmpl8::Surface8::Surface8( char* a_File ) :
 	m_Buffer( NULL ),
 	m_Width( 0 ), m_Height( 0 )
 {
@@ -24,19 +24,19 @@ Surface8::Surface8( char* a_File ) :
 	{
 		char t[128];
 		sprintf( t, "File not found: %s", a_File );
-		NotifyUser( t ); 
+		Tmpl8::NotifyUser(t);
 		return;
 	}
 	else fclose( f );
 	LoadImage( a_File );
 }
 
-Surface8::~Surface8()
+Tmpl8::Surface8::~Surface8()
 {
 	FREE64( m_Buffer );
 }
 
-void Surface8::LoadImage( char* a_File )
+void Tmpl8::Surface8::LoadImage(char* a_File)
 {
 	char binFile[1024], *lastDot = binFile + strlen( a_File ), *pos = binFile;
 	strcpy( binFile, a_File );
@@ -103,7 +103,7 @@ void Surface8::LoadImage( char* a_File )
 // True-color surface class implementation
 // -----------------------------------------------------------
 
-Surface::Surface( int a_Width, int a_Height, Pixel* a_Buffer, int a_Pitch ) :
+Tmpl8::Surface::Surface(int a_Width, int a_Height, Pixel* a_Buffer, int a_Pitch) :
 	m_Width( a_Width ),
 	m_Height( a_Height ),
 	m_Buffer( a_Buffer ),
@@ -111,7 +111,7 @@ Surface::Surface( int a_Width, int a_Height, Pixel* a_Buffer, int a_Pitch ) :
 {
 }
 
-Surface::Surface( int a_Width, int a_Height ) :
+Tmpl8::Surface::Surface(int a_Width, int a_Height) :
 	m_Width( a_Width ),
 	m_Height( a_Height ),
 	m_Pitch( a_Width )
@@ -119,7 +119,7 @@ Surface::Surface( int a_Width, int a_Height ) :
 	m_Buffer = (Pixel*)MALLOC64( a_Width * a_Height * sizeof( Pixel ) );
 }
 
-Surface::Surface( char* a_File ) :
+Tmpl8::Surface::Surface(char* a_File) :
 	m_Buffer( NULL ),
 	m_Width( 0 ), m_Height( 0 )
 {
@@ -128,14 +128,14 @@ Surface::Surface( char* a_File ) :
 	{
 		char t[128];
 		sprintf( t, "File not found: %s", a_File );
-		NotifyUser( t ); 
+		Tmpl8::NotifyUser(t);
 		return;
 	}
 	else fclose( f );
 	LoadImage( a_File );
 }
 
-void Surface::LoadImage( char* a_File )
+void Tmpl8::Surface::LoadImage(char* a_File)
 {
 	FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 	fif = FreeImage_GetFileType( a_File, 0 );
@@ -155,24 +155,24 @@ void Surface::LoadImage( char* a_File )
 	FreeImage_Unload( dib );
 }
 
-Surface::~Surface()
+Tmpl8::Surface::~Surface()
 {
 	FREE64( m_Buffer );
 }
 
-void Surface::Clear( Pixel a_Color )
+void Tmpl8::Surface::Clear(Pixel a_Color)
 {
 	int s = m_Width * m_Height;
 	for ( int i = 0; i < s; i++ ) m_Buffer[i] = a_Color;
 }
 
-void Surface::Centre( char* a_String, int y1, Pixel color )
+void Tmpl8::Surface::Centre(char* a_String, int y1, Pixel color)
 {
 	int x = (m_Width - (int)strlen( a_String ) * 6) / 2;
 	Print( a_String, x, y1, color );
 }
 
-void Surface::Print( char* a_String, int x1, int y1, Pixel color )
+void Tmpl8::Surface::Print(char* a_String, int x1, int y1, Pixel color)
 {
 	Pixel* t = m_Buffer + x1 + y1 * m_Pitch;
 	int i;
@@ -193,7 +193,7 @@ void Surface::Print( char* a_String, int x1, int y1, Pixel color )
 	}
 }
 
-void Surface::Resize( Surface* a_Orig )
+void Tmpl8::Surface::Resize(Tmpl8::Surface* a_Orig)
 {
 	Pixel* src = a_Orig->GetBuffer(), *dst = m_Buffer;
 	int u, v, owidth = a_Orig->GetWidth(), oheight = a_Orig->GetHeight();
@@ -220,7 +220,7 @@ void Surface::Resize( Surface* a_Orig )
 	}
 }
 
-void Surface::Line( float x1, float y1, float x2, float y2, Pixel c )
+void Tmpl8::Surface::Line(float x1, float y1, float x2, float y2, Pixel c)
 {
 	if ((x1 < 0) || (y1 < 0) || (x1 >= m_Width) || (y1 >= m_Height) ||
 		(x2 < 0) || (y2 < 0) || (x2 >= m_Width) || (y2 >= m_Height))
@@ -241,12 +241,12 @@ void Surface::Line( float x1, float y1, float x2, float y2, Pixel c )
 	}
 }
 
-void Surface::Plot( int x, int y, Pixel c )
+void Tmpl8::Surface::Plot(int x, int y, Pixel c)
 { 
 	if ((x >= 0) && (y >= 0) && (x < m_Width) && (y < m_Height)) m_Buffer[x + y * m_Pitch] = c;
 }
 
-void Surface::Box( int x1, int y1, int x2, int y2, Pixel c )
+void Tmpl8::Surface::Box(int x1, int y1, int x2, int y2, Pixel c)
 {
 	Line( (float)x1, (float)y1, (float)x2, (float)y1, c );
 	Line( (float)x2, (float)y1, (float)x2, (float)y2, c );
@@ -254,7 +254,7 @@ void Surface::Box( int x1, int y1, int x2, int y2, Pixel c )
 	Line( (float)x1, (float)y1, (float)x1, (float)y2, c );
 }
 
-void Surface::Bar( int x1, int y1, int x2, int y2, Pixel c )
+void Tmpl8::Surface::Bar(int x1, int y1, int x2, int y2, Pixel c)
 {
 	Pixel* a = x1 + y1 * m_Pitch + m_Buffer;
 	for ( int y = y1; y <= y2; y++ )
@@ -264,7 +264,7 @@ void Surface::Bar( int x1, int y1, int x2, int y2, Pixel c )
 	}
 }
 
-void Surface::CopyTo( Surface* a_Dst, int a_X, int a_Y )
+void Tmpl8::Surface::CopyTo(Tmpl8::Surface* a_Dst, int a_X, int a_Y)
 {
 	Pixel* dst = a_Dst->GetBuffer();
 	Pixel* src = m_Buffer;
@@ -293,7 +293,7 @@ void Surface::CopyTo( Surface* a_Dst, int a_X, int a_Y )
 	}
 }
 
-void Surface::BlendCopyTo( Surface* a_Dst, int a_X, int a_Y )
+void Tmpl8::Surface::BlendCopyTo(Tmpl8::Surface* a_Dst, int a_X, int a_Y)
 {
 	Pixel* dst = a_Dst->GetBuffer();
 	Pixel* src = m_Buffer;
@@ -322,7 +322,7 @@ void Surface::BlendCopyTo( Surface* a_Dst, int a_X, int a_Y )
 	}
 }
 
-void Surface::SetChar( int c, char* c1, char* c2, char* c3, char* c4, char* c5 )
+void Tmpl8::Surface::SetChar(int c, char* c1, char* c2, char* c3, char* c4, char* c5)
 {
 	strcpy( s_Font[c][0], c1 );
 	strcpy( s_Font[c][1], c2 );
@@ -331,7 +331,7 @@ void Surface::SetChar( int c, char* c1, char* c2, char* c3, char* c4, char* c5 )
 	strcpy( s_Font[c][4], c5 );
 }
 
-void Surface::InitCharset()
+void Tmpl8::Surface::InitCharset()
 {
 	SetChar( 0, ":ooo:", "o:::o", "ooooo", "o:::o", "o:::o" );
 	SetChar( 1, "oooo:", "o:::o", "oooo:", "o:::o", "oooo:" );
@@ -389,7 +389,7 @@ void Surface::InitCharset()
 	for ( i = 0; i < 50; i++ ) s_Transl[(unsigned char)c[i]] = i;
 }
 
-void Surface::ScaleColor( unsigned int a_Scale )
+void Tmpl8::Surface::ScaleColor(unsigned int a_Scale)
 {
 	int s = m_Pitch * m_Height;
 	for ( int i = 0; i < s; i++ )
@@ -401,7 +401,7 @@ void Surface::ScaleColor( unsigned int a_Scale )
 	}
 }
 
-Sprite::Sprite( Surface* a_Surface, unsigned int a_NumFrames ) :
+Tmpl8::Sprite::Sprite(Surface* a_Surface, unsigned int a_NumFrames) :
 	m_Width(  a_Surface->GetWidth() / a_NumFrames ),
 	m_Height( a_Surface->GetHeight() ),
 	m_Pitch(  a_Surface->GetWidth() ),
@@ -414,14 +414,14 @@ Sprite::Sprite( Surface* a_Surface, unsigned int a_NumFrames ) :
 	InitializeStartData();
 }
 
-Sprite::~Sprite()
+Tmpl8::Sprite::~Sprite()
 {
 	delete m_Surface;
 	for ( unsigned int i = 0; i < m_NumFrames; i++ ) delete m_Start[i];
 	delete m_Start;
 }
 
-void Sprite::Draw( int a_X, int a_Y, Surface* a_Target )
+void Tmpl8::Sprite::Draw(int a_X, int a_Y, Surface* a_Target)
 {
 	if ((a_X < -m_Width) || (a_X > (a_Target->GetWidth() + m_Width))) return;
 	if ((a_Y < -m_Height) || (a_Y > (a_Target->GetHeight() + m_Height))) return;
@@ -480,7 +480,7 @@ void Sprite::Draw( int a_X, int a_Y, Surface* a_Target )
 	}
 }
 
-void Sprite::DrawScaled( int a_X, int a_Y, int a_Width, int a_Height, Surface* a_Target )
+void Tmpl8::Sprite::DrawScaled(int a_X, int a_Y, int a_Width, int a_Height, Surface* a_Target)
 {
 	if ((a_Width == 0) || (a_Height == 0)) return;
 	for ( int x = 0; x < a_Width; x++ ) for ( int y = 0; y < a_Height; y++ )
@@ -492,7 +492,7 @@ void Sprite::DrawScaled( int a_X, int a_Y, int a_Width, int a_Height, Surface* a
 	}
 }
 
-void Sprite::InitializeStartData()
+void Tmpl8::Sprite::InitializeStartData()
 {
     for ( unsigned int f = 0; f < m_NumFrames; ++f )
     {
@@ -513,4 +513,4 @@ void Sprite::InitializeStartData()
 	}
 }
 
-}; // namespace Tmpl8
+//}; // namespace Tmpl8

@@ -18,8 +18,8 @@
 //#include <glm/gtc/matrix_transform.hpp>
 //#include "glm\gtx\matrix_decompose.hpp"
 //#include "glm\gtx\quaternion.hpp"
-#include "surface.h"
-#include "game.h"
+//#include "surface.h"
+//#include "game.h"
 
 
 #include <cl/cl.h>
@@ -493,6 +493,7 @@ namespace Tmpl8 {
 	float GetTime();
 	void StartTimer();
 	float GetDuration();
+	void NotifyUser(char* s);
 
 	// random numbers
 	inline float Rand(float range) { return ((float)rand() / RAND_MAX) * range; }
@@ -505,6 +506,9 @@ namespace Tmpl8 {
 #define PI	3.14159265358979323846264f
 
 	// AG tmpl includes
+#include "surface.h"
+#include "game.h"
+
 #include "Light.h"
 #include "Material.h"
 #include "AABB.h"

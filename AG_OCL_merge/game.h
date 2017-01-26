@@ -3,7 +3,9 @@
 #define SCRWIDTH	 1280
 #define SCRHEIGHT	 800
 
-namespace Tmpl8 {
+#define OCL_GAME_TMPL 1
+
+//namespace Tmpl8 {
 
 class Surface;
 class Game
@@ -21,6 +23,12 @@ public:
 	void KeyDown(int a_Key);
 private:
 	Surface* renderSurface;
+#if OCL_GAME_TMPL == 1
+	Tmpl8::Texture* clOutput = 0;
+	Tmpl8::Shader* shader = 0;
+	Tmpl8::Kernel* testFunction;
+	Tmpl8::Buffer* outputBuffer;
+#endif
 
 	int moveForward;
 	int moveBackward;
@@ -35,4 +43,4 @@ private:
 	int resetPosition;
 };
 
-}; // namespace Tmpl8
+//}; // namespace Tmpl8

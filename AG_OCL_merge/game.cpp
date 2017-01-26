@@ -9,6 +9,17 @@ void Tmpl8::Game::Init()
 {
 	Tmpl8::Scene* myScene = new Scene();
 	renderer = new Renderer(myScene, renderSurface);
+
+#if OCL_GAME_TMPL == 1
+	// load shader and texture
+	clOutput = new Tmpl8::Texture(SCRWIDTH, SCRHEIGHT, Tmpl8::Texture::FLOAT);
+	shader = new Tmpl8::Shader("shaders/vignette.vert", "shaders/vignette.frag");
+	// load OpenCL code
+	testFunction = new Tmpl8::Kernel("programs/program.cl", "TestFunction");
+	// link cl output texture as an OpenCL buffer
+	outputBuffer = new Tmpl8::Buffer(clOutput->GetID(), Tmpl8::Buffer::TARGET);
+	testFunction->SetArgument(0, outputBuffer);
+#endif
 }
 
 // -----------------------------------------------------------
@@ -121,8 +132,14 @@ void Tmpl8::Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Tmpl8::Game::Tick(float dt)
 {
+#if OCL_GAME_TMPL == 1
+	testFunction->Run(outputBuffer);
+	shader->Bind();
+	shader->SetInputTexture(GL_TEXTURE0, "color", clOutput);
+	shader->SetInputMatrix("view", mat4::identity());
+	DrawQuad();
+#else
 	renderer->Render();
-
 	char buffer[500];
 	sprintf(
 		buffer,
@@ -131,4 +148,6 @@ void Tmpl8::Game::Tick(float dt)
 		SCRWIDTH,
 		SCRHEIGHT);
 	renderSurface->Print(buffer, 2, 2, 0xffffff);
+#endif
+
 }

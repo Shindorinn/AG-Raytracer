@@ -3,9 +3,9 @@
 
 #pragma once
 
-namespace Tmpl8 {
+//namespace Tmpl8 {
 
-#include "emmintrin.h"
+//#include "emmintrin.h"
 
 #define REDMASK	(0xff0000)
 #define GREENMASK (0x00ff00)
@@ -142,4 +142,4 @@ private:
 	Surface* m_Surface;
 };
 
-}; // namespace Tmpl8
+//}; // namespace Tmpl8
