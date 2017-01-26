@@ -86,6 +86,12 @@ void Tmpl8::Shader::Bind()
 // SetInputTexture method
 // Link a texture to the shader.
 // ----------------------------------------------------------------------------
+//void Tmpl8::Shader::SetInputTexture(unsigned int slot, const char* name, SDL_Texture* texture)
+//{
+//	glActiveTexture(slot);
+//	glBindTexture(GL_TEXTURE_2D, texture->id);
+//	glUniform1i(glGetUniformLocation(id, name), slot);
+//}
 void Tmpl8::Shader::SetInputTexture(unsigned int slot, const char* name, Tmpl8::Texture* texture)
 {
 	glActiveTexture( slot );

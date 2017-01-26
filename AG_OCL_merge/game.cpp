@@ -134,10 +134,16 @@ void Tmpl8::Game::Tick(float dt)
 {
 #if OCL_GAME_TMPL == 1
 	testFunction->Run(outputBuffer);
-	shader->Bind();
-	shader->SetInputTexture(GL_TEXTURE0, "color", clOutput);
-	shader->SetInputMatrix("view", mat4::identity());
-	DrawQuad();
+	//outputBuffer->CopyFromDevice();
+	Pixel* buffer = renderSurface->GetBuffer();
+	//memcpy(buffer, outputBuffer->hostBuffer, outputBuffer->size);
+	//shader->Bind();
+	//shader->SetInputTexture(GL_TEXTURE0, "color", clOutput);
+	//shader->SetInputTexture(GL_TEXTURE0, "color", this->frameBuffer);
+	//shader->SetInputMatrix("view", mat4::identity());
+	//DrawQuad();
+	
+
 #else
 	renderer->Render();
 	char buffer[500];

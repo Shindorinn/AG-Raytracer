@@ -15,6 +15,7 @@ public:
 	void Init( const char* vfile, const char* pfile );
 	void Compile( const char* vtext, const char* ftext );
 	void Bind();
+	//void SetInputTexture(unsigned int slot, const char* name, SDL_Texture* texture);
 	void SetInputTexture( unsigned int slot, const char* name, Texture* texture );
 	void SetInputMatrix( const char* name, const mat4& matrix );
 	void Unbind();

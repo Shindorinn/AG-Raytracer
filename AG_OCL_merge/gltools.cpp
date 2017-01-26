@@ -18,6 +18,7 @@ void Tmpl8::CheckGL()
 		else if (error == 0x506) strcat( t, "INVALID FRAMEBUFFER OPERATION" );
 		else strcat( t, "UNKNOWN ERROR" );
 		FATALERROR( "OpenGL error" );
+		//FATALERROR(GLeeGetErrorString());
 	}
 }
 

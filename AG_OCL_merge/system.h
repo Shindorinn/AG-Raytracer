@@ -14,14 +14,6 @@
 
 #include "windows.h"
 
-//#include "glm/glm.hpp"
-//#include <glm/gtc/matrix_transform.hpp>
-//#include "glm\gtx\matrix_decompose.hpp"
-//#include "glm\gtx\quaternion.hpp"
-//#include "surface.h"
-//#include "game.h"
-
-
 #include <cl/cl.h>
 #include <cl/cl_gl_ext.h>
 #ifdef USE_GLEE
@@ -45,10 +37,6 @@
 // external libraries
 #include "freeimage.h"
 #include "threads.h"
-
-//using namespace Tmpl8;				// to use template classes
-//using namespace glm;				// to use glm vector stuff
-//using namespace std;				// to use stl vectors
 
 inline float Rand(float range) { return ((float)rand() / RAND_MAX) * range; }
 inline int IRand(int range) { return rand() % range; }
@@ -475,20 +463,12 @@ namespace Tmpl8 {
 
 #define BADFLOAT(x) ((*(uint*)&x & 0x7f000000) == 0x7f000000)
 
-	// namespaces
-	//using namespace std;
-
 	// OCL framework includes
 #include "shared.h"
 #include "gltools.h"
 #include "opencl.h"
 #include "shader.h"
 #include "texture.h"
-	//#include "game.h"
-
-	// library namespace
-	//using namespace ocllab;
-
 
 	float GetTime();
 	void StartTimer();

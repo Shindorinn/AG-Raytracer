@@ -1,8 +1,5 @@
 #pragma once
 
-#define SCRWIDTH	 1280
-#define SCRHEIGHT	 800
-
 #define OCL_GAME_TMPL 1
 
 //namespace Tmpl8 {

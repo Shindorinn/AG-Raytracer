@@ -370,12 +370,13 @@ int main(int argc, char **argv)
 	surface = new Tmpl8::Surface(SCRWIDTH, SCRHEIGHT);
 	surface->Clear(0);
 	surface->InitCharset();
-	SDL_Window* window = SDL_CreateWindow("Template", 100, 100, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("Template", 100, 100, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL|SDL_WINDOW_SHOWN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	SDL_Texture* frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCRWIDTH, SCRHEIGHT);
 	int exitapp = 0;
 	game = new Tmpl8::Game();
 	game->SetTarget(surface);
+	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 	while (!exitapp)
 	{
 		void* target = 0;

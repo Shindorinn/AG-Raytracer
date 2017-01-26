@@ -1,2 +1,2 @@
-//#define SCRWIDTH			800
-//#define SCRHEIGHT			480
+#define SCRWIDTH	 1280
+#define SCRHEIGHT	 800
