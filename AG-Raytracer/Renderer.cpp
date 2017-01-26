@@ -34,13 +34,10 @@ int Renderer::Render() {
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			if (x == 634 && y == 579)
-				printf("634, 579");
-
 			vec3 colorResult;
-			//if (x < SCRWIDTH / 2)
-			//	colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-		//	else
+			if (x < SCRWIDTH / 2)
+				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0, x, y);
+			else
 				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
@@ -60,6 +57,9 @@ int Renderer::Render() {
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
 
 			//printf("r: %f%,g: %f%,b:%f% \n", r, g, b);
+
+			if (r < 0 || g < 0 || b < 0)
+				printf("oh shit negatief");
 
 			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
@@ -146,13 +146,12 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
-	Ray newRay = Ray(intersect + R  *EPSILON, R);
+	Ray newRay = Ray(intersect + R  * EPSILON, R);
 
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
 	//TODO: Albedo setting maybe.
-	vec3 BRDFIndirect = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
-
+	vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
 
 	float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
 
@@ -196,18 +195,13 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 
 	Ray r = Ray(intersect + EPSILON * L, L);
 
-	r.hit = 0;
-
 	//If our ray to a light hits something on its path towards the light, we can't see light, so we will return black.
 	Trace(&r);
 
-
-
-	if (r.hit)
-		//TODO: Check of geraakte primitive de lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
-		if (!r.hit->isLight)
-			//Als we licht geraakt hebben niks ertussen, dus prima.
-			return vec3(0);
+	//TODO: Check of geraakte primitive dé lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
+	if (!r.hit->isLight)
+		//Als we licht geraakt hebben niks ertussen, dus prima.
+		return vec3(0);
 
 	Entity* hit = r.hit;
 	Light* lightHit = static_cast<Light*>(hit);
@@ -233,7 +227,7 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	// terminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return vec3(0, 0, 0);
+		return vec3(0);
 	}
 
 	Entity* hit = ray->hit;
@@ -252,16 +246,17 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
-	Ray newRay = Ray(intersect, R);
+	Ray newRay = Ray(intersect + R  * EPSILON, R);
 
 	//float BRDF = primitiveHit->material.albedo / PI;
-	vec3 BRDF = vec3(primitiveHit->material.color.r / PI, primitiveHit->material.color.g / PI, primitiveHit->material.color.b / PI);
+	vec3 BRDF = primitiveHit->material.color * INVPI;
 
 	vec3 Ei = BasicSample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
 	return PI * 2.0f * BRDF * Ei;
 }
 
+//TODO: pak de niet cosine weighted dinges.
 vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 {
 	float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
