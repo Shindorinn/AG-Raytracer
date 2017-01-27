@@ -21,4 +21,9 @@ public:
 	vec3 DirectSampleLights(vec3 intersect, vec3 normal, Material material);
 
 	vec3 Reflect(vec3 direction, vec3 normal);
+
+	glm::uint RandomInt(glm::uint * seed);
+
+	float RandomFloat(glm::uint * seed);
+
 };

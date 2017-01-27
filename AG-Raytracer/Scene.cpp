@@ -85,13 +85,13 @@ Scene::Scene()
 	primitives[9] = new Triangle(vec3(3, -5, 10), vec3(-3, -5, 10), vec3(3, 3, 10));
 	primitives[9]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
-	//primitives[10] = new Sphere(vec3(0, 0, 6), 1.0f);
-	//primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[10] = new Sphere(vec3(-1, 0, 6), 1.0f);
+	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	primitives[11] = new Triangle(vec3(-3, -5, -5.1), vec3(-3, 3, -5.1), vec3(3, 3, -5.1));
 	primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-	primitives[10] = new Triangle(vec3(3, -5, -5.1), vec3(-3, -5, -5.1), vec3(3, 3, -5.1));
-	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[12] = new Triangle(vec3(3, -5, -5.1), vec3(-3, -5, -5.1), vec3(3, 3, -5.1));
+	primitives[12]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	//primitives[11] = new Sphere(vec3(1.5, 0, 5), 0.7f);
 	//primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
@@ -99,12 +99,12 @@ Scene::Scene()
 	//primitives[12] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
 	//primitives[12]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
 
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < 13; i++)
 	{
 		entities[i] = primitives[i];
 	}
-	entities[12] = lights[0];
-	entities[13] = lights[1];
+	entities[13] = lights[0];
+	entities[14] = lights[1];
 
 
 
