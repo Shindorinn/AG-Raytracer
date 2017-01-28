@@ -331,121 +331,121 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 
 
 // AG Tmpl window code
-void redirectIO()
-{
-	static const WORD MAX_CONSOLE_LINES = 500;
-	int hConHandle;
-	long lStdHandle;
-	CONSOLE_SCREEN_BUFFER_INFO coninfo;
-	FILE *fp;
-	AllocConsole();
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
-		&coninfo);
-	coninfo.dwSize.Y = MAX_CONSOLE_LINES;
-	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),
-		coninfo.dwSize);
-	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
-	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-	fp = _fdopen(hConHandle, "w");
-	*stdout = *fp;
-	setvbuf(stdout, NULL, _IONBF, 0);
-	lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
-	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-	fp = _fdopen(hConHandle, "r");
-	*stdin = *fp;
-	setvbuf(stdin, NULL, _IONBF, 0);
-	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
-	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-	fp = _fdopen(hConHandle, "w");
-	*stderr = *fp;
-	setvbuf(stderr, NULL, _IONBF, 0);
-	std::ios::sync_with_stdio();
-	freopen("CON", "w", stdout);
-	freopen("CON", "w", stderr);
-}
-
-int main(int argc, char **argv)
-{
-	redirectIO();
-	printf("application started.\n");
-	SDL_Init(SDL_INIT_VIDEO);
-	surface = new Tmpl8::Surface(SCRWIDTH, SCRHEIGHT);
-	surface->Clear(0);
-	surface->InitCharset();
-	SDL_Window* window = SDL_CreateWindow("Template", 100, 100, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL|SDL_WINDOW_SHOWN);
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	SDL_Texture* frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCRWIDTH, SCRHEIGHT);
-	int exitapp = 0;
-	game = new Tmpl8::Game();
-	game->SetTarget(surface);
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
-	while (!exitapp)
-	{
-		void* target = 0;
-		int pitch;
-		SDL_LockTexture(frameBuffer, NULL, &target, &pitch);
-		if (pitch == (surface->GetWidth() * 4))
-		{
-			memcpy(target, surface->GetBuffer(), SCRWIDTH * SCRHEIGHT * 4);
-		}
-		else
-		{
-			unsigned char* t = (unsigned char*)target;
-			for (int i = 0; i < SCRHEIGHT; i++)
-			{
-				memcpy(t, surface->GetBuffer() + i * SCRWIDTH, SCRWIDTH * 4);
-				t += pitch;
-			}
-		}
-		SDL_UnlockTexture(frameBuffer);
-		SDL_RenderCopy(renderer, frameBuffer, NULL, NULL);
-		SDL_RenderPresent(renderer);
-		if (firstframe)
-		{
-			game->Init();
-			firstframe = false;
-		}
-		// calculate frame time and pass it to game->Tick
-		StartTimer();
-		game->Tick(lastftime);
-		lastftime = GetDuration();
-		// event loop
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				exitapp = 1;
-				break;
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE)
-				{
-					exitapp = 1;
-					// find other keys here: http://sdl.beuc.net/sdl.wiki/SDLKey
-				}
-				game->KeyDown(event.key.keysym.scancode);
-				break;
-			case SDL_KEYUP:
-				game->KeyUp(event.key.keysym.scancode);
-				break;
-			case SDL_MOUSEMOTION:
-				game->MouseMove(event.motion.x, event.motion.y);
-				break;
-			case SDL_MOUSEBUTTONUP:
-				game->MouseUp(event.button.button);
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				game->MouseDown(event.button.button);
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	game->Shutdown();
-	SDL_Quit();
-	return 1;
-}
+//void redirectIO()
+//{
+//	static const WORD MAX_CONSOLE_LINES = 500;
+//	int hConHandle;
+//	long lStdHandle;
+//	CONSOLE_SCREEN_BUFFER_INFO coninfo;
+//	FILE *fp;
+//	AllocConsole();
+//	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
+//		&coninfo);
+//	coninfo.dwSize.Y = MAX_CONSOLE_LINES;
+//	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE),
+//		coninfo.dwSize);
+//	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+//	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+//	fp = _fdopen(hConHandle, "w");
+//	*stdout = *fp;
+//	setvbuf(stdout, NULL, _IONBF, 0);
+//	lStdHandle = (long)GetStdHandle(STD_INPUT_HANDLE);
+//	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+//	fp = _fdopen(hConHandle, "r");
+//	*stdin = *fp;
+//	setvbuf(stdin, NULL, _IONBF, 0);
+//	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+//	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+//	fp = _fdopen(hConHandle, "w");
+//	*stderr = *fp;
+//	setvbuf(stderr, NULL, _IONBF, 0);
+//	std::ios::sync_with_stdio();
+//	freopen("CON", "w", stdout);
+//	freopen("CON", "w", stderr);
+//}
+//
+//int main(int argc, char **argv)
+//{
+//	redirectIO();
+//	printf("application started.\n");
+//	SDL_Init(SDL_INIT_VIDEO);
+//	surface = new Tmpl8::Surface(SCRWIDTH, SCRHEIGHT);
+//	surface->Clear(0);
+//	surface->InitCharset();
+//	SDL_Window* window = SDL_CreateWindow("Template", 100, 100, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL|SDL_WINDOW_SHOWN);
+//	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+//	SDL_Texture* frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCRWIDTH, SCRHEIGHT);
+//	int exitapp = 0;
+//	game = new Tmpl8::Game();
+//	game->SetTarget(surface);
+//	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+//	while (!exitapp)
+//	{
+//		void* target = 0;
+//		int pitch;
+//		SDL_LockTexture(frameBuffer, NULL, &target, &pitch);
+//		if (pitch == (surface->GetWidth() * 4))
+//		{
+//			memcpy(target, surface->GetBuffer(), SCRWIDTH * SCRHEIGHT * 4);
+//		}
+//		else
+//		{
+//			unsigned char* t = (unsigned char*)target;
+//			for (int i = 0; i < SCRHEIGHT; i++)
+//			{
+//				memcpy(t, surface->GetBuffer() + i * SCRWIDTH, SCRWIDTH * 4);
+//				t += pitch;
+//			}
+//		}
+//		SDL_UnlockTexture(frameBuffer);
+//		SDL_RenderCopy(renderer, frameBuffer, NULL, NULL);
+//		SDL_RenderPresent(renderer);
+//		if (firstframe)
+//		{
+//			game->Init();
+//			firstframe = false;
+//		}
+//		// calculate frame time and pass it to game->Tick
+//		StartTimer();
+//		game->Tick(lastftime);
+//		lastftime = GetDuration();
+//		// event loop
+//		SDL_Event event;
+//		while (SDL_PollEvent(&event))
+//		{
+//			switch (event.type)
+//			{
+//			case SDL_QUIT:
+//				exitapp = 1;
+//				break;
+//			case SDL_KEYDOWN:
+//				if (event.key.keysym.sym == SDLK_ESCAPE)
+//				{
+//					exitapp = 1;
+//					// find other keys here: http://sdl.beuc.net/sdl.wiki/SDLKey
+//				}
+//				game->KeyDown(event.key.keysym.scancode);
+//				break;
+//			case SDL_KEYUP:
+//				game->KeyUp(event.key.keysym.scancode);
+//				break;
+//			case SDL_MOUSEMOTION:
+//				game->MouseMove(event.motion.x, event.motion.y);
+//				break;
+//			case SDL_MOUSEBUTTONUP:
+//				game->MouseUp(event.button.button);
+//				break;
+//			case SDL_MOUSEBUTTONDOWN:
+//				game->MouseDown(event.button.button);
+//				break;
+//			default:
+//				break;
+//			}
+//		}
+//	}
+//	game->Shutdown();
+//	SDL_Quit();
+//	return 1;
+//}
 
 // EOF
