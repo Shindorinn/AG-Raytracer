@@ -11,7 +11,7 @@ class Scene
 public:
 	
 #if TRI_SCENE
-	Tmpl8::Primitive* primitives[9];
+	Tmpl8::Triangle* primitives[9];
 	Tmpl8::Light* lights[1];
 
 #elif BUNNY_LOAD

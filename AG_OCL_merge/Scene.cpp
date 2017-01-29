@@ -111,7 +111,7 @@ Tmpl8::Scene::Scene()
 
 #endif
 	sceneBounds = this->CalculateSceneBounds();
-	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
+	bvh = new BVH((Primitive**)primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
 }
 
 Tmpl8::AABB* Tmpl8::Scene::CalculateSceneBounds()

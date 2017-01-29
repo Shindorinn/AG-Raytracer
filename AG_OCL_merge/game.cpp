@@ -11,7 +11,6 @@ struct RenderData
 	float p2x, p2y, p2z, dummy5;
 };
 
-
 // -----------------------------------------------------------
 // Initialize the game
 // -----------------------------------------------------------
@@ -34,6 +33,8 @@ void Tmpl8::Game::Init()
 	const int number_of_triangles,
 	const int number_of_lights
 	*/
+
+	// Create RenderData to send to GPU
 	RenderData rd = RenderData();
 	rd.posx = camera->position.x;
 	rd.posy = camera->position.y;
@@ -51,7 +52,38 @@ void Tmpl8::Game::Init()
 	rd.p2y = camera->p2.y;
 	rd.p2z = camera->p2.z;
 
-	Buffer* renderDataBuffer = new Buffer(1, 0, &rd);
+	Buffer* renderDataBuffer = new Buffer(80, 0, &rd); // 5 * 16 bytes
+
+	// Create SceneData to send to GPU
+	// Every triangle consist of 5 float4's, 3 vertices, one normal, one color
+	int triangleCount = myScene->triangleCount;
+	int triangleDataSize = (5 * triangleCount);
+	std::vector<vec4> triangleData = std::vector<vec4>();
+	triangleData.reserve(triangleDataSize);
+	for (uint i = 0; i < triangleCount; i++) {
+		Triangle* t = myScene->primitives[i];
+		triangleData.push_back(vec4(t->v0, 0));				// 1st vertex
+		triangleData.push_back(vec4(t->v1, 0));				// 2nd vertex
+		triangleData.push_back(vec4(t->v2, 0));				// 3rd vertex
+		triangleData.push_back(vec4(t->normal, 0));			// normal
+		triangleData.push_back(vec4(t->material.color, 0));	// color
+	}
+
+	Buffer* triangleDataBuffer = new Buffer(80 * triangleCount, 0, &triangleData);
+
+	// Every light is a point light, consists of 2 float 4's, position and color
+	int lightCount = myScene->lightCount;
+	int lightDataSize = (2 * lightCount);
+	std::vector<vec4> lightData = std::vector<vec4>();
+	lightData.reserve(lightDataSize);
+	
+	for (uint i = 0; i < lightCount; i++) {
+		Light* l = myScene->lights[i];
+		lightData.push_back(vec4(l->position, 0));		// 1st position
+		lightData.push_back(vec4(l->position, 0));	// 2nd color		
+	}
+
+	Buffer* lightDataBuffer = new Buffer(32 * lightCount, 0, &lightData);
 
 	// link cl output texture as an OpenCL buffer
 	outputBuffer = new Tmpl8::Buffer(clOutput->GetID(), Tmpl8::Buffer::TARGET);
@@ -61,6 +93,8 @@ void Tmpl8::Game::Init()
 	GPURenderFunction->SetArgument(3, SCRHEIGHT);
 	GPURenderFunction->SetArgument(4, myScene->triangleCount);
 	GPURenderFunction->SetArgument(5, myScene->lightCount);
+
+	printf("Game::Init -> Finished construction!");
 #endif
 }
 
