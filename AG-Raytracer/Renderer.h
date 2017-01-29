@@ -12,6 +12,8 @@ public:
 	int frameCount;
 	int numberOfLights;
 
+	int pixelNumber;
+
 	int Render();
 
 	vec3 Trace(Ray* ray);

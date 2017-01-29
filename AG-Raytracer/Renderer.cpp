@@ -11,11 +11,6 @@
 #define MAXRAYDEPTH 5
 #define UseRR 0
 
-int pixel = 1;
-
-float randomMin = INFINITY;
-float randomMax = -INFINITY;
-
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
 
@@ -23,13 +18,14 @@ Renderer::Renderer(Scene* scene, Surface* renderSurface)
 	this->renderSurface = renderSurface;
 	this->scene->camera->GenerateRays();
 	this->frameCount = 0;
+	this->pixelNumber = 1;
 	this->numberOfLights = sizeof(this->scene->lights) / sizeof(this->scene->lights[0]);
 }
 
 //Int, so it can return the total pixel values summed
 int Renderer::Render() {
 
-	int pixelCount = 1;
+	int pixelCount = 0;
 
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
@@ -51,7 +47,6 @@ int Renderer::Render() {
 
 			// First convert range
 			colorResult *= 256.0f;
-			//printf("r: %f%, g: %f%, b: %f% \n", colorResult.r, colorResult.g, colorResult.b);
 
 			//Put our newly calculated values in the accumulator.
 			accumulator[y][x].r += colorResult.r;
@@ -68,19 +63,17 @@ int Renderer::Render() {
 			//	if (r < 0 || g < 0 || b < 0)
 			//		printf("dingen zijn <0");
 
-				//printf("r: %f%,g: %f%,b:%f% \n", r, g, b);
-
-				// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
+			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
 			int nextG = min((int)g, 255);
 			int nextB = min((int)b, 255);
 
-			pixelCount += (int)r + (int)g + (int)b; //nextR + nextG + nextB;
+			pixelCount += (int)r + (int)g + (int)b;//(int)(r + g + b); //NOT nextR + nextG + nextB;
 
 			// Then merge it to the buffer.
 			buffer[y][x] = (nextR << 16) + (nextG << 8) + (nextB);
 
-			pixel++;
+			this->pixelNumber++;
 		}
 	}
 	//#pragma omp parallel for
@@ -89,15 +82,9 @@ int Renderer::Render() {
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 
-	pixel = 0;
+	this->pixelNumber = 1;
 
-	//	printf("minimumRandom: %f% ", randomMin);
-		//printf("maximumRandom: %f% ", randomMax);
-
-		//TODO: Use this for testing?
-	//	this->renderSurface->Plot(600, 350, 0xffffff);
 	return pixelCount;
-
 }
 
 vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
@@ -151,10 +138,8 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
-	vec3 oldNormal = normal;
 
-	float dotproduct = dot(normal, ray->direction);
-
+	//TODO: CHECK this.
 	normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
 
 	if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
@@ -164,10 +149,8 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 		return primitiveHit->material.color * Sample(&r, depth + 1, false);
 	}
 
-	vec3 normalFaceRay = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
-
 	// continue in random direction
-	vec3 R = CosineWeightedDiffuseReflection(normalFaceRay);
+	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
@@ -197,8 +180,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material)
 {
-	//TODO: Don't hardcode the 2, but get #lights.
-	int lightIndex = rand() % 2;
+	int lightIndex = rand() % numberOfLights;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
 
 	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -244,8 +226,7 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	if (result.x < 0 || result.y < 0 || result.z < 0)
 		printf("smaller in direct illu 0");
 
-	//TODO: Don't hardcode the 2.0f, but get #lights.
-	return BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
+	return BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
 }
 
 //This is the "old", slow, noisy sampling function. But it works, so it's useful for testing.
@@ -334,8 +315,8 @@ float Renderer::RandomFloat(glm::uint * seed)
 
 vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 {
-	glm::uint  seed1 = ((uint)frameCount + pixel * 6217) * 57089;
-	glm::uint  seed2 = ((uint)frameCount + pixel * 104729) * 19423;
+	glm::uint  seed1 = ((uint)frameCount + pixelNumber * 6217) * 57089;
+	glm::uint  seed2 = ((uint)frameCount + pixelNumber * 104729) * 19423;
 
 	//float r0 = RandomFloat(&seed1);
 	//float r1A = RandomFloat(&seed2);
@@ -355,18 +336,9 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 	glm::uint seeed1 = SeedRandom(seed1);
 	float r1 = 2.0f * PI * RandomFloat(&seeed1);
 
-	if (r1 < randomMin)
-		randomMin = r1;
-	if (r1 > randomMax)
-		randomMax = r1;
-
 	glm::uint seeed2 = SeedRandom(seed2);
 	float r2 = RandomFloat(&seeed2);
 
-	if (r2 < randomMin)
-		randomMin = r2;
-	if (r2 > randomMax)
-		randomMax = r2;
 	//printf("random1: %f% ", r1);
 	//printf("random2: %f% ", r2);
 	//float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
@@ -412,22 +384,6 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 	//	printf("this should never happen but happens. Fuck.");
 	//return normalize(manualDirNotNormalized);
 }
-
-////Internet, https://www.shadertoy.com/view/4tl3z4
-//vec3 cosWeightedRandomHemisphereDirection(const vec3 n) {
-//	vec2 r = hash2();
-//
-//	vec3  uu = normalize(cross(n, vec3(0.0, 1.0, 1.0)));
-//	vec3  vv = cross(uu, n);
-//
-//	float ra = sqrt(r.y);
-//	float rx = ra*cos(6.2831*r.x);
-//	float ry = ra*sin(6.2831*r.x);
-//	float rz = sqrt(1.0 - r.y);
-//	vec3  rr = vec3(rx*uu + ry*vv + rz*n);
-//
-//	return normalize(rr);
-//}
 
 vec3 Renderer::Trace(Ray* ray)
 {
