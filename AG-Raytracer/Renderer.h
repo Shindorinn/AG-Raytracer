@@ -10,6 +10,7 @@ public:
 
 	vec3 accumulator[SCRHEIGHT][SCRWIDTH];
 	int frameCount;
+	int numberOfLights;
 
 	int Render();
 
@@ -26,4 +27,7 @@ public:
 
 	float RandomFloat(glm::uint * seed);
 
+	glm::uint TauStep(int s1, int s2, int s3, uint M, glm::uint* seed);
+	glm::uint HQIRand(glm::uint* seed);
+	glm::uint SeedRandom(glm::uint s);
 };

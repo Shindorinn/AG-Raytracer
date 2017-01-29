@@ -1,7 +1,7 @@
 ﻿#include "template.h"
 
 #define DEBUG 1
-#define EPSILON 0.0001f
+#define EPSILON 0.01f
 #define INVPI 0.31830988618379067153776752674503f
 
 #define Psurvival 0.8f
@@ -9,17 +9,21 @@
 #define USEBVH 0
 
 #define MAXRAYDEPTH 5
-
 #define UseRR 0
 
 int pixel = 1;
 
+float randomMin = INFINITY;
+float randomMax = -INFINITY;
+
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
+
 	this->scene = scene;
 	this->renderSurface = renderSurface;
 	this->scene->camera->GenerateRays();
 	this->frameCount = 0;
+	this->numberOfLights = sizeof(this->scene->lights) / sizeof(this->scene->lights[0]);
 }
 
 //Int, so it can return the total pixel values summed
@@ -30,19 +34,20 @@ int Renderer::Render() {
 	//Increase frameCount, which is used for averaging multiple frames of path tracing.
 	frameCount++;
 
-	//#pragma omp parallel for
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
 		//printf("Current y:%i% \n", y);
-//#pragma omp parallel for
+
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			if (x == 632 && y == 422)
-				printf("test");
+			//if (x == 632 && y == 422)
+			//	printf("test");
 			vec3 colorResult;
-			//	if (x < SCRWIDTH / 2)
+			//if (x < SCRWIDTH / 2)
 			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 			//else
-			//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//	colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -60,12 +65,12 @@ int Renderer::Render() {
 			float g = accumulator[y][x].g / static_cast<float>(frameCount);
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
 
-			if (r < 0 || g < 0 || b < 0)
-				printf("dingen zijn <0");
+			//	if (r < 0 || g < 0 || b < 0)
+			//		printf("dingen zijn <0");
 
-			//printf("r: %f%,g: %f%,b:%f% \n", r, g, b);
+				//printf("r: %f%,g: %f%,b:%f% \n", r, g, b);
 
-			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
+				// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
 			int nextG = min((int)g, 255);
 			int nextB = min((int)b, 255);
@@ -85,8 +90,12 @@ int Renderer::Render() {
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 
 	pixel = 0;
-	//TODO: Use this for testing?
-//	this->renderSurface->Plot(600, 350, 0xffffff);
+
+	//	printf("minimumRandom: %f% ", randomMin);
+		//printf("maximumRandom: %f% ", randomMax);
+
+		//TODO: Use this for testing?
+	//	this->renderSurface->Plot(600, 350, 0xffffff);
 	return pixelCount;
 
 }
@@ -102,6 +111,9 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	*/
 #if UseRR
 	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	//glm::uint  seed1 = ((uint)frameCount + pixel * 15485867 + depth * 103183) * 57089;
+	//float a = RandomFloat(&seed1);
+
 
 	//Russian Roulette; check if we need to kill a ray.
 	if (a > Psurvival && secondaryRay)
@@ -139,7 +151,11 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
+	vec3 oldNormal = normal;
 
+	float dotproduct = dot(normal, ray->direction);
+
+	normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
 
 	if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
 	{
@@ -148,8 +164,10 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 		return primitiveHit->material.color * Sample(&r, depth + 1, false);
 	}
 
+	vec3 normalFaceRay = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
+
 	// continue in random direction
-	vec3 R = CosineWeightedDiffuseReflection(normal);
+	vec3 R = CosineWeightedDiffuseReflection(normalFaceRay);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
@@ -162,7 +180,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
 	float dotdot = dot(normal, R);
-	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
+	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) * 2.0f*PI; // irradiance
 	vec3 indirectIllumination = BRDFIndirect * Ei;
 
 #if UseRR
@@ -183,12 +201,12 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	int lightIndex = rand() % 2;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
 
-	//TODO: Check if this code could be made faster.  || ANSWER: It's okay, but could try 1-a and 1-b, if a+b > 1. In practice, however, this shouldn't have that big of an effect.
-	float a = 1.0; float b = 1.0;
-	while (a + b > 1)
+	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	if (a + b > 1)
 	{
-		a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		a = 1 - a;
+		b = 1 - b;
 	}
 
 	vec3 point = lightTri->v0 + a*(lightTri->v1 - lightTri->v0) + b*(lightTri->v2 - lightTri->v0);
@@ -219,10 +237,8 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	Entity* hit = r.hit;
 	Light* lightHit = static_cast<Light*>(hit);
 
-	//TODO: Check if this should indeed just be "Material.color".
 	vec3 BRDF = material.color * INVPI;
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
-
 
 	vec3 result = BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
 	if (result.x < 0 || result.y < 0 || result.z < 0)
@@ -273,6 +289,32 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	return PI * 2.0f * BRDF * Ei;
 }
 
+#pragma region 
+glm::uint Renderer::TauStep(int s1, int s2, int s3, glm::uint M, glm::uint* seed)
+{
+	glm::uint b = (((*seed << s1) ^ *seed) >> s2);
+	*seed = (((*seed & M) << s3) ^ b);
+	return *seed;
+}
+
+
+glm::uint Renderer::HQIRand(glm::uint* seed)
+{
+	uint z1 = TauStep(13, 19, 12, 429496729, seed);
+	uint z2 = TauStep(2, 25, 4, 4294967288, seed);
+	uint z3 = TauStep(3, 11, 17, 429496280, seed);
+	uint z4 = 1664525 * *seed + 1013904223;
+	return z1 ^ z2 ^ z3 ^ z4;
+}
+
+
+glm::uint Renderer::SeedRandom(glm::uint s)
+{
+	uint seed = s * 1099087573;
+	seed = HQIRand(&seed);
+	return seed;
+}
+
 glm::uint Renderer::RandomInt(glm::uint * seed)
 {
 	// Marsaglia Xor32; see http://excamera.com/sphinx/article-xorshift.html
@@ -288,11 +330,12 @@ float Renderer::RandomFloat(glm::uint * seed)
 {
 	return RandomInt(seed) * 2.3283064365387e-10f;
 }
+#pragma endregion RandomStuff
 
 vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 {
-	glm::uint  seed1 = ((uint)frameCount + pixel) * 160481219 * 49979687;
-	glm::uint  seed2 = ((uint)frameCount + pixel) * 32452867 * 67867979;
+	glm::uint  seed1 = ((uint)frameCount + pixel * 6217) * 57089;
+	glm::uint  seed2 = ((uint)frameCount + pixel * 104729) * 19423;
 
 	//float r0 = RandomFloat(&seed1);
 	//float r1A = RandomFloat(&seed2);
@@ -304,32 +347,70 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 
 	//NOTE: THE RANDOM WITH SEEDS YIELDS ENTIRELY DIFFERENT RESULTS. SOMETHING IS WEIRD/BROKEN.
 
-	float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1A = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	float r2s = sqrt(r0);
-	float r1 = 2 * PI * r1A;
-	float x = r2s * cos(r1);
-	float y = r2s * sin(r1);
+	//float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	//float r2 = 1;
+	//while (r2 == 1)
+	//	r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	//nu
+	glm::uint seeed1 = SeedRandom(seed1);
+	float r1 = 2.0f * PI * RandomFloat(&seeed1);
 
-	vec3 dir = vec3(x, y, sqrt(1 - r0));
+	if (r1 < randomMin)
+		randomMin = r1;
+	if (r1 > randomMax)
+		randomMax = r1;
 
-	//vec3 randomDir = normalize(vec3(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
-	//Note: this direction below isn't random, but I think it should work.
-	vec3 randomDir = abs(normal.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	glm::uint seeed2 = SeedRandom(seed2);
+	float r2 = RandomFloat(&seeed2);
 
-	vec3 t = cross(randomDir, normal);
-	vec3 b = cross(normal, t);
+	if (r2 < randomMin)
+		randomMin = r2;
+	if (r2 > randomMax)
+		randomMax = r2;
+	//printf("random1: %f% ", r1);
+	//printf("random2: %f% ", r2);
+	//float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	//float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-	mat3 tangentSpace = mat3(t, b, normal);
-	//mat3 test = mat3(t.x, b.x, normal.x, t.y, b.y, normal.y, t.z, b.z, normal.z);
+	float r2s = sqrt(r2);
+	vec3 w = normal;
+	vec3 axis = fabs(w.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 u = normalize(cross(axis, w));
+	vec3 v = cross(w, u);
 
-	vec3 manualDirNotNormalized = vec3(dir.x * t.x + dir.x*t.y + dir.x * t.z, dir.y * b.x + dir.y* b.y + dir.y * b.z, dir.z * normal.x + dir.z * normal.y + dir.z * normal.z);
+	vec3 new_dir = normalize(u  * cos(r1) * r2s + v* sin(r1) * r2s + w * sqrt(1.0f - r2));
 
-	//transformedDir is what we used before. Looks almost right, but I'm almost certain it is not.
-	vec3 transformedDir = tangentSpace * dir;
-
-	if (dot(normalize(manualDirNotNormalized), normal) < 0)
+	if (dot(new_dir, normal) < 0)
 		printf("this should never happen but happens. Fuck.");
-	return normalize(manualDirNotNormalized);
+
+	return new_dir;
+
+	//float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1A = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	//float r2s = sqrt(r0);
+	//float r1 = 2 * PI * r1A;
+	//float x = r2s * cos(r1);
+	//float y = r2s * sin(r1);
+
+	//vec3 dir = vec3(x, y, sqrt(1 - r0));
+
+	////vec3 randomDir = normalize(vec3(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
+	////Note: this direction below isn't random, but I think it should work.
+	//vec3 randomDir = abs(normal.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+
+	//vec3 t = cross(randomDir, normal);
+	//vec3 b = cross(normal, t);
+
+	//mat3 tangentSpace = mat3(t, b, normal);
+	////mat3 test = mat3(t.x, b.x, normal.x, t.y, b.y, normal.y, t.z, b.z, normal.z);
+
+	//vec3 manualDirNotNormalized = vec3(dir.x * t.x + dir.x*t.y + dir.x * t.z, dir.y * b.x + dir.y* b.y + dir.y * b.z, dir.z * normal.x + dir.z * normal.y + dir.z * normal.z);
+
+	////transformedDir is what we used before. Looks almost right, but I'm almost certain it is not.
+	//vec3 transformedDir = tangentSpace * dir;
+
+	//if (dot(normalize(manualDirNotNormalized), normal) < 0)
+	//	printf("this should never happen but happens. Fuck.");
+	//return normalize(manualDirNotNormalized);
 }
 
 ////Internet, https://www.shadertoy.com/view/4tl3z4
@@ -376,7 +457,7 @@ vec3 Renderer::Trace(Ray* ray)
 			smallestT = ray->t;
 			ray->hit = this->scene->entities[x];
 		}
-		}
+	}
 
 	smallestT = ray->t;
 #endif
@@ -396,4 +477,4 @@ vec3 Renderer::Trace(Ray* ray)
 
 		return intersectionPoint;
 	}
-	}
+}
