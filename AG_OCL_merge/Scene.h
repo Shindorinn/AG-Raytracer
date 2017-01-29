@@ -34,4 +34,7 @@ public:
 	Scene();
 
 	Tmpl8::AABB* CalculateSceneBounds();
+
+	int triangleCount;
+	int lightCount;
 };

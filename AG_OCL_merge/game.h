@@ -23,7 +23,7 @@ private:
 #if OCL_GAME_TMPL == 1
 	Tmpl8::Texture* clOutput = 0;
 	Tmpl8::Shader* shader = 0;
-	Tmpl8::Kernel* testFunction;
+	Tmpl8::Kernel* GPURenderFunction;
 	Tmpl8::Buffer* outputBuffer;
 #endif
 

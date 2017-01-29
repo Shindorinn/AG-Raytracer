@@ -9,6 +9,9 @@ Tmpl8::Scene::Scene()
 	//sceneBounds = new AABB(vec3(-100, -100, -100), vec3(100, 100, 100));
 
 #if TRI_SCENE
+	lightCount = 1;
+	triangleCount = 9;
+
 	lights[0] = new Light(vec3(0, 0, 1), vec3(100, 100, 100));
 	//lights[1] = new Light(vec3(-2, 0, 0), vec3(50, 50, 50));
 

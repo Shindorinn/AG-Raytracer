@@ -2,6 +2,16 @@
 
 Tmpl8::Renderer* renderer;
 
+struct RenderData
+{
+	float posx, posy, posz, dummy1;
+	float targetx, targety, targetz, dummy2;
+	float p0x, p0y, p0z, dummy3;
+	float p1x, p1y, p1z, dummy4;
+	float p2x, p2y, p2z, dummy5;
+};
+
+
 // -----------------------------------------------------------
 // Initialize the game
 // -----------------------------------------------------------
@@ -9,16 +19,48 @@ void Tmpl8::Game::Init()
 {
 	Tmpl8::Scene* myScene = new Scene();
 	renderer = new Renderer(myScene, renderSurface);
-
+	Tmpl8::Camera* camera = myScene->camera;
 #if OCL_GAME_TMPL == 1
 	// load shader and texture
 	clOutput = new Tmpl8::Texture(SCRWIDTH, SCRHEIGHT, Tmpl8::Texture::FLOAT);
 	shader = new Tmpl8::Shader("shaders/vignette.vert", "shaders/vignette.frag");
 	// load OpenCL code
-	testFunction = new Tmpl8::Kernel("programs/program.cl", "TestFunction");
+	GPURenderFunction = new Tmpl8::Kernel("programs/program.cl", "WhittedStyleRender");
+	/*
+	unsigned int *out_data,
+	RenderData renderData,
+	const int width,
+	const int height,
+	const int number_of_triangles,
+	const int number_of_lights
+	*/
+	RenderData rd = RenderData();
+	rd.posx = camera->position.x;
+	rd.posy = camera->position.y;
+	rd.posz = camera->position.z;
+	rd.targetx = camera->viewDirection.x;
+	rd.targety = camera->viewDirection.y;
+	rd.targetz = camera->viewDirection.z;
+	rd.p0x = camera->p0.x;
+	rd.p0y = camera->p0.y;
+	rd.p0z = camera->p0.z;
+	rd.p1x = camera->p1.x;
+	rd.p1y = camera->p1.y;
+	rd.p1z = camera->p1.z;
+	rd.p2x = camera->p2.x;
+	rd.p2y = camera->p2.y;
+	rd.p2z = camera->p2.z;
+
+	Buffer* renderDataBuffer = new Buffer(1, 0, &rd);
+
 	// link cl output texture as an OpenCL buffer
 	outputBuffer = new Tmpl8::Buffer(clOutput->GetID(), Tmpl8::Buffer::TARGET);
-	testFunction->SetArgument(0, outputBuffer);
+	GPURenderFunction->SetArgument(0, outputBuffer);
+	GPURenderFunction->SetArgument(1, renderDataBuffer);
+	GPURenderFunction->SetArgument(2, SCRWIDTH);
+	GPURenderFunction->SetArgument(3, SCRHEIGHT);
+	GPURenderFunction->SetArgument(4, myScene->triangleCount);
+	GPURenderFunction->SetArgument(5, myScene->lightCount);
 #endif
 }
 
@@ -133,7 +175,7 @@ void Tmpl8::Game::KeyDown(int a_Key)
 void Tmpl8::Game::Tick(float dt)
 {
 #if OCL_GAME_TMPL == 1
-	testFunction->Run(outputBuffer);
+	GPURenderFunction->Run(outputBuffer);
 	shader->Bind();
 	shader->SetInputTexture(GL_TEXTURE0, "color", clOutput);
 	shader->SetInputMatrix("view", mat4::identity());
