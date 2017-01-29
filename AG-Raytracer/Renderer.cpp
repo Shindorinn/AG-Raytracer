@@ -40,10 +40,10 @@ int Renderer::Render() {
 			//if (x == 632 && y == 422)
 			//	printf("test");
 			vec3 colorResult;
-			//if (x < SCRWIDTH / 2)
-			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			//else
-			//	colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			if (x < SCRWIDTH / 2)
+				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			else
+				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -89,6 +89,7 @@ int Renderer::Render() {
 
 vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 {
+	//TODO: De RR later, en dan een count bijhouden van alle dode rays? Dan  (AmountOfRays - KilledOf) / AmountOfRays gebruiken om levende rays te scalen?
 	/*
 	Over Russian Roulette:
 
@@ -157,13 +158,11 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
-	//TODO: Albedo setting maybe.
 	vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
-
 
 	float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
 	float dotdot = dot(normal, R);
-	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) * 2.0f*PI; // irradiance
+	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) * 2.0f * PI; // irradiance
 	vec3 indirectIllumination = BRDFIndirect * Ei;
 
 #if UseRR
@@ -262,12 +261,24 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 	Ray newRay = Ray(intersect + R * EPSILON, R);
 
-	//float BRDF = primitiveHit->material.albedo / PI;
+
+	////Code for direct Illu only
+	//newRay.hit = nullptr;
+	//vec3 intersect2 = Trace(&newRay);
+	//if (!newRay.hit)
+	//	return vec3(0);
+	//else
+	//	if (!newRay.hit->isLight)
+	//		return vec3(0);
+	//	else
+	//		if (dot(static_cast<Light*>(newRay.hit)->tri->normal, newRay.direction) > 0)
+	//			return vec3(0);
+
 	vec3 BRDF = primitiveHit->material.color * INVPI;
 
 	vec3 Ei = BasicSample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
-	return PI * 2.0f * BRDF * Ei;
+	return PI * 2.0f * BRDF * Ei; //* dot(normal, R) * static_cast<Light*>(newRay.hit)->color;
 }
 
 #pragma region 
@@ -421,7 +432,7 @@ vec3 Renderer::Trace(Ray* ray)
 	if (smallestT == INFINITY)
 	{
 		return vec3(0);
-	}
+}
 	else
 	{
 		//Set t back, this is needed for the pathtracing code which checks if we need to return black (occlusion toward light)
