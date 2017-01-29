@@ -150,18 +150,18 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 		return primitiveHit->material.color * Sample(&r, depth + 1, false);
 	}
 
+	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
+
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
 
-	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
-
 	vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
 
-	float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
-	float dotdot = dot(normal, R);
+	//float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
+
 	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) * 2.0f * PI; // irradiance
 	vec3 indirectIllumination = BRDFIndirect * Ei;
 
@@ -172,6 +172,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 result = indirectIllumination + directIllumination;
 	if (result.x < 0 || result.y < 0 || result.z < 0)
 		printf("smaller 0");
+
 	return indirectIllumination + directIllumination;
 
 #endif
@@ -221,11 +222,12 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	vec3 BRDF = material.color * INVPI;
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
 
-	vec3 result = BRDF * 2.0f * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
+
+	vec3 result = BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
 	if (result.x < 0 || result.y < 0 || result.z < 0)
 		printf("smaller in direct illu 0");
 
-	return BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
+	return result;
 }
 
 //This is the "old", slow, noisy sampling function. But it works, so it's useful for testing.
@@ -241,17 +243,20 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	// terminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return vec3(0, 0, 0);
+		return vec3(0);
 	}
 
 	Entity* hit = ray->hit;
 
 	// terminate if we hit a light source
 	if (hit->isLight)
+	{
+		//printf("%f% \n ", dot(static_cast<Light*>(hit)->tri->normal, ray->direction));
 		if (dot(static_cast<Light*>(hit)->tri->normal, ray->direction) > 0)
 			return vec3(0);
 		else
 			return static_cast<Light*>(hit)->color;
+	}
 
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
@@ -432,7 +437,7 @@ vec3 Renderer::Trace(Ray* ray)
 	if (smallestT == INFINITY)
 	{
 		return vec3(0);
-}
+	}
 	else
 	{
 		//Set t back, this is needed for the pathtracing code which checks if we need to return black (occlusion toward light)
