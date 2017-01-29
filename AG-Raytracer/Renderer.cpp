@@ -153,7 +153,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
 	// continue in random direction
-	vec3 R = DiffuseReflection(normal);
+	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
@@ -263,7 +263,7 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
 	// continue in random direction
-	vec3 R = DiffuseReflection(normal);
+	vec3 R = CosineWeightedDiffuseReflection(normal);
 	Ray newRay = Ray(intersect + R * EPSILON, R);
 
 
@@ -355,71 +355,49 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 	glm::uint  seed1 = ((uint)frameCount + pixelNumber * 6217) * 57089;
 	glm::uint  seed2 = ((uint)frameCount + pixelNumber * 104729) * 19423;
 
-	//float r0 = RandomFloat(&seed1);
-	//float r1A = RandomFloat(&seed2);
-	//	printf("random1: %f% ", randomfloat1);
-		//printf("random2: %f% ", randomfloat2);
-
-	//WHAT OTHER PEOPLE DID (AND WORKS):  http://i.imgur.com/tfpLGce.png
-	//WHAT JACCO DID: http://i.imgur.com/rSLuSxD.png
-
 	//NOTE: THE RANDOM WITH SEEDS YIELDS ENTIRELY DIFFERENT RESULTS. SOMETHING IS WEIRD/BROKEN.
 
 	//float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 	//float r2 = 1;
 	//while (r2 == 1)
 	//	r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	//nu
+
 	glm::uint seeed1 = SeedRandom(seed1);
 	float r1 = 2.0f * PI * RandomFloat(&seeed1);
 
 	glm::uint seeed2 = SeedRandom(seed2);
 	float r2 = RandomFloat(&seeed2);
 
-	//printf("random1: %f% ", r1);
-	//printf("random2: %f% ", r2);
-	//float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
-	//float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
 	float r2s = sqrt(r2);
-	vec3 w = normal;
-	vec3 axis = fabs(w.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
-	vec3 u = normalize(cross(axis, w));
-	vec3 v = cross(w, u);
+	vec3 n = normal;
+	vec3 axis = fabs(n.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 t = normalize(cross(axis, n));
+	vec3 b = cross(n, t);
 
-	vec3 new_dir = normalize(u  * cos(r1) * r2s + v* sin(r1) * r2s + w * sqrt(1.0f - r2));
+	vec3 new_dir = normalize(t  * cos(r1) * r2s + b* sin(r1) * r2s + n * sqrt(1.0f - r2));
 
 	if (dot(new_dir, normal) < 0)
-		printf("this should never happen but happens. Fuck.");
+		printf("this should never happen but happens.");
 
 	return new_dir;
 
-	//float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1A = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	//float r2s = sqrt(r0);
-	//float r1 = 2 * PI * r1A;
+	////float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1A = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	////float r2s = sqrt(r0);
+	////float r1 = 2 * PI * r1A;
+
 	//float x = r2s * cos(r1);
 	//float y = r2s * sin(r1);
 
-	//vec3 dir = vec3(x, y, sqrt(1 - r0));
+	//vec3 dir = vec3(x, y, sqrt(1 - r2));
 
-	////vec3 randomDir = normalize(vec3(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
-	////Note: this direction below isn't random, but I think it should work.
-	//vec3 randomDir = abs(normal.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	//vec3 axisSelf = abs(normal.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
 
-	//vec3 t = cross(randomDir, normal);
-	//vec3 b = cross(normal, t);
+	//vec3 tSelf = cross(axisSelf, normal);
+	//vec3 bSelf = cross(normal, tSelf);
 
-	//mat3 tangentSpace = mat3(t, b, normal);
-	////mat3 test = mat3(t.x, b.x, normal.x, t.y, b.y, normal.y, t.z, b.z, normal.z);
+	//vec3 manual = normalize( dir.x * tSelf + dir.y * bSelf + dir.z * normal);
 
-	//vec3 manualDirNotNormalized = vec3(dir.x * t.x + dir.x*t.y + dir.x * t.z, dir.y * b.x + dir.y* b.y + dir.y * b.z, dir.z * normal.x + dir.z * normal.y + dir.z * normal.z);
-
-	////transformedDir is what we used before. Looks almost right, but I'm almost certain it is not.
-	//vec3 transformedDir = tangentSpace * dir;
-
-	//if (dot(normalize(manualDirNotNormalized), normal) < 0)
-	//	printf("this should never happen but happens. Fuck.");
-	//return normalize(manualDirNotNormalized);
+	//return manual;
 }
 
 vec3 Renderer::Trace(Ray* ray)
