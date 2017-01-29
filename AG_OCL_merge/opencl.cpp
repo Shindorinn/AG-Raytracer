@@ -401,10 +401,11 @@ Tmpl8::Kernel::Kernel(char* file, char* entryPoint)
     error = clBuildProgram( program, 0, NULL, "-cl-fast-relaxed-math -cl-mad-enable -cl-denorms-are-zero -cl-no-signed-zeros -cl-unsafe-math-optimizations -cl-finite-math-only", NULL, NULL );
     if (error != CL_SUCCESS)
     {
-	    if (!log) log = new char[100 * 1024]; // can be quite large
+	    if (!log) log = new char[100 * 1024 * 4]; // can be quite large
 		log[0] = 0;
 		clGetProgramBuildInfo( program, getFirstDevice( context ), CL_PROGRAM_BUILD_LOG, 100 * 1024, log, NULL );
-		log[2048] = 0; // truncate very long logs
+		//log[2048] = 0; // truncate very long logs
+		printf(log);
 		ERRORMESSAGE( log, "Build error" );
     }
     kernel = clCreateKernel( program, entryPoint, &error );

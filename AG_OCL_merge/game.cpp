@@ -93,6 +93,8 @@ void Tmpl8::Game::Init()
 	GPURenderFunction->SetArgument(3, SCRHEIGHT);
 	GPURenderFunction->SetArgument(4, myScene->triangleCount);
 	GPURenderFunction->SetArgument(5, myScene->lightCount);
+	GPURenderFunction->SetArgument(6, triangleDataBuffer);
+	GPURenderFunction->SetArgument(7, lightDataBuffer);
 
 	printf("Game::Init -> Finished construction!");
 #endif
@@ -214,7 +216,7 @@ void Tmpl8::Game::Tick(float dt)
 	shader->SetInputTexture(GL_TEXTURE0, "color", clOutput);
 	shader->SetInputMatrix("view", mat4::identity());
 	DrawQuad();
-	
+	printf("Tick! \n");
 
 #else
 	renderer->Render();
