@@ -60,8 +60,8 @@ int Renderer::Render() {
 			float g = accumulator[y][x].g / static_cast<float>(frameCount);
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
 
-			//	if (r < 0 || g < 0 || b < 0)
-			//		printf("dingen zijn <0");
+			if (r < 0 || g < 0 || b < 0)
+				printf("dingen zijn <0");
 
 			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
@@ -153,7 +153,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
 	// continue in random direction
-	vec3 R = CosineWeightedDiffuseReflection(normal);
+	vec3 R = DiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
@@ -263,7 +263,7 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
 	// continue in random direction
-	vec3 R = CosineWeightedDiffuseReflection(normal);
+	vec3 R = DiffuseReflection(normal);
 	Ray newRay = Ray(intersect + R * EPSILON, R);
 
 
@@ -328,6 +328,27 @@ float Renderer::RandomFloat(glm::uint * seed)
 	return RandomInt(seed) * 2.3283064365387e-10f;
 }
 #pragma endregion RandomStuff
+
+
+vec3 Renderer::DiffuseReflection(vec3 normal)
+{
+	// based on SmallVCM / GIC
+	float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float term1 = 2 * PI * r1;
+	float term2 = 2 * sqrt(r2 * (1 - r2));
+	vec3 R = vec3(cos(term1) * term2, sin(term1) * term2, 1 - 2 * r2);
+	if (R.z < 0) R.z = -R.z;
+
+
+	vec3 w = normal;
+	vec3 axis = fabs(w.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 u = normalize(cross(axis, w));
+	vec3 v = cross(w, u);
+
+
+	vec3 result = normalize(R.x * u + R.y * v + R.z*w);
+	return result;
+}
 
 vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 {
