@@ -8,8 +8,10 @@
 
 #define USEBVH 0
 
-#define MAXRAYDEPTH 5
+#define MAXRAYDEPTH 10
 #define UseRR 0
+
+glm::uint seed1 = 6217 * 57089;
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
@@ -129,6 +131,8 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	if (hit->isLight)
 	{
+		//TODO: dot(..) > < 0 fixen
+
 		//This is to check if the ray is an indirect illumination one.
 		if (secondaryRay)
 			return vec3(0);
@@ -140,7 +144,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
-	//TODO: CHECK this.
+	//TODO: CHECK this. YES
 	normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
 
 #pragma region 
@@ -162,23 +166,23 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 		vec3 newDirection = Refract(outside, ray->direction, normal);
 		Ray r(intersect + newDirection * EPSILON, newDirection);
-		return primitiveHit->material.color * Sample(&r, depth + 1, true);
+		return primitiveHit->material.color * Sample(&r, depth + 1, false);
 	}
 #pragma endregion Reflection/Refraction
 
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
 	// continue in random direction
-	vec3 R = DiffuseReflection(normal);
+	vec3 R = CosineWeightedDiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
 
 	vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
 
-	//float PDF = 1 / (2 * PI); //dot(normal, R) / PI;//
+	float PDF = dot(normal, R) / PI; //1 / (2 * PI); //dot(normal, R) / PI;//
 
-	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) * 2.0f * PI; // irradiance
+	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
 	vec3 indirectIllumination = BRDFIndirect * Ei;
 
 #if UseRR
@@ -198,6 +202,8 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 {
 	int lightIndex = rand() % numberOfLights;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
+
+	//TODO: CHECK UNIFORM RANDOM SAMPLING TRIANGLE.
 
 	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
@@ -297,9 +303,10 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 
 	vec3 BRDF = primitiveHit->material.color * INVPI;
 
+	float PDF = dot(normal, R) / PI;
 	vec3 Ei = BasicSample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
-	return PI * 2.0f * BRDF * Ei; //* dot(normal, R) * static_cast<Light*>(newRay.hit)->color;
+	return BRDF * Ei / PDF; //* dot(normal, R) * static_cast<Light*>(newRay.hit)->color;
 }
 
 #pragma region 
@@ -349,6 +356,8 @@ float Renderer::RandomFloat(glm::uint * seed)
 vec3 Renderer::DiffuseReflection(vec3 normal)
 {
 	// based on SmallVCM / GIC
+
+	//TODO: andere seed dingen
 	float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float term1 = 2 * PI * r1;
 	float term2 = 2 * sqrt(r2 * (1 - r2));
@@ -361,28 +370,23 @@ vec3 Renderer::DiffuseReflection(vec3 normal)
 	vec3 u = normalize(cross(axis, w));
 	vec3 v = cross(w, u);
 
-
 	vec3 result = normalize(R.x * u + R.y * v + R.z*w);
 	return result;
 }
 
 vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 {
-	glm::uint  seed1 = ((uint)frameCount + pixelNumber * 6217) * 57089;
-	glm::uint  seed2 = ((uint)frameCount + pixelNumber * 104729) * 19423;
-
 	//NOTE: THE RANDOM WITH SEEDS YIELDS ENTIRELY DIFFERENT RESULTS. SOMETHING IS WEIRD/BROKEN.
 
-	//float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
-	//float r2 = 1;
-	//while (r2 == 1)
-	//	r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	/*float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+	float r2 = 1;
+	while (r2 == 1)
+		r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);*/
 
-	glm::uint seeed1 = SeedRandom(seed1);
-	float r1 = 2.0f * PI * RandomFloat(&seeed1);
-
-	glm::uint seeed2 = SeedRandom(seed2);
-	float r2 = RandomFloat(&seeed2);
+	float r1 = 2.0f * PI * RandomFloat(&seed1);
+	float r2 = 1;
+	while (r2 == 1)
+		r2 = RandomFloat(&seed1);
 
 	float r2s = sqrt(r2);
 	vec3 n = normal;
