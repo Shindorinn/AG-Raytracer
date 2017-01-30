@@ -4,12 +4,10 @@
 #define EPSILON 0.01f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define Psurvival 0.8f
-
 #define USEBVH 0
 
 #define MAXRAYDEPTH 10
-#define UseRR 0
+#define UseRR 1
 
 glm::uint seed1 = 6217 * 57089;
 
@@ -42,12 +40,12 @@ int Renderer::Render() {
 			//if (x == 632 && y == 422)
 			//	printf("test");
 			vec3 colorResult;
-			if (x < SCRWIDTH / 2)
-				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			else
-				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//if (x < SCRWIDTH / 2)
+			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//	else
+				//	colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
-			// First convert range
+				// First convert range
 			colorResult *= 256.0f;
 
 			//Put our newly calculated values in the accumulator.
@@ -91,27 +89,7 @@ int Renderer::Render() {
 
 vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 {
-	//TODO: De RR later, en dan een count bijhouden van alle dode rays? Dan  (AmountOfRays - KilledOf) / AmountOfRays gebruiken om levende rays te scalen?
-	/*
-	Over Russian Roulette:
-
-	Pak geen vaste waarde voor kans, maar pak (r+g+b)/3, en dit cappen tussen 0 en 1.
-	Verder: je DirectLight moet je altijd doen, 100%, dus die ook ZEKER NIET delen door je kans.
-	Je moet wel de RandomLights delen door die kans, maar dus NIET je totaal.
-	*/
-#if UseRR
-	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	//glm::uint  seed1 = ((uint)frameCount + pixel * 15485867 + depth * 103183) * 57089;
-	//float a = RandomFloat(&seed1);
-
-
-	//Russian Roulette; check if we need to kill a ray.
-	if (a > Psurvival && secondaryRay)
-	{
-		return vec3(0);
-	}
-#else
-
+#if !UseRR
 	if (depth > MAXRAYDEPTH)
 	{
 		return vec3(0);
@@ -141,6 +119,18 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	}
 
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
+
+#if UseRR
+	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+	float pSurvive = clamp(max(max(primitiveHit->material.color.r, primitiveHit->material.color.g), primitiveHit->material.color.b), 0.0f, 1.0f);
+
+	//Russian Roulette; check if we need to kill a ray.
+	if (a > pSurvive && secondaryRay)
+	{
+		return vec3(0);
+	}
+#endif
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
@@ -186,7 +176,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 indirectIllumination = BRDFIndirect * Ei;
 
 #if UseRR
-	return vec3(indirectIllumination.x / Psurvival, indirectIllumination.y / Psurvival, indirectIllumination.z / Psurvival) + directIllumination;
+	return (indirectIllumination / pSurvive) + directIllumination;
 
 #else
 	vec3 result = indirectIllumination + directIllumination;
