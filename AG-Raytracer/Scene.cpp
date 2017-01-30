@@ -110,8 +110,8 @@ Scene::Scene()
 
 #elif OBJ_LOAD
 
-	lights[0] = new Light(vec3(-3, 2, -3), vec3(70, 70, 70));
-	lights[1] = new Light(vec3(3, -3, -5), vec3(70, 70, 70));
+	lights[0] = new Light(vec3(-1.5, -3, -2), vec3(-1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
+	lights[1] = new Light(vec3(-1.5, -3, 0), vec3(1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
 
 #if BUNNY_LOAD
 	string inputfile = "bunny.obj";
@@ -162,18 +162,25 @@ Scene::Scene()
 			Triangle* triangle = new Triangle(vertices[0], vertices[1], vertices[2]);
 			//triangle->normal = vec3(normal.x / 3, normal.y / 3, normal.z / 3);
 			primitives[counter] = triangle;
+			entities[counter] = triangle;
 
 			counter++;
 		}
 	}
 
 	Triangle* tri1 = new Triangle(vec3(8, -8, 8), vec3(-8, -8, 8), vec3(-8, 8, 8));
-	tri1->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-	primitives[counter++] = tri1;
+	tri1->material = Material(vec3(3, 3, 3), Material::MaterialKind::DIFFUSE);
+	primitives[counter] = tri1;
+	entities[counter++] = tri1;
 
 	Triangle* tri2 = new Triangle(vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
-	tri2->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-	primitives[counter++] = tri2;
+	tri2->material = Material(vec3(10, 10, 10), Material::MaterialKind::DIFFUSE);
+	primitives[counter] = tri2;
+	entities[counter++] = tri2;
+
+	entities[counter++] = lights[0];
+	entities[counter++] = lights[1];
+
 
 #endif
 	sceneBounds = this->CalculateSceneBounds();

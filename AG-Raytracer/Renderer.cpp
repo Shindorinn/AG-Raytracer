@@ -4,7 +4,7 @@
 #define EPSILON 0.01f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 0
+#define USEBVH 1
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -447,7 +447,7 @@ vec3 Renderer::Trace(Ray* ray)
 	//Lights are not included in the BVH.
 
 	//TODO: Fix this hardcoding.
-	for (int x = 12; x < 14; x++)
+	for (int x = 4058; x < 4060; x++)
 	{
 		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
 		{
@@ -455,8 +455,6 @@ vec3 Renderer::Trace(Ray* ray)
 			ray->hit = this->scene->entities[x];
 		}
 	}
-
-	smallestT = ray->t;
 #endif
 
 	if (smallestT == INFINITY)
