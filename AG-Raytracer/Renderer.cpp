@@ -143,17 +143,33 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	//TODO: CHECK this.
 	normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
 
+#pragma region 
 	if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
 	{
 		// continue in fixed direction
-		Ray r(intersect, reflect(ray->direction, normal));
+		vec3 newDirection = reflect(ray->direction, normal);
+		Ray r(intersect + newDirection * EPSILON, newDirection);
 		return primitiveHit->material.color * Sample(&r, depth + 1, false);
 	}
+
+	if (primitiveHit->material.materialKind == Material::MaterialKind::GLASS)
+	{
+		bool outside = true;
+		float distPositionOrigin = distance(ray->origin, primitiveHit->position);
+		//Check if we are inside or outside.
+		if (distPositionOrigin < static_cast<Sphere*>(hit)->radius)
+			outside = false;
+
+		vec3 newDirection = Refract(outside, ray->direction, normal);
+		Ray r(intersect + newDirection * EPSILON, newDirection);
+		return primitiveHit->material.color * Sample(&r, depth + 1, true);
+	}
+#pragma endregion Reflection/Refraction
 
 	vec3 directIllumination = DirectSampleLights(intersect, normal, primitiveHit->material);
 
 	// continue in random direction
-	vec3 R = CosineWeightedDiffuseReflection(normal);
+	vec3 R = DiffuseReflection(normal);
 
 	//This random ray is used for the indirect lighting.
 	Ray newRay = Ray(intersect + R * EPSILON, R);
@@ -398,6 +414,22 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 	//vec3 manual = normalize( dir.x * tSelf + dir.y * bSelf + dir.z * normal);
 
 	//return manual;
+}
+
+vec3 Renderer::Refract(bool inside, vec3 D, vec3 N)
+{
+	float n1 = inside ? 1.2f : 1, n2 = inside ? 1 : 1.2f;
+	float eta = n1 / n2, cosi = dot(-D, N);
+	float cost2 = 1.0f - eta * eta * (1 - cosi * cosi);
+	vec3 R = reflect(D, N);
+	if (cost2 > 0)
+	{
+		float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float a = n1 - n2, b = n1 + n2, R0 = (a * a) / (b * b), c = 1 - cosi;
+		float Fr = R0 + (1 - R0) * (c * c * c * c * c);
+		if (r1 > Fr) R = eta * D + ((eta * cosi - sqrt(fabs(cost2))) * N);
+	}
+	return R;
 }
 
 vec3 Renderer::Trace(Ray* ray)

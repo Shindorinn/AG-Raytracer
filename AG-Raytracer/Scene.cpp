@@ -86,7 +86,7 @@ Scene::Scene()
 	primitives[9]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	primitives[10] = new Sphere(vec3(-1, 0, 6), 1.0f);
-	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
+	primitives[10]->material = Material(vec3(1, 1, 1), Material::MaterialKind::GLASS);
 
 	primitives[11] = new Triangle(vec3(-3, -5, -5.1), vec3(-3, 3, -5.1), vec3(3, 3, -5.1));
 	primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
