@@ -1,10 +1,10 @@
 ﻿#include "template.h"
 
 #define DEBUG 1
-#define EPSILON 0.01f
+#define EPSILON 0.0001f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 1
+#define USEBVH 0
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -67,6 +67,11 @@ int Renderer::Render() {
 			int nextR = min((int)r, 255);
 			int nextG = min((int)g, 255);
 			int nextB = min((int)b, 255);
+
+			//Gamma correction.
+			nextR = pow((float)nextR / 255, 1 / 2.2f) * 255;
+			nextG = pow((float)nextG / 255, 1 / 2.2f) * 255;
+			nextB = pow((float)nextB / 255, 1 / 2.2f) * 255;
 
 			pixelCount += (int)r + (int)g + (int)b;//(int)(r + g + b); //NOT nextR + nextG + nextB;
 
@@ -460,7 +465,7 @@ vec3 Renderer::Trace(Ray* ray)
 	if (smallestT == INFINITY)
 	{
 		return vec3(0);
-	}
+}
 	else
 	{
 		//Set t back, this is needed for the pathtracing code which checks if we need to return black (occlusion toward light)
