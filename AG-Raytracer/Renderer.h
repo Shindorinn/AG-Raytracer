@@ -30,10 +30,5 @@ public:
 	vec3 DiffuseReflection(vec3 normal);
 
 	glm::uint RandomInt(glm::uint * seed);
-
 	float RandomFloat(glm::uint * seed);
-
-	glm::uint TauStep(int s1, int s2, int s3, uint M, glm::uint* seed);
-	glm::uint HQIRand(glm::uint* seed);
-	glm::uint SeedRandom(glm::uint s);
 };
