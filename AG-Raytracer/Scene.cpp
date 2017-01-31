@@ -110,8 +110,13 @@ Scene::Scene()
 
 #elif OBJ_LOAD
 
+	/*
 	lights[0] = new Light(vec3(-1.5, -3, -2), vec3(-1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
-	lights[1] = new Light(vec3(-1.5, -3, 0), vec3(1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
+	lights[1] = new Light(vec3(-1.5, -3, 0), vec3(1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));*/
+
+	lights[0] = new Light(vec3(-1.5, -4.9, 5), vec3(-1.5, -4.9, 9.9), vec3(1.5, -4.9, 5), vec3(2));
+	lights[1] = new Light(vec3(-1.5, -4.9, 9.9), vec3(1.5, -4.9, 9.9), vec3(1.5, -4.9, 5), vec3(2));
+
 
 	//#if BUNNY_LOAD
 	//	string inputfile = "bunny.obj";
@@ -169,15 +174,91 @@ Scene::Scene()
 		}
 	}
 
-	Triangle* tri1 = new Triangle(vec3(8, -8, 8), vec3(-8, -8, 8), vec3(-8, 8, 8));
-	tri1->material = Material(vec3(3, 3, 3), Material::MaterialKind::DIFFUSE);
+	//Triangle* tri1 = new Triangle(vec3(8, -8, 8), vec3(-8, -8, 8), vec3(-8, 8, 8));
+	//tri1->material = Material(vec3(3, 3, 3), Material::MaterialKind::DIFFUSE);
+	//primitives[counter] = tri1;
+	//entities[counter++] = tri1;
+
+	//Triangle* tri2 = new Triangle(vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
+	//tri2->material = Material(vec3(10, 10, 10), Material::MaterialKind::DIFFUSE);
+	//primitives[counter] = tri2;
+	//entities[counter++] = tri2;
+
+	//entities[counter++] = lights[0];
+	//entities[counter++] = lights[1];
+
+	Triangle* tri1 = new Triangle(vec3(-3, -5, -5), vec3(-3, -5, 10), vec3(3, -5, -5));
+	tri1->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+	Triangle* tri2 = new Triangle(vec3(3, -5, -5), vec3(-3, -5, 10), vec3(3, -5, 10));
+	tri2->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+
 	primitives[counter] = tri1;
 	entities[counter++] = tri1;
 
-	Triangle* tri2 = new Triangle(vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
-	tri2->material = Material(vec3(10, 10, 10), Material::MaterialKind::DIFFUSE);
 	primitives[counter] = tri2;
 	entities[counter++] = tri2;
+
+
+	Triangle* tri3 = new Triangle(vec3(-3, -5, 10), vec3(-3, -5, -5), vec3(-3, 3, -5));
+	tri3->material = Material(vec3(0.9, 0, 0), Material::MaterialKind::DIFFUSE);
+	Triangle* tri4 = new Triangle(vec3(-3, -5, 10), vec3(-3, 3, -5), vec3(-3, 3, 10));
+	tri4->material = Material(vec3(0.9, 0, 0), Material::MaterialKind::DIFFUSE);
+
+	primitives[counter] = tri3;
+	entities[counter++] = tri3;
+
+	primitives[counter] = tri4;
+	entities[counter++] = tri4;
+
+
+	Triangle* tri5 = new Triangle(vec3(3, -5, -5), vec3(3, -5, 10), vec3(3, 3, -5));
+	tri5->material = Material(vec3(0, 0.9, 0), Material::MaterialKind::DIFFUSE);
+	Triangle* tri6 = new Triangle(vec3(3, 3, -5), vec3(3, -5, 10), vec3(3, 3, 10));
+	tri6->material = Material(vec3(0, 0.9, 0), Material::MaterialKind::DIFFUSE);
+
+	primitives[counter] = tri5;
+	entities[counter++] = tri5;
+
+	primitives[counter] = tri6;
+	entities[counter++] = tri6;
+
+
+	Triangle* tri7 = new Triangle(vec3(-3, 3, 10), vec3(-3, 3, -5), vec3(3, 3, -5));
+	tri7->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+	Triangle* tri8 = new Triangle(vec3(3, 3, 10), vec3(-3, 3, 10), vec3(3, 3, -5));
+	tri8->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+
+	primitives[counter] = tri7;
+	entities[counter++] = tri7;
+
+	primitives[counter] = tri8;
+	entities[counter++] = tri8;
+
+
+	Triangle* tri9 = new Triangle(vec3(-3, -5, 10), vec3(-3, 3, 10), vec3(3, 3, 10));
+	tri9->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+	Triangle* tri10 = new Triangle(vec3(3, -5, 10), vec3(-3, -5, 10), vec3(3, 3, 10));
+	tri10->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+
+	primitives[counter] = tri9;
+	entities[counter++] = tri9;
+
+	primitives[counter] = tri10;
+	entities[counter++] = tri10;
+
+
+	Triangle* tri11 = new Triangle(vec3(SCRWIDTH / 2 - 30, SCRHEIGHT / 2 - 40, 5), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 20, 7), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 60, 3));
+	tri11->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+	Triangle* tri12 = new Triangle(vec3(SCRWIDTH / 2 + 30, SCRHEIGHT / 2 - 60, 3), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 40, 5), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 20, 7));
+	tri12->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+
+	primitives[counter] = tri11;
+	entities[counter++] = tri11;
+
+	primitives[counter] = tri12;
+	entities[counter++] = tri12;
+
+
 
 	entities[counter++] = lights[0];
 	entities[counter++] = lights[1];

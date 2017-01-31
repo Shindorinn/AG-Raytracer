@@ -35,9 +35,9 @@ public:
 //	Entity* entities[15492];
 
 #elif f16_LOAD
-	Primitive* primitives[4058];
+	Primitive* primitives[4058 + 10];
 	Light* lights[2];
-	Entity* entities[4060];
+	Entity* entities[4060 + 10];
 
 #endif
 
