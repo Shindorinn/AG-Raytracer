@@ -86,17 +86,15 @@ void Tmpl8::Shader::Bind()
 // SetInputTexture method
 // Link a texture to the shader.
 // ----------------------------------------------------------------------------
-//void Tmpl8::Shader::SetInputTexture(unsigned int slot, const char* name, SDL_Texture* texture)
-//{
-//	glActiveTexture(slot);
-//	glBindTexture(GL_TEXTURE_2D, texture->id);
-//	glUniform1i(glGetUniformLocation(id, name), slot);
-//}
 void Tmpl8::Shader::SetInputTexture(unsigned int slot, const char* name, Tmpl8::Texture* texture)
 {
 	glActiveTexture( slot );
 	glBindTexture( GL_TEXTURE_2D, texture->GetID() );
-	glUniform1i( glGetUniformLocation( id, name ), slot );
+	int ptr = glGetUniformLocation(id, name);
+	glUniform1i( 
+		ptr, 
+		slot 
+		);
 }
 
 // SetInputMatrix
@@ -105,7 +103,12 @@ void Tmpl8::Shader::SetInputTexture(unsigned int slot, const char* name, Tmpl8::
 void Tmpl8::Shader::SetInputMatrix(const char* name, const mat4& matrix)
 {
 	const GLfloat* data = (const GLfloat*)&matrix;
-	glUniformMatrix4fv( glGetUniformLocation( id, name ), 1, GL_FALSE, data );
+	glUniformMatrix4fv( 
+		glGetUniformLocation( id, name ),
+		1,
+		GL_FALSE,
+		data
+	);
 }
 
 // Unbind method

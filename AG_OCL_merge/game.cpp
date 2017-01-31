@@ -22,7 +22,7 @@ void Tmpl8::Game::Init()
 #if OCL_GAME_TMPL == 1
 	// load shader and texture
 	clOutput = new Tmpl8::Texture(SCRWIDTH, SCRHEIGHT, Tmpl8::Texture::FLOAT);
-	shader = new Tmpl8::Shader("shaders/vignette.vert", "shaders/vignette.frag");
+	shader = new Tmpl8::Shader("shaders/passthrough.vert", "shaders/passthrough.frag");
 	// load OpenCL code
 	GPURenderFunction = new Tmpl8::Kernel("programs/program.cl", "WhittedStyleRender");
 	/*
@@ -58,32 +58,30 @@ void Tmpl8::Game::Init()
 	// Every triangle consist of 5 float4's, 3 vertices, one normal, one color
 	int triangleCount = myScene->triangleCount;
 	int triangleDataSize = (5 * triangleCount);
-	std::vector<vec4> triangleData = std::vector<vec4>();
-	triangleData.reserve(triangleDataSize);
+	vec4* triangleData = new vec4[triangleDataSize];
 	for (uint i = 0; i < triangleCount; i++) {
 		Triangle* t = myScene->primitives[i];
-		triangleData.push_back(vec4(t->v0, 0));				// 1st vertex
-		triangleData.push_back(vec4(t->v1, 0));				// 2nd vertex
-		triangleData.push_back(vec4(t->v2, 0));				// 3rd vertex
-		triangleData.push_back(vec4(t->normal, 0));			// normal
-		triangleData.push_back(vec4(t->material.color, 0));	// color
+		triangleData[i * 5] = vec4(t->v0, 0);				// 1st vertex
+		triangleData[i * 5 + 1] = vec4(t->v1, 0);				// 2nd vertex
+		triangleData[i * 5 + 2] = vec4(t->v2, 0);				// 3rd vertex
+		triangleData[i * 5 + 3] = vec4(t->normal, 0);			// normal
+		triangleData[i * 5 + 4] = vec4(t->material.color, 0);	// color
 	}
 
-	Buffer* triangleDataBuffer = new Buffer(80 * triangleCount, 0, &triangleData);
+	Buffer* triangleDataBuffer = new Buffer(80 * triangleCount, 0, triangleData);
 
 	// Every light is a point light, consists of 2 float 4's, position and color
 	int lightCount = myScene->lightCount;
 	int lightDataSize = (2 * lightCount);
-	std::vector<vec4> lightData = std::vector<vec4>();
-	lightData.reserve(lightDataSize);
+	vec4* lightData = new vec4[lightDataSize];
 	
 	for (uint i = 0; i < lightCount; i++) {
 		Light* l = myScene->lights[i];
-		lightData.push_back(vec4(l->position, 0));		// 1st position
-		lightData.push_back(vec4(l->position, 0));	// 2nd color		
+		lightData[i*2] = vec4(l->position, 0);	// 1st position
+		lightData[i*2 + 1] = vec4(l->position, 0);	// 2nd color		
 	}
 
-	Buffer* lightDataBuffer = new Buffer(32 * lightCount, 0, &lightData);
+	Buffer* lightDataBuffer = new Buffer(32 * lightCount, 0, lightData);
 
 	// link cl output texture as an OpenCL buffer
 	outputBuffer = new Tmpl8::Buffer(clOutput->GetID(), Tmpl8::Buffer::TARGET);

@@ -172,5 +172,11 @@
     <None Include="__backup__program.cl">
       <Filter>programs</Filter>
     </None>
+    <None Include="shaders\passthrough.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\passthrough.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
