@@ -17,11 +17,14 @@ public:
 	int Render();
 
 	vec3 Trace(Ray* ray, bool isShadowRay = false);
+
 	vec3 Sample(Ray* ray, int depth, bool secondaryRay = false);
 	vec3 BasicSample(Ray* ray, int depth);
+	vec3 SampleMIS(Ray* ray);
+
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 
-	vec3 DirectSampleLights(vec3 intersect, vec3 normal, Material material);
+	vec3 DirectSampleLights(vec3 intersect, vec3 normal, Material material, bool isMis = false);
 
 	vec3 Reflect(vec3 direction, vec3 normal);
 	vec3 Renderer::Refract(bool inside, vec3 D, vec3 N);

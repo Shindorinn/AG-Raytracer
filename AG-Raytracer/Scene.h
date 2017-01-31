@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #define TRI_SCENE 0
-#define OBJ_LOAD 1
-#define TUNNEL_SCENE 0
+#define OBJ_LOAD 0
+#define TUNNEL_SCENE 1
 #define BUNNY_LOAD 0
 #define SUZANNE_LOAD 0
-#define f16_LOAD 1
+#define f16_LOAD 0
 
 class Scene
 {

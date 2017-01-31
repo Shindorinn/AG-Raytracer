@@ -4,7 +4,7 @@
 #define EPSILON 0.005f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 1
+#define USEBVH 0
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -40,12 +40,12 @@ int Renderer::Render() {
 			//if (x == 632 && y == 422)
 			//	printf("test");
 			vec3 colorResult;
-			//if (x < SCRWIDTH / 2)
-			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			//	else
-				//	colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			if (x < SCRWIDTH / 2)
+				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			else
+				colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
 
-				// First convert range
+			// First convert range
 			colorResult *= 256.0f;
 
 			//Put our newly calculated values in the accumulator.
@@ -90,6 +90,155 @@ int Renderer::Render() {
 	this->pixelNumber = 1;
 
 	return pixelCount;
+}
+
+
+vec3 Renderer::SampleMIS(Ray* ray)
+{
+#if !UseRR
+	if (depth > MAXRAYDEPTH)
+	{
+		return vec3(0);
+	}
+#endif
+
+	int depth = 0;
+
+	bool secondary = false;
+	vec3 T = vec3(1); vec3 E = vec3(0);
+	while (true)
+	{
+		// trace ray
+		vec3 intersect = Trace(ray);
+
+		// terminate if ray left the scene
+		if (ray->t == INFINITY)
+		{
+			break;
+		}
+
+		Entity* hit = ray->hit;
+
+		if (hit->isLight)
+		{
+			//TODO: dot(..) > < 0 fixen
+
+			//This is to check if the ray is an indirect illumination one.
+			if (secondary)
+				break;
+			else
+			{
+				E += static_cast<Light*>(hit)->color;
+				break;
+			}
+
+			/*{
+				Light* light = static_cast<Light*>(hit);
+				float brdfPDF = dot(light->tri->normal, light->tri->normal) * INVPI;
+
+				vec3 L = intersect - ray->origin;
+				float dist = length(L);
+				L /= dist;
+
+				float cos_o = dot(-L, light->tri->normal);
+				float solidAngle = (cos_o * light->area) / (dist*dist);
+				float lightPDF = 1 / solidAngle;
+
+
+				float misPDF = lightPDF + brdfPDF;
+
+				E += (light->color / misPDF);
+				break;
+			}*/
+
+		}
+
+		Primitive* primitiveHit = static_cast<Primitive*>(hit);
+
+#if UseRR
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+		float pSurvive = clamp(max(max(primitiveHit->material.color.r, primitiveHit->material.color.g), primitiveHit->material.color.b), 0.0f, 1.0f);
+
+		//Russian Roulette; check if we need to kill a ray.
+		if (a > pSurvive && secondary)
+		{
+			break;
+		}
+#endif
+
+		vec3 normal = primitiveHit->GetNormal(intersect);
+
+		normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
+
+#pragma region 
+		if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
+		{
+			secondary = false;
+
+			// continue in fixed direction
+			vec3 newDirection = reflect(ray->direction, normal);
+			Ray r(intersect + newDirection * EPSILON, newDirection);
+
+			ray = &r;
+			E += T* primitiveHit->material.color;
+
+			//return primitiveHit->material.color * Sample(&r, depth + 1, false);
+		}
+
+		if (primitiveHit->material.materialKind == Material::MaterialKind::GLASS)
+		{
+			secondary = false;
+
+			bool outside = true;
+			float distPositionOrigin = distance(ray->origin, primitiveHit->position);
+			//Check if we are inside or outside.
+			if (distPositionOrigin < static_cast<Sphere*>(hit)->radius)
+				outside = false;
+
+			vec3 newDirection = Refract(outside, ray->direction, normal);
+			Ray r(intersect + newDirection * EPSILON, newDirection);
+
+			ray = &r;
+			E += T* primitiveHit->material.color;
+			//return primitiveHit->material.color * Sample(&r, depth + 1, false);
+		}
+#pragma endregion Reflection/Refraction
+
+		E += T * DirectSampleLights(intersect, normal, primitiveHit->material, true);
+
+		// continue in random direction
+		vec3 R = CosineWeightedDiffuseReflection(normal);
+
+		//This random ray is used for the indirect lighting.
+		Ray newRay = Ray(intersect + R * EPSILON, R);
+
+		ray = &newRay;
+
+		vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
+
+		float PDF = dot(normal, R) / PI;
+
+		//vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
+		vec3 indirectIllumination = BRDFIndirect * (dot(normal, R) / PDF);
+
+		depth++;
+		secondary = true;
+
+#if UseRR
+		indirectIllumination /= pSurvive;
+
+#else
+		//vec3 result = indirectIllumination + directIllumination;
+		//if (result.x < 0 || result.y < 0 || result.z < 0)
+		//	printf("smaller 0");
+
+		//return indirectIllumination + directIllumination;
+
+#endif
+		T *= indirectIllumination;
+	}
+	return E;
 }
 
 vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
@@ -192,7 +341,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 #endif
 }
 
-vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material)
+vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material, bool isMIS)
 {
 	int lightIndex = rand() % numberOfLights;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
@@ -243,9 +392,19 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 
 	vec3 BRDF = material.color * INVPI;
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
+	float lightPDF = 1 / solidAngle;
 
-
-	vec3 result = BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * solidAngle * cos_i;
+	vec3 result;
+	if (isMIS)
+	{
+		float brdfPDF = dot(normal, L) * INVPI;
+		float misPDF = lightPDF + brdfPDF;
+		result = BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * (cos_i / misPDF);
+	}
+	else
+	{
+		result = BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * (cos_i / lightPDF);
+	}
 	if (result.x < 0 || result.y < 0 || result.z < 0)
 		printf("smaller in direct illu 0");
 
@@ -522,7 +681,7 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 		if (ray->t < tToLight)
 			return vec3(0);
 		return vec3(1);
-	}
+}
 #endif
 
 	if (smallestT == INFINITY)
