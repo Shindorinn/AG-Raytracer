@@ -90,11 +90,15 @@ void Tmpl8::Shader::SetInputTexture(unsigned int slot, const char* name, Tmpl8::
 {
 	glActiveTexture( slot );
 	glBindTexture( GL_TEXTURE_2D, texture->GetID() );
-	int ptr = glGetUniformLocation(id, name);
+	int ptr = glGetUniformLocation(id, name); // This was added to allow for a breakpoint and to distinguish which call was blocking
 	glUniform1i( 
 		ptr, 
 		slot 
 		);
+	/*glUniform1i(
+	glGetUniformLocation(id, name),
+		slot
+		);*/
 }
 
 // SetInputMatrix
