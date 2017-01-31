@@ -42,7 +42,7 @@ int Renderer::Render() {
 		//	if (x < SCRWIDTH / 2)
 				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 			//else
-		//		colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//	colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -68,9 +68,10 @@ int Renderer::Render() {
 			int nextB = min((int)b, 255);
 
 			//Gamma correction.
-			nextR = pow((float)nextR / 255, 1 / 2.2f) * 255;
-			nextG = pow((float)nextG / 255, 1 / 2.2f) * 255;
-			nextB = pow((float)nextB / 255, 1 / 2.2f) * 255;
+			float gamma = 2.2f;
+			nextR = pow((float)nextR / 255, 1 / gamma) * 255;
+			nextG = pow((float)nextG / 255, 1 / gamma) * 255;
+			nextB = pow((float)nextB / 255, 1 / gamma) * 255;
 
 			pixelCount += (int)r + (int)g + (int)b;
 
@@ -120,15 +121,14 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 		if (hit->isLight)
 		{
-			////This is to check if the ray is an indirect illumination one.
-			//if (secondary)
-			//	break;
-			//else
-			//{
-			//	E += static_cast<Light*>(hit)->color;
-			//	break;
-			//}
+			//This is to check if the ray is an indirect illumination one.
+			if (!secondary)
+			{
+				E += static_cast<Light*>(hit)->color;
+				break;
+			}
 
+			else
 			{
 				Light* light = static_cast<Light*>(hit);
 
@@ -607,7 +607,7 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 
 		//TODO: go through lights as well.
 		return vec3(1);
-	}
+}
 #endif
 
 	if (smallestT == INFINITY)

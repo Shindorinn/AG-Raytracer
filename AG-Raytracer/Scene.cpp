@@ -86,38 +86,38 @@ Scene::Scene()
 	primitives[9]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
 
 	primitives[10] = new Sphere(vec3(-1, 0, 6), 1.0f);
-	primitives[10]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
+	primitives[10]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::GLASS);
 
 	primitives[11] = new Triangle(vec3(-3, -5, -5.1), vec3(-3, 3, -5.1), vec3(3, 3, -5.1));
 	primitives[11]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
 	primitives[12] = new Triangle(vec3(3, -5, -5.1), vec3(-3, -5, -5.1), vec3(3, 3, -5.1));
 	primitives[12]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
 
+	primitives[13] = new Sphere(vec3(1.5, -1, 6), 1.0f);
+	primitives[13]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::MIRROR);
 	//primitives[11] = new Sphere(vec3(1.5, 0, 5), 0.7f);
 	//primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
 
 	//primitives[12] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
 	//primitives[12]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
 
-	for (int i = 0; i < 13; i++)
+	for (int i = 0; i < 14; i++)
 	{
 		entities[i] = primitives[i];
 	}
-	entities[13] = lights[0];
-	entities[14] = lights[1];
-
-
+	entities[14] = lights[0];
+	entities[15] = lights[1];
 
 #elif OBJ_LOAD
 
 	lights[0] = new Light(vec3(-1.5, -3, -2), vec3(-1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
 	lights[1] = new Light(vec3(-1.5, -3, 0), vec3(1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
 
-#if BUNNY_LOAD
-	string inputfile = "bunny.obj";
-#elif SUZANNE_LOAD
-	string inputfile = "suzanne.obj";
-#elif f16_LOAD
+	//#if BUNNY_LOAD
+	//	string inputfile = "bunny.obj";
+	//#elif SUZANNE_LOAD
+	//	string inputfile = "suzanne.obj";
+#if f16_LOAD
 	string inputfile = "f16.obj";
 #endif
 
@@ -160,6 +160,7 @@ Scene::Scene()
 			index_offset += fv;
 
 			Triangle* triangle = new Triangle(vertices[0], vertices[1], vertices[2]);
+			triangle->material = Material(vec3(0.9, 0, 0), Material::MaterialKind::DIFFUSE);
 			//triangle->normal = vec3(normal.x / 3, normal.y / 3, normal.z / 3);
 			primitives[counter] = triangle;
 			entities[counter] = triangle;
