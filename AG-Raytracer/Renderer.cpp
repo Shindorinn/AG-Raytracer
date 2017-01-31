@@ -32,18 +32,17 @@ int Renderer::Render() {
 
 #pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++) {
-		//printf("Current y:%i% \n", y);
 
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			//if (x == 632 && y == 422)
-			//	printf("test");
+			if (x == 680 && y == 139)
+				printf("test");
 			vec3 colorResult;
 			if (x < SCRWIDTH / 2)
 				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 			else
-				colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
+				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -73,7 +72,7 @@ int Renderer::Render() {
 			nextG = pow((float)nextG / 255, 1 / 2.2f) * 255;
 			nextB = pow((float)nextB / 255, 1 / 2.2f) * 255;
 
-			pixelCount += (int)r + (int)g + (int)b;//(int)(r + g + b); //NOT nextR + nextG + nextB;
+			pixelCount += (int)r + (int)g + (int)b;
 
 			// Then merge it to the buffer.
 			buffer[y][x] = (nextR << 16) + (nextG << 8) + (nextB);
@@ -121,8 +120,6 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 		if (hit->isLight)
 		{
-			//TODO: dot(..) > < 0 fixen
-
 			////This is to check if the ray is an indirect illumination one.
 			//if (secondary)
 			//	break;
@@ -135,12 +132,11 @@ vec3 Renderer::SampleMIS(Ray* ray)
 			{
 				Light* light = static_cast<Light*>(hit);
 
-
 				vec3 L = intersect - ray->origin;
 				float dist = length(L);
 				L /= dist;
 
-				float brdfPDF = dot(light->tri->normal, L) * INVPI;
+				float brdfPDF = dot(light->tri->normal, -L) * INVPI;
 				float cos_o = dot(-L, light->tri->normal);
 				float solidAngle = (cos_o * light->area) / (dist*dist);
 				float lightPDF = 1 / solidAngle;
@@ -264,13 +260,16 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	if (hit->isLight)
 	{
-		//TODO: dot(..) > < 0 fixen
 
 		//This is to check if the ray is an indirect illumination one.
 		if (secondaryRay)
 			return vec3(0);
 		else
-			return static_cast<Light*>(hit)->color;
+			//Check if our primary ray hits the light on the top side (light only shines down in our code).
+			if (dot(static_cast<Light*>(hit)->tri->normal, ray->direction) > 0)
+				return vec3(0);
+			else
+				return static_cast<Light*>(hit)->color;
 	}
 
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
@@ -347,8 +346,6 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	int lightIndex = rand() % numberOfLights;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
 
-	//TODO: CHECK UNIFORM RANDOM SAMPLING TRIANGLE.
-
 	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	if (a + b > 1)
@@ -379,16 +376,10 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	//This is a shadow ray, so we can speed up tracing (return if we hit something).
 	vec3 resultOfShadowTrace = Trace(&r, true);
 
+	//The results acts as a bool here. vec3(0) states that the light is occluded.
 	if (resultOfShadowTrace == vec3(0))
 		return vec3(0);
 
-	//if (r.hit)
-	//	//TODO: Check of geraakte primitive de lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
-	//	if (!r.hit->isLight)
-	//		//Als we licht geraakt hebben niks ertussen, dus prima.
-	//		return vec3(0);
-
-	//Entity* hit = r.hit;
 	Light* lightHit = this->scene->lights[lightIndex];
 
 	vec3 BRDF = material.color * INVPI;
@@ -402,12 +393,11 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 		float misPDF = lightPDF + brdfPDF;
 		result = BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * (cos_i / misPDF);
 	}
+
 	else
 	{
 		result = BRDF * (float)numberOfLights * this->scene->lights[lightIndex]->color * (cos_i / lightPDF);
 	}
-	if (result.x < 0 || result.y < 0 || result.z < 0)
-		printf("smaller in direct illu 0");
 
 	return result;
 }
@@ -433,7 +423,6 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	// terminate if we hit a light source
 	if (hit->isLight)
 	{
-		//printf("%f% \n ", dot(static_cast<Light*>(hit)->tri->normal, ray->direction));
 		if (dot(static_cast<Light*>(hit)->tri->normal, ray->direction) > 0)
 			return vec3(0);
 		else
@@ -445,28 +434,15 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
 	// continue in random direction
-	vec3 R = CosineWeightedDiffuseReflection(normal);
+	vec3 R = DiffuseReflection(normal);
 	Ray newRay = Ray(intersect + R * EPSILON, R);
-
-
-	////Code for direct Illu only
-	//newRay.hit = nullptr;
-	//vec3 intersect2 = Trace(&newRay);
-	//if (!newRay.hit)
-	//	return vec3(0);
-	//else
-	//	if (!newRay.hit->isLight)
-	//		return vec3(0);
-	//	else
-	//		if (dot(static_cast<Light*>(newRay.hit)->tri->normal, newRay.direction) > 0)
-	//			return vec3(0);
 
 	vec3 BRDF = primitiveHit->material.color * INVPI;
 
-	float PDF = dot(normal, R) / PI;
+	float PDF = 1 / (2.0*PI);
 	vec3 Ei = BasicSample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
-	return BRDF * Ei / PDF; //* dot(normal, R) * static_cast<Light*>(newRay.hit)->color;
+	return BRDF * Ei / PDF;
 }
 
 #pragma region 
@@ -515,8 +491,6 @@ float Renderer::RandomFloat(glm::uint * seed)
 
 vec3 Renderer::DiffuseReflection(vec3 normal)
 {
-	// based on SmallVCM / GIC
-
 	//TODO: andere seed dingen
 	float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float term1 = 2 * PI * r1;
@@ -524,20 +498,17 @@ vec3 Renderer::DiffuseReflection(vec3 normal)
 	vec3 R = vec3(cos(term1) * term2, sin(term1) * term2, 1 - 2 * r2);
 	if (R.z < 0) R.z = -R.z;
 
+	vec3 n = normal;
+	vec3 axis = fabs(n.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 t = normalize(cross(axis, n));
+	vec3 b = cross(n, t);
 
-	vec3 w = normal;
-	vec3 axis = fabs(w.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
-	vec3 u = normalize(cross(axis, w));
-	vec3 v = cross(w, u);
-
-	vec3 result = normalize(R.x * u + R.y * v + R.z*w);
+	vec3 result = normalize(R.x * t + R.y * b + R.z*n);
 	return result;
 }
 
 vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 {
-	//NOTE: THE RANDOM WITH SEEDS YIELDS ENTIRELY DIFFERENT RESULTS. SOMETHING IS WEIRD/BROKEN.
-
 	/*float r1 = 2.0f * PI * (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
 	float r2 = 1;
 	while (r2 == 1)
@@ -556,28 +527,7 @@ vec3 Renderer::CosineWeightedDiffuseReflection(vec3 normal)
 
 	vec3 new_dir = normalize(t  * cos(r1) * r2s + b* sin(r1) * r2s + n * sqrt(1.0f - r2));
 
-	if (dot(new_dir, normal) < 0)
-		printf("this should never happen but happens.");
-
 	return new_dir;
-
-	////float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1A = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	////float r2s = sqrt(r0);
-	////float r1 = 2 * PI * r1A;
-
-	//float x = r2s * cos(r1);
-	//float y = r2s * sin(r1);
-
-	//vec3 dir = vec3(x, y, sqrt(1 - r2));
-
-	//vec3 axisSelf = abs(normal.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
-
-	//vec3 tSelf = cross(axisSelf, normal);
-	//vec3 bSelf = cross(normal, tSelf);
-
-	//vec3 manual = normalize( dir.x * tSelf + dir.y * bSelf + dir.z * normal);
-
-	//return manual;
 }
 
 vec3 Renderer::Refract(bool inside, vec3 D, vec3 N)
@@ -623,12 +573,6 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 			if (this->scene->entities[x]->CheckIntersection(ray))
 				if (ray->t < tToLight)
 					return vec3(0);
-			/*
-						&& smallestT > ray->t)
-					{
-						smallestT = ray->t;
-						ray->hit = this->scene->entities[x];
-					}*/
 		}
 		return vec3(1);
 	}
@@ -652,26 +596,6 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 			}
 		}
 	}
-	//else
-	//{
-	//	ray->t = INFINITY;
-	//	scene->bvh->Traverse(ray, scene->bvh->rootNode);
-	//	smallestT = ray->t;
-
-	//	if
-
-	//	////Lights are not included in the BVH.
-
-	//	////TODO: Fix this hardcoding.
-	//	//for (int x = 4058; x < 4060; x++)
-	//	//{
-	//	//	if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
-	//	//	{
-	//	//		smallestT = ray->t;
-	//	//		ray->hit = this->scene->entities[x];
-	//	//	}
-	//	//}
-	//}
 
 	else
 	{
@@ -681,8 +605,10 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 
 		if (ray->t < tToLight)
 			return vec3(0);
+
+		//TODO: go through lights as well.
 		return vec3(1);
-}
+	}
 #endif
 
 	if (smallestT == INFINITY)
@@ -695,7 +621,6 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 		ray->t = smallestT;
 
 		vec3 intersectionPoint = ray->origin + smallestT*ray->direction;
-		//vec3 normal = hit->GetNormal(intersectionPoint);
 		vec3 colorResult = vec3(0, 0, 0);
 
 		return intersectionPoint;
