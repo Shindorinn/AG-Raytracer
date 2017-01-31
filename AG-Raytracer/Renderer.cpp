@@ -141,6 +141,8 @@ vec3 Renderer::SampleMIS(Ray* ray)
 				float solidAngle = (cos_o * light->area) / (dist*dist);
 				float lightPDF = 1 / solidAngle;
 
+				if (dot(light->tri->normal, ray->direction) > 0)
+					break;
 
 				float misPDF = lightPDF + brdfPDF;
 
