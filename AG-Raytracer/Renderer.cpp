@@ -35,19 +35,17 @@ int Renderer::Render() {
 #pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			if (x == 680 && y == 139)
-				printf("test");
 			vec3 colorResult;
 			//	if (x < SCRWIDTH / 2)
 			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			//else
 			//	colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
-			
+
 			//OTHER SAMPLING OPTIONS ARE:
 			//colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
 			//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			
+
 			// First convert range
 			colorResult *= 256.0f;
 
@@ -168,40 +166,40 @@ vec3 Renderer::SampleMIS(Ray* ray)
 		vec3 normal = primitiveHit->GetNormal(intersect);
 
 		normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
-
-#pragma region 
-		if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
-		{
-			secondary = false;
-
-			// continue in fixed direction
-			vec3 newDirection = reflect(ray->direction, normal);
-			Ray r(intersect + newDirection * EPSILON, newDirection);
-
-			ray = &r;
-			E += T* primitiveHit->material.color;
-
-			//return primitiveHit->material.color * Sample(&r, depth + 1, false);
-		}
-
-		if (primitiveHit->material.materialKind == Material::MaterialKind::GLASS)
-		{
-			secondary = false;
-
-			bool outside = true;
-			float distPositionOrigin = distance(ray->origin, primitiveHit->position);
-			//Check if we are inside or outside.
-			if (distPositionOrigin < static_cast<Sphere*>(hit)->radius)
-				outside = false;
-
-			vec3 newDirection = Refract(outside, ray->direction, normal);
-			Ray r(intersect + newDirection * EPSILON, newDirection);
-
-			ray = &r;
-			E += T* primitiveHit->material.color;
-			//return primitiveHit->material.color * Sample(&r, depth + 1, false);
-		}
-#pragma endregion Reflection/Refraction
+		//
+		//#pragma region 
+		//		if (primitiveHit->material.materialKind == Material::MaterialKind::MIRROR)
+		//		{
+		//			secondary = false;
+		//
+		//			// continue in fixed direction
+		//			vec3 newDirection = reflect(ray->direction, normal);
+		//			Ray r(intersect + newDirection * EPSILON, newDirection);
+		//
+		//			ray = &r;
+		//			E += T* primitiveHit->material.color;
+		//
+		//			//return primitiveHit->material.color * Sample(&r, depth + 1, false);
+		//		}
+		//
+		//		if (primitiveHit->material.materialKind == Material::MaterialKind::GLASS)
+		//		{
+		//			secondary = false;
+		//
+		//			bool outside = true;
+		//			float distPositionOrigin = distance(ray->origin, primitiveHit->position);
+		//			//Check if we are inside or outside.
+		//			if (distPositionOrigin < static_cast<Sphere*>(hit)->radius)
+		//				outside = false;
+		//
+		//			vec3 newDirection = Refract(outside, ray->direction, normal);
+		//			Ray r(intersect + newDirection * EPSILON, newDirection);
+		//
+		//			ray = &r;
+		//			E += T* primitiveHit->material.color;
+		//			//return primitiveHit->material.color * Sample(&r, depth + 1, false);
+		//		}
+		//#pragma endregion Reflection/Refraction
 
 		E += T * DirectSampleLights(intersect, normal, primitiveHit->material, true);
 
@@ -455,7 +453,7 @@ float Renderer::RandomFloat(glm::uint * seed)
 
 vec3 Renderer::DiffuseReflection(vec3 normal)
 {
-	float r1 = RandomFloat(&seed1) , r2 = RandomFloat(&seed1);
+	float r1 = RandomFloat(&seed1), r2 = RandomFloat(&seed1);
 	float term1 = 2 * PI * r1;
 	float term2 = 2 * sqrt(r2 * (1 - r2));
 	vec3 R = vec3(cos(term1) * term2, sin(term1) * term2, 1 - 2 * r2);
