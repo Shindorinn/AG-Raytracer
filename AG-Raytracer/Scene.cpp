@@ -247,18 +247,17 @@ Scene::Scene()
 	entities[counter++] = tri10;
 
 
-	Triangle* tri11 = new Triangle(vec3(SCRWIDTH / 2 - 30, SCRHEIGHT / 2 - 40, 5), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 20, 7), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 60, 3));
-	tri11->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
-	Triangle* tri12 = new Triangle(vec3(SCRWIDTH / 2 + 30, SCRHEIGHT / 2 - 60, 3), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 40, 5), vec3(SCRWIDTH / 2, SCRHEIGHT / 2 - 20, 7));
-	tri12->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+	//Triangle* tri11 = new Triangle(vec3(0, 0 - 2, 7), vec3(0 - 3, 0 - 4, 5), vec3(0, 0 - 6, 3));
+	//tri11->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
+	//Triangle* tri12 = new Triangle(vec3(0, 0 - 4, 5), vec3(0 + 3, 0 - 6, 3), vec3(0, 0 - 2, 7));
+	//tri12->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
 
-	primitives[counter] = tri11;
-	entities[counter++] = tri11;
+	//primitives[counter] = tri11;
+	//entities[counter++] = tri11;
 
-	primitives[counter] = tri12;
-	entities[counter++] = tri12;
-
-
+	//primitives[counter] = tri12;
+	//entities[counter++] = tri12;
+	
 
 	entities[counter++] = lights[0];
 	entities[counter++] = lights[1];
