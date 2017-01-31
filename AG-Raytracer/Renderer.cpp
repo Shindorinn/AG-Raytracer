@@ -123,23 +123,24 @@ vec3 Renderer::SampleMIS(Ray* ray)
 		{
 			//TODO: dot(..) > < 0 fixen
 
-			//This is to check if the ray is an indirect illumination one.
-			if (secondary)
-				break;
-			else
-			{
-				E += static_cast<Light*>(hit)->color;
-				break;
-			}
+			////This is to check if the ray is an indirect illumination one.
+			//if (secondary)
+			//	break;
+			//else
+			//{
+			//	E += static_cast<Light*>(hit)->color;
+			//	break;
+			//}
 
-			/*{
+			{
 				Light* light = static_cast<Light*>(hit);
-				float brdfPDF = dot(light->tri->normal, light->tri->normal) * INVPI;
+
 
 				vec3 L = intersect - ray->origin;
 				float dist = length(L);
 				L /= dist;
 
+				float brdfPDF = dot(light->tri->normal, L) * INVPI;
 				float cos_o = dot(-L, light->tri->normal);
 				float solidAngle = (cos_o * light->area) / (dist*dist);
 				float lightPDF = 1 / solidAngle;
@@ -147,9 +148,9 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 				float misPDF = lightPDF + brdfPDF;
 
-				E += (light->color / misPDF);
+				E += T* (light->color / misPDF);
 				break;
-			}*/
+			}
 
 		}
 
