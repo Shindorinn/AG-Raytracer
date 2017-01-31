@@ -4,7 +4,7 @@
 #define EPSILON 0.005f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 1
+#define USEBVH 0
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -39,8 +39,8 @@ int Renderer::Render() {
 			if (x == 680 && y == 139)
 				printf("test");
 			vec3 colorResult;
-		//	if (x < SCRWIDTH / 2)
-				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//	if (x < SCRWIDTH / 2)
+			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 			//else
 			//	colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
 
@@ -58,9 +58,6 @@ int Renderer::Render() {
 			float r = accumulator[y][x].r / static_cast<float>(frameCount);
 			float g = accumulator[y][x].g / static_cast<float>(frameCount);
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
-
-			if (r < 0 || g < 0 || b < 0)
-				printf("dingen zijn <0");
 
 			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
@@ -81,9 +78,7 @@ int Renderer::Render() {
 			this->pixelNumber++;
 		}
 	}
-	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
-		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 
@@ -141,6 +136,8 @@ vec3 Renderer::SampleMIS(Ray* ray)
 				float solidAngle = (cos_o * light->area) / (dist*dist);
 				float lightPDF = 1 / solidAngle;
 
+				if (dot(light->tri->normal, ray->direction) > 0)
+					break;
 
 				float misPDF = lightPDF + brdfPDF;
 
@@ -153,7 +150,7 @@ vec3 Renderer::SampleMIS(Ray* ray)
 		Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
 #if UseRR
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float a = RandomFloat(&seed1);
 
 		float pSurvive = clamp(max(max(primitiveHit->material.color.r, primitiveHit->material.color.g), primitiveHit->material.color.b), 0.0f, 1.0f);
 
@@ -216,7 +213,6 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 		float PDF = dot(normal, R) / PI;
 
-		//vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
 		vec3 indirectIllumination = BRDFIndirect * (dot(normal, R) / PDF);
 
 		depth++;
@@ -224,14 +220,6 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 #if UseRR
 		indirectIllumination /= pSurvive;
-
-#else
-		//vec3 result = indirectIllumination + directIllumination;
-		//if (result.x < 0 || result.y < 0 || result.z < 0)
-		//	printf("smaller 0");
-
-		//return indirectIllumination + directIllumination;
-
 #endif
 		T *= indirectIllumination;
 	}
@@ -260,7 +248,6 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	if (hit->isLight)
 	{
-
 		//This is to check if the ray is an indirect illumination one.
 		if (secondaryRay)
 			return vec3(0);
@@ -275,7 +262,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	Primitive* primitiveHit = static_cast<Primitive*>(hit);
 
 #if UseRR
-	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float a = RandomFloat(&seed1);
 
 	float pSurvive = clamp(max(max(primitiveHit->material.color.r, primitiveHit->material.color.g), primitiveHit->material.color.b), 0.0f, 1.0f);
 
@@ -333,8 +320,6 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 #else
 	vec3 result = indirectIllumination + directIllumination;
-	if (result.x < 0 || result.y < 0 || result.z < 0)
-		printf("smaller 0");
 
 	return indirectIllumination + directIllumination;
 
@@ -346,8 +331,8 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 	int lightIndex = rand() % numberOfLights;
 	Triangle* lightTri = this->scene->lights[lightIndex]->tri;
 
-	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float a = RandomFloat(&seed1);
+	float b = RandomFloat(&seed1);
 	if (a + b > 1)
 	{
 		a = 1 - a;
@@ -446,31 +431,6 @@ vec3 Renderer::BasicSample(Ray* ray, int depth)
 }
 
 #pragma region 
-glm::uint Renderer::TauStep(int s1, int s2, int s3, glm::uint M, glm::uint* seed)
-{
-	glm::uint b = (((*seed << s1) ^ *seed) >> s2);
-	*seed = (((*seed & M) << s3) ^ b);
-	return *seed;
-}
-
-
-glm::uint Renderer::HQIRand(glm::uint* seed)
-{
-	uint z1 = TauStep(13, 19, 12, 429496729, seed);
-	uint z2 = TauStep(2, 25, 4, 4294967288, seed);
-	uint z3 = TauStep(3, 11, 17, 429496280, seed);
-	uint z4 = 1664525 * *seed + 1013904223;
-	return z1 ^ z2 ^ z3 ^ z4;
-}
-
-
-glm::uint Renderer::SeedRandom(glm::uint s)
-{
-	uint seed = s * 1099087573;
-	seed = HQIRand(&seed);
-	return seed;
-}
-
 glm::uint Renderer::RandomInt(glm::uint * seed)
 {
 	// Marsaglia Xor32; see http://excamera.com/sphinx/article-xorshift.html
@@ -491,8 +451,7 @@ float Renderer::RandomFloat(glm::uint * seed)
 
 vec3 Renderer::DiffuseReflection(vec3 normal)
 {
-	//TODO: andere seed dingen
-	float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float r1 = RandomFloat(&seed1) , r2 = RandomFloat(&seed1);
 	float term1 = 2 * PI * r1;
 	float term2 = 2 * sqrt(r2 * (1 - r2));
 	vec3 R = vec3(cos(term1) * term2, sin(term1) * term2, 1 - 2 * r2);
@@ -538,7 +497,7 @@ vec3 Renderer::Refract(bool inside, vec3 D, vec3 N)
 	vec3 R = reflect(D, N);
 	if (cost2 > 0)
 	{
-		float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float r1 = RandomFloat(&seed1);
 		float a = n1 - n2, b = n1 + n2, R0 = (a * a) / (b * b), c = 1 - cosi;
 		float Fr = R0 + (1 - R0) * (c * c * c * c * c);
 		if (r1 > Fr) R = eta * D + ((eta * cosi - sqrt(fabs(cost2))) * N);
@@ -605,9 +564,8 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 		if (ray->t < tToLight)
 			return vec3(0);
 
-		//TODO: go through lights as well.
 		return vec3(1);
-}
+	}
 #endif
 
 	if (smallestT == INFINITY)

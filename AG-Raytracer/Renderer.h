@@ -26,15 +26,9 @@ public:
 
 	vec3 DirectSampleLights(vec3 intersect, vec3 normal, Material material, bool isMis = false);
 
-	vec3 Reflect(vec3 direction, vec3 normal);
-	vec3 Renderer::Refract(bool inside, vec3 D, vec3 N);
+	vec3 Refract(bool inside, vec3 D, vec3 N);
 	vec3 DiffuseReflection(vec3 normal);
 
 	glm::uint RandomInt(glm::uint * seed);
-
 	float RandomFloat(glm::uint * seed);
-
-	glm::uint TauStep(int s1, int s2, int s3, uint M, glm::uint* seed);
-	glm::uint HQIRand(glm::uint* seed);
-	glm::uint SeedRandom(glm::uint s);
 };
