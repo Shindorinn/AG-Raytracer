@@ -1,10 +1,10 @@
 ﻿#include "template.h"
 
 #define DEBUG 1
-#define EPSILON 0.0001f
+#define EPSILON 0.005f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 0
+#define USEBVH 1
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -139,7 +139,6 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	vec3 normal = primitiveHit->GetNormal(intersect);
 
-	//TODO: CHECK this. YES
 	normal = dot(normal, ray->direction) <= 0.0f ? normal : normal * (-1.0f);
 
 #pragma region 
@@ -175,7 +174,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	vec3 BRDFIndirect = primitiveHit->material.color * INVPI;
 
-	float PDF = dot(normal, R) / PI; //1 / (2 * PI); //dot(normal, R) / PI;//
+	float PDF = dot(normal, R) / PI;
 
 	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
 	vec3 indirectIllumination = BRDFIndirect * Ei;
@@ -224,17 +223,23 @@ vec3 Renderer::DirectSampleLights(vec3 intersect, vec3 normal, Material material
 
 	r.hit = 0;
 
+	r.t = length(point - (intersect + 2 * EPSILON * L));
+
 	//If our ray to a light hits something on its path towards the light, we can't see light, so we will return black.
-	Trace(&r);
+	//This is a shadow ray, so we can speed up tracing (return if we hit something).
+	vec3 resultOfShadowTrace = Trace(&r, true);
 
-	if (r.hit)
-		//TODO: Check of geraakte primitive de lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
-		if (!r.hit->isLight)
-			//Als we licht geraakt hebben niks ertussen, dus prima.
-			return vec3(0);
+	if (resultOfShadowTrace == vec3(0))
+		return vec3(0);
 
-	Entity* hit = r.hit;
-	Light* lightHit = static_cast<Light*>(hit);
+	//if (r.hit)
+	//	//TODO: Check of geraakte primitive de lightTri is. Dan optimalisatie: Shadowrays, midner werk, sneller
+	//	if (!r.hit->isLight)
+	//		//Als we licht geraakt hebben niks ertussen, dus prima.
+	//		return vec3(0);
+
+	//Entity* hit = r.hit;
+	Light* lightHit = this->scene->lights[lightIndex];
 
 	vec3 BRDF = material.color * INVPI;
 	float solidAngle = (cos_o * this->scene->lights[lightIndex]->area) / (dist*dist);
@@ -431,41 +436,99 @@ vec3 Renderer::Refract(bool inside, vec3 D, vec3 N)
 	return R;
 }
 
-vec3 Renderer::Trace(Ray* ray)
+vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 {
 	float smallestT = INFINITY;
 
 #if !USEBVH
-	for (int x = 0; x < sizeof(this->scene->entities) / sizeof(this->scene->entities[0]); x++)
+	if (!isShadowRay)
 	{
-		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
+		for (int x = 0; x < sizeof(this->scene->entities) / sizeof(this->scene->entities[0]); x++)
 		{
-			smallestT = ray->t;
-			ray->hit = this->scene->entities[x];
+			if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
+			{
+				smallestT = ray->t;
+				ray->hit = this->scene->entities[x];
+			}
 		}
+
+	}
+	else
+	{
+		//The from the point to the light.
+		float tToLight = ray->t;
+
+		for (int x = 0; x < sizeof(this->scene->entities) / sizeof(this->scene->entities[0]); x++)
+		{
+			if (this->scene->entities[x]->CheckIntersection(ray))
+				if (ray->t < tToLight)
+					return vec3(0);
+			/*
+						&& smallestT > ray->t)
+					{
+						smallestT = ray->t;
+						ray->hit = this->scene->entities[x];
+					}*/
+		}
+		return vec3(1);
 	}
 
+
 #else 
-	scene->bvh->Traverse(ray, scene->bvh->rootNode);
-	smallestT = ray->t;
-
-	//Lights are not included in the BVH.
-
-	//TODO: Fix this hardcoding.
-	for (int x = 4058; x < 4060; x++)
+	if (!isShadowRay)
 	{
-		if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
+		scene->bvh->Traverse(ray, scene->bvh->rootNode);
+		smallestT = ray->t;
+
+		//Lights are not included in the BVH.
+
+		//TODO: Fix this hardcoding.
+		for (int x = 4058; x < 4060; x++)
 		{
-			smallestT = ray->t;
-			ray->hit = this->scene->entities[x];
+			if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
+			{
+				smallestT = ray->t;
+				ray->hit = this->scene->entities[x];
+			}
 		}
+	}
+	//else
+	//{
+	//	ray->t = INFINITY;
+	//	scene->bvh->Traverse(ray, scene->bvh->rootNode);
+	//	smallestT = ray->t;
+
+	//	if
+
+	//	////Lights are not included in the BVH.
+
+	//	////TODO: Fix this hardcoding.
+	//	//for (int x = 4058; x < 4060; x++)
+	//	//{
+	//	//	if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
+	//	//	{
+	//	//		smallestT = ray->t;
+	//	//		ray->hit = this->scene->entities[x];
+	//	//	}
+	//	//}
+	//}
+
+	else
+	{
+		float tToLight = ray->t;
+		ray->t = INFINITY;
+		scene->bvh->Traverse(ray, scene->bvh->rootNode, true);
+
+		if (ray->t < tToLight)
+			return vec3(0);
+		return vec3(1);
 	}
 #endif
 
 	if (smallestT == INFINITY)
 	{
 		return vec3(0);
-}
+	}
 	else
 	{
 		//Set t back, this is needed for the pathtracing code which checks if we need to return black (occlusion toward light)
