@@ -8,46 +8,7 @@ Scene::Scene()
 	camera = new Camera();
 	//sceneBounds = new AABB(vec3(-100, -100, -100), vec3(100, 100, 100));
 
-#if TRI_SCENE
-	lights[0] = new Light(vec3(-1.5, -3, 5), vec3(-1.5, -3, 7), vec3(1.5, -3, 5), vec3(2, 2, 2));
-	lights[1] = new Light(vec3(-1.5, -3, 7), vec3(1.5, -3, 7), vec3(1.5, -3, 5), vec3(2, 2, 2));
-
-	primitives[0] = new Triangle(vec3(-3, 0, 8), vec3(-3, 2, 8), vec3(-1, 0, 8));
-	primitives[0]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
-
-	primitives[1] = new Triangle(vec3(0, 0, 8), vec3(0, 2, 8), vec3(2, 0, 8));
-	primitives[1]->material = Material(vec3(0, 1, 0), Material::MaterialKind::DIFFUSE);
-
-	primitives[2] = new Triangle(vec3(3, 0, 8), vec3(3, 2, 8), vec3(5, 0, 8));
-	primitives[2]->material = Material(vec3(0, 1, 1), Material::MaterialKind::DIFFUSE);
-
-	primitives[3] = new Triangle(vec3(-3, 2.5, 8), vec3(-3, 4.5, 8), vec3(-1, 2.5, 8));
-	primitives[3]->material = Material(vec3(1, 0, 0), Material::MaterialKind::DIFFUSE);
-
-	primitives[4] = new Triangle(vec3(0, 2.5, 8), vec3(0, 4.5, 8), vec3(2, 2.5, 8));
-	primitives[4]->material = Material(vec3(1, 0, 1), Material::MaterialKind::DIFFUSE);
-
-	primitives[5] = new Triangle(vec3(3, 2.5, 8), vec3(3, 4.5, 8), vec3(5, 2.5, 8));
-	primitives[5]->material = Material(vec3(1, 1, 0), Material::MaterialKind::DIFFUSE);
-
-	primitives[6] = new Triangle(vec3(-3, -2.5, 8), vec3(-3, -0.5, 8), vec3(-1, -2.5, 8));
-	primitives[6]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-
-	primitives[7] = new Triangle(vec3(0, -2.5, 8), vec3(0, -0.5, 8), vec3(2, -2.5, 8));
-	primitives[7]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-
-	primitives[8] = new Triangle(vec3(3, -2.5, 8), vec3(3, -0.5, 8), vec3(5, -2.5, 8));
-	primitives[8]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-
-	for (int i = 0; i < 9; i++)
-	{
-		entities[i] = primitives[i];
-	}
-	entities[9] = lights[0];
-	entities[10] = lights[1];
-
-
-#elif TUNNEL_SCENE 
+#if TUNNEL_SCENE 
 	lights[0] = new Light(vec3(-1.5, -4.9, 5), vec3(-1.5, -4.9, 9.9), vec3(1.5, -4.9, 5), vec3(2));
 	lights[1] = new Light(vec3(-1.5, -4.9, 9.9), vec3(1.5, -4.9, 9.9), vec3(1.5, -4.9, 5), vec3(2));
 
@@ -95,11 +56,6 @@ Scene::Scene()
 
 	primitives[13] = new Sphere(vec3(1.5, -1, 6), 1.0f);
 	primitives[13]->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::MIRROR);
-	//primitives[11] = new Sphere(vec3(1.5, 0, 5), 0.7f);
-	//primitives[11]->material = Material(vec3(1, 1, 1), Material::MaterialKind::DIFFUSE);
-
-	//primitives[12] = new Triangle(vec3(-1, 0, 8), vec3(-1, 2, 5), vec3(1, 0, 8));
-	//primitives[12]->material = Material(vec3(0, 0, 1), Material::MaterialKind::DIFFUSE);
 
 	for (int i = 0; i < 14; i++)
 	{
@@ -108,23 +64,12 @@ Scene::Scene()
 	entities[14] = lights[0];
 	entities[15] = lights[1];
 
-#elif OBJ_LOAD
-
-	/*
-	lights[0] = new Light(vec3(-1.5, -3, -2), vec3(-1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));
-	lights[1] = new Light(vec3(-1.5, -3, 0), vec3(1.5, -3, 0), vec3(1.5, -3, -2), vec3(5));*/
+#elif f16_LOAD
 
 	lights[0] = new Light(vec3(-1.5, -4.9, 5), vec3(-1.5, -4.9, 9.9), vec3(1.5, -4.9, 5), vec3(2));
 	lights[1] = new Light(vec3(-1.5, -4.9, 9.9), vec3(1.5, -4.9, 9.9), vec3(1.5, -4.9, 5), vec3(2));
 
-
-	//#if BUNNY_LOAD
-	//	string inputfile = "bunny.obj";
-	//#elif SUZANNE_LOAD
-	//	string inputfile = "suzanne.obj";
-#if f16_LOAD
 	string inputfile = "f16.obj";
-#endif
 
 	tinyobj::attrib_t attrib;
 	vector<tinyobj::shape_t> shapes;
@@ -154,7 +99,7 @@ Scene::Scene()
 				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				float vx = attrib.vertices[3 * idx.vertex_index + 0];
 				float vy = -attrib.vertices[3 * idx.vertex_index + 1];
-				float vz = -attrib.vertices[3 * idx.vertex_index + 2];
+				float vz = -(attrib.vertices[3 * idx.vertex_index + 2] -3);
 				float nx = attrib.normals[3 * idx.normal_index + 0];
 				float ny = attrib.normals[3 * idx.normal_index + 1];
 				float nz = attrib.normals[3 * idx.normal_index + 2];
@@ -165,7 +110,7 @@ Scene::Scene()
 			index_offset += fv;
 
 			Triangle* triangle = new Triangle(vertices[0], vertices[1], vertices[2]);
-			triangle->material = Material(vec3(0.9, 0, 0), Material::MaterialKind::DIFFUSE);
+			triangle->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
 			//triangle->normal = vec3(normal.x / 3, normal.y / 3, normal.z / 3);
 			primitives[counter] = triangle;
 			entities[counter] = triangle;
@@ -173,19 +118,6 @@ Scene::Scene()
 			counter++;
 		}
 	}
-
-	//Triangle* tri1 = new Triangle(vec3(8, -8, 8), vec3(-8, -8, 8), vec3(-8, 8, 8));
-	//tri1->material = Material(vec3(3, 3, 3), Material::MaterialKind::DIFFUSE);
-	//primitives[counter] = tri1;
-	//entities[counter++] = tri1;
-
-	//Triangle* tri2 = new Triangle(vec3(8, -8, 8), vec3(-8, 8, 8), vec3(8, 8, 8));
-	//tri2->material = Material(vec3(10, 10, 10), Material::MaterialKind::DIFFUSE);
-	//primitives[counter] = tri2;
-	//entities[counter++] = tri2;
-
-	//entities[counter++] = lights[0];
-	//entities[counter++] = lights[1];
 
 	Triangle* tri1 = new Triangle(vec3(-3, -5, -5), vec3(-3, -5, 10), vec3(3, -5, -5));
 	tri1->material = Material(vec3(0.9, 0.9, 0.9), Material::MaterialKind::DIFFUSE);
@@ -245,19 +177,6 @@ Scene::Scene()
 
 	primitives[counter] = tri10;
 	entities[counter++] = tri10;
-
-
-	//Triangle* tri11 = new Triangle(vec3(0, 0 - 2, 7), vec3(0 - 3, 0 - 4, 5), vec3(0, 0 - 6, 3));
-	//tri11->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
-	//Triangle* tri12 = new Triangle(vec3(0, 0 - 4, 5), vec3(0 + 3, 0 - 6, 3), vec3(0, 0 - 2, 7));
-	//tri12->material = Material(vec3(1, 1, 1), Material::MaterialKind::MIRROR);
-
-	//primitives[counter] = tri11;
-	//entities[counter++] = tri11;
-
-	//primitives[counter] = tri12;
-	//entities[counter++] = tri12;
-	
 
 	entities[counter++] = lights[0];
 	entities[counter++] = lights[1];

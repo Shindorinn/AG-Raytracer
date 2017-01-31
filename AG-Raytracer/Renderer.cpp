@@ -13,7 +13,6 @@ glm::uint seed1 = 6217 * 57089;
 
 Renderer::Renderer(Scene* scene, Surface* renderSurface)
 {
-
 	this->scene = scene;
 	this->renderSurface = renderSurface;
 	this->scene->camera->GenerateRays();
@@ -41,9 +40,14 @@ int Renderer::Render() {
 			vec3 colorResult;
 			//	if (x < SCRWIDTH / 2)
 			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+
 			//else
 			//	colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
-
+			
+			//OTHER SAMPLING OPTIONS ARE:
+			//colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
+			//colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			
 			// First convert range
 			colorResult *= 256.0f;
 
