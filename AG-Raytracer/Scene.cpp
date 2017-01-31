@@ -184,6 +184,10 @@ Scene::Scene()
 
 #endif
 	sceneBounds = this->CalculateSceneBounds();
+
+	lightCount = sizeof(this->lights) / sizeof(this->lights[0]);
+	primCount = sizeof(this->primitives) / sizeof(this->primitives[0]);
+
 	bvh = new BVH(primitives, sizeof(this->primitives) / sizeof(this->primitives[0]));
 }
 

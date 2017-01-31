@@ -4,7 +4,7 @@
 #define EPSILON 0.005f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 0
+#define USEBVH 1
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -39,10 +39,10 @@ int Renderer::Render() {
 			if (x == 680 && y == 139)
 				printf("test");
 			vec3 colorResult;
-			if (x < SCRWIDTH / 2)
+		//	if (x < SCRWIDTH / 2)
 				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
-			else
-				colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//else
+		//		colorResult = BasicSample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 
 			// First convert range
 			colorResult *= 256.0f;
@@ -586,8 +586,7 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 
 		//Lights are not included in the BVH.
 
-		//TODO: Fix this hardcoding.
-		for (int x = 4058; x < 4060; x++)
+		for (int x = this->scene->primCount; x < this->scene->primCount + this->scene->lightCount; x++)
 		{
 			if (this->scene->entities[x]->CheckIntersection(ray) && smallestT > ray->t)
 			{
