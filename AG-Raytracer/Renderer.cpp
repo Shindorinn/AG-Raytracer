@@ -4,7 +4,7 @@
 #define EPSILON 0.005f
 #define INVPI 0.31830988618379067153776752674503f
 
-#define USEBVH 1
+#define USEBVH 0
 
 #define MAXRAYDEPTH 10
 #define UseRR 1
@@ -39,8 +39,8 @@ int Renderer::Render() {
 			if (x == 680 && y == 139)
 				printf("test");
 			vec3 colorResult;
-		//	if (x < SCRWIDTH / 2)
-				colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
+			//	if (x < SCRWIDTH / 2)
+			colorResult = Sample(this->scene->camera->primaryRays[y*SCRWIDTH + x], 0);
 			//else
 			//	colorResult = SampleMIS(this->scene->camera->primaryRays[y*SCRWIDTH + x]);
 
@@ -58,9 +58,6 @@ int Renderer::Render() {
 			float r = accumulator[y][x].r / static_cast<float>(frameCount);
 			float g = accumulator[y][x].g / static_cast<float>(frameCount);
 			float b = accumulator[y][x].b / static_cast<float>(frameCount);
-
-			if (r < 0 || g < 0 || b < 0)
-				printf("dingen zijn <0");
 
 			// Then clamp the newly calculated float values (they may be way above 255, when something is very bright for example).
 			int nextR = min((int)r, 255);
@@ -81,9 +78,7 @@ int Renderer::Render() {
 			this->pixelNumber++;
 		}
 	}
-	//#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
-		//#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 			this->renderSurface->Plot(x, y, this->buffer[y][x]);
 
@@ -218,7 +213,6 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 		float PDF = dot(normal, R) / PI;
 
-		//vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R) / PDF; // irradiance
 		vec3 indirectIllumination = BRDFIndirect * (dot(normal, R) / PDF);
 
 		depth++;
@@ -226,14 +220,6 @@ vec3 Renderer::SampleMIS(Ray* ray)
 
 #if UseRR
 		indirectIllumination /= pSurvive;
-
-#else
-		//vec3 result = indirectIllumination + directIllumination;
-		//if (result.x < 0 || result.y < 0 || result.z < 0)
-		//	printf("smaller 0");
-
-		//return indirectIllumination + directIllumination;
-
 #endif
 		T *= indirectIllumination;
 	}
@@ -246,7 +232,7 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 	if (depth > MAXRAYDEPTH)
 	{
 		return vec3(0);
-	}
+}
 #endif
 
 	// trace ray
@@ -262,7 +248,6 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 	if (hit->isLight)
 	{
-
 		//This is to check if the ray is an indirect illumination one.
 		if (secondaryRay)
 			return vec3(0);
@@ -335,8 +320,6 @@ vec3 Renderer::Sample(Ray* ray, int depth, bool secondaryRay)
 
 #else
 	vec3 result = indirectIllumination + directIllumination;
-	if (result.x < 0 || result.y < 0 || result.z < 0)
-		printf("smaller 0");
 
 	return indirectIllumination + directIllumination;
 
@@ -493,7 +476,6 @@ float Renderer::RandomFloat(glm::uint * seed)
 
 vec3 Renderer::DiffuseReflection(vec3 normal)
 {
-	//TODO: andere seed dingen
 	float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	float term1 = 2 * PI * r1;
 	float term2 = 2 * sqrt(r2 * (1 - r2));
@@ -606,10 +588,9 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 
 		if (ray->t < tToLight)
 			return vec3(0);
-
-		//TODO: go through lights as well.
+		
 		return vec3(1);
-}
+	}
 #endif
 
 	if (smallestT == INFINITY)
@@ -625,5 +606,5 @@ vec3 Renderer::Trace(Ray* ray, bool isShadowRay)
 		vec3 colorResult = vec3(0, 0, 0);
 
 		return intersectionPoint;
+		}
 	}
-}
